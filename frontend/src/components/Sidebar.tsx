@@ -1,7 +1,7 @@
 
 import '../App.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faGear, faCloudArrowUp, faPhotoFilm } from "@fortawesome/free-solid-svg-icons"
+import { faGear, faCloudArrowUp, faPhotoFilm, faFileImport } from "@fortawesome/free-solid-svg-icons"
 
 export const Sidebar = () => {
   return (
@@ -29,8 +29,9 @@ export const Main = () => {
   return (
     <>
       <div className="flex items-center justify-center border-[var(--primary-border)] w-full h-[calc(100vh-93px)] px-40 py-20">
-        <div className="h-full w-full border-4 border-[var(--primary-border)] border-dashed text-center flex items-center justify-center rounded-2xl bg-[var(--secondary-bg)]">
-          Drag your Study Material Here (PDF, PPT, etc.)
+        <div className="h-full w-full border-4 border-[var(--primary-border)] border-dashed text-center flex flex-col gap-3 items-center justify-center rounded-2xl bg-[var(--secondary-bg)]">
+          <FontAwesomeIcon icon={faFileImport} size="xl" style={{color: "#3b94dc",}} />
+          Drag your Study Material Here <br/> (PDF, PPT, etc.)
         </div>
       </div>
     </>
