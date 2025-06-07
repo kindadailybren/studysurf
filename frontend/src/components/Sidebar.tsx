@@ -28,8 +28,8 @@ export const Sidebar = () => {
 export const Main = () => {
   return (
     <>
-      <div className="flex items-center justify-center border-[var(--primary-border)] w-full h-[calc(100vh-93px)] px-40 py-20">
-        <div className="h-full w-full border-4 border-[var(--primary-border)] border-dashed text-center flex flex-col gap-3 items-center justify-center rounded-2xl bg-[var(--secondary-bg)]">
+      <div className="flex items-center justify-center border-[var(--primary-border)] w-full h-[calc(100vh-93px)] px-20 py-20">
+        <div className="h-full w-full border-4 border-[var(--primary-border)] border-dashed text-center flex flex-col gap-3 items-center justify-center rounded-2xl bg-[var(--secondary-bg)] hover:bg-[var(--secondary-bg-hvr)] duration-200">
           <FontAwesomeIcon icon={faFileImport} size="xl" style={{color: "#3b94dc",}} />
           Drag your Study Material Here <br/> (PDF, PPT, etc.)
         </div>
