@@ -9,7 +9,7 @@ function App() {
   return (
     <>
       <Navbar />
-      <div className="flex"> 
+      <div className="flex text-[var(--primary-text)] "> 
         <Sidebar />
         <Main />
       </div>
