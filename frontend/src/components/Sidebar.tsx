@@ -6,10 +6,19 @@ import { faGear, faCloudArrowUp, faPhotoFilm } from "@fortawesome/free-solid-svg
 export const Sidebar = () => {
   return (
     <>
-      <div className="flex flex-col border-r-4 border-[#3A3A3A] w-50 h-[calc(100vh-93px)] pt-[10px]">
-        <div className="flex"><FontAwesomeIcon icon={faCloudArrowUp} size="2xl" style={{color: "#ffffff",}} /><h1 className="text-white text-center">Upload</h1></div>
-        <div className="flex"><FontAwesomeIcon icon={faPhotoFilm} size="2xl" style={{color: "#ffffff",}} /><h1 className="text-white">Gallery</h1></div>
-        <div className="flex"><FontAwesomeIcon icon={faGear} size="2xl" style={{color: "#ffffff",}} /><h1 className="text-white">Settings</h1></div>
+      <div className="flex flex-col gap-y-2 border-r-1 border-[var(--primary-border)] w-60 h-auto pt-5 px-3">
+        <div className="flex items-center gap-x-5 px-4 py-3 bg-[var(--highlight-bg)] rounded-xl text-[var(--highlight-text)]">
+          <FontAwesomeIcon icon={faCloudArrowUp} size="2xl"/>
+          <h1 className="text-center">Upload</h1>
+        </div>
+        <div className="flex items-center gap-x-5 px-4 py-3 transition duration-200 ease-in-out hover:bg-[var(--highlight-bg)] rounded-xl hover:text-[var(--highlight-text)] cursor-pointer">
+          <FontAwesomeIcon icon={faPhotoFilm} size="2xl"/>
+          <h1 className="">Gallery</h1>
+        </div>
+        <div className="flex items-center gap-x-5 px-4 py-3 transition duration-200 ease-in-out hover:bg-[var(--highlight-bg)] rounded-xl hover:text-[var(--highlight-text)] cursor-pointer">
+          <FontAwesomeIcon icon={faGear} size="2xl"/>
+          <h1 className="">Settings</h1>
+        </div>
       </div>
     </>
   )
@@ -19,8 +28,8 @@ export const Sidebar = () => {
 export const Main = () => {
   return (
     <>
-      <div className="flex items-center justify-center border-r-4 border-[#3A3A3A] w-full h-[calc(100vh-93px)]">
-        <div className="h-8/9 w-full m-14 border border-dashed text-center text-white flex items-center justify-center">
+      <div className="flex items-center justify-center border-[var(--primary-border)] w-full h-[calc(100vh-93px)] px-40 py-20">
+        <div className="h-full w-full border-4 border-[var(--primary-border)] border-dashed text-center flex items-center justify-center rounded-2xl bg-[var(--secondary-bg)]">
           Drag your Study Material Here (PDF, PPT, etc.)
         </div>
       </div>
