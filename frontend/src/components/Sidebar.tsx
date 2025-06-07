@@ -20,7 +20,7 @@ export const Main = () => {
   return (
     <>
       <div className="flex items-center justify-center border-r-4 border-[#3A3A3A] w-full h-[calc(100vh-93px)]">
-        <div className="h-200 w-4/5 border border-dashed text-center text-white flex items-center justify-center">
+        <div className="h-8/9 w-full m-14 border border-dashed text-center text-white flex items-center justify-center">
           Drag your Study Material Here (PDF, PPT, etc.)
         </div>
       </div>
