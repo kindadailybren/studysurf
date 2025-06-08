@@ -16,8 +16,8 @@ export const Sidebar = () => {
   return (
     <div className="flex flex-col gap-y-2 w-60 h-screen pt-5 px-3">
       <div className="flex mb-5">
-        <img src="/studysurf_final.png" className="h-8 pr-2"></img>
-        <h1 className="text-[#82B6E0] text-4xl font-[Kantumruy] ">StudySurf</h1>
+        <img src="/studysurf_final.png" className="h-8 pr-2 pl-2"></img>
+        <h1 className="text-[#82B6E0] text-2xl">StudySurf</h1>
       </div>
       <div
         className={`flex items-center gap-x-5 px-4 py-3 rounded-xl cursor-pointer transition ${isActive("upload")}`}
