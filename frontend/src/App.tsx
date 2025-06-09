@@ -1,6 +1,4 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useState, useRef } from 'react'
 import './App.css'
 import { Navbar } from './components/Navbar.tsx'
 import { Sidebar, Main } from './components/Sidebar.tsx'
@@ -8,8 +6,7 @@ import { Sidebar, Main } from './components/Sidebar.tsx'
 function App() {
   return (
     <>
-      <Navbar />
-      <div className="flex text-[var(--primary-text)] "> 
+      <div className="flex text-[var(--primary-text)] h-screen"> 
         <Sidebar />
         <Main />
       </div>

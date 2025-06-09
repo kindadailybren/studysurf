@@ -2,6 +2,7 @@ import '../App.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faGear, faCloudArrowUp, faPhotoFilm } from "@fortawesome/free-solid-svg-icons"
 import { useState } from "react";
+import { FileUpload, SelectVideo, VideoSettings } from './sub-components/mainSub.tsx'
 
 export const Sidebar = () => {
   const [activeTab, setActiveTab] = useState("upload");
@@ -24,18 +25,45 @@ export const Sidebar = () => {
           <h1 className="text-center opacity-0 group-hover:opacity-100">Settings</h1>
         </div>
       </div>
-    </>
-  )
+      <div
+        className={`flex items-center gap-x-5 px-4 py-3 rounded-xl cursor-pointer transition ${isActive("upload")}`}
+        onClick={() => setSelected("upload")}
+      >
+        <FontAwesomeIcon icon={faCloudArrowUp} size="2xl" />
+        <h1>Upload</h1>
+      </div>
+
+      <div
+        className={`flex items-center gap-x-5 px-4 py-3 rounded-xl cursor-pointer transition ${isActive("gallery")}`}
+        onClick={() => setSelected("gallery")}
+      >
+        <FontAwesomeIcon icon={faPhotoFilm} size="2xl" />
+        <h1>Gallery</h1>
+      </div>
+
+      <div
+        className={`flex items-center gap-x-5 px-4 py-3 rounded-xl cursor-pointer transition ${isActive("settings")}`}
+        onClick={() => setSelected("settings")}
+      >
+        <FontAwesomeIcon icon={faGear} size="2xl" />
+        <h1>Settings</h1>
+      </div>
+
+    </div>
+  );
 }
 
 
 export const Main = () => {
+
   return (
     <>
-      <div className="flex items-center justify-center border-[var(--primary-border)] w-full h-[calc(100vh-93px)] px-40 py-20">
-        <div className="h-full w-full border-4 border-[var(--primary-border)] border-dashed text-center flex items-center justify-center rounded-2xl bg-[var(--secondary-bg)]">
-          Drag your Study Material Here (PDF, PPT, etc.)
-        </div>
+      <div className="flex items-center justify-center border-[var(--primary-border)] w-full h-screen mb-10">
+        <form className="w-[88%] h-[88%] mb-10">
+          <FileUpload/>
+          <SelectVideo/>
+          <VideoSettings/>
+        </form>
       </div>
     </>
   )
