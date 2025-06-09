@@ -25,31 +25,7 @@ export const Sidebar = () => {
           <h1 className="text-center opacity-0 group-hover:opacity-100">Settings</h1>
         </div>
       </div>
-      <div
-        className={`flex items-center gap-x-5 px-4 py-3 rounded-xl cursor-pointer transition ${isActive("upload")}`}
-        onClick={() => setSelected("upload")}
-      >
-        <FontAwesomeIcon icon={faCloudArrowUp} size="2xl" />
-        <h1>Upload</h1>
-      </div>
-
-      <div
-        className={`flex items-center gap-x-5 px-4 py-3 rounded-xl cursor-pointer transition ${isActive("gallery")}`}
-        onClick={() => setSelected("gallery")}
-      >
-        <FontAwesomeIcon icon={faPhotoFilm} size="2xl" />
-        <h1>Gallery</h1>
-      </div>
-
-      <div
-        className={`flex items-center gap-x-5 px-4 py-3 rounded-xl cursor-pointer transition ${isActive("settings")}`}
-        onClick={() => setSelected("settings")}
-      >
-        <FontAwesomeIcon icon={faGear} size="2xl" />
-        <h1>Settings</h1>
-      </div>
-
-    </div>
+    </>
   );
 }
 
