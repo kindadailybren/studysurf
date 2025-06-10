@@ -1,7 +1,6 @@
 import { useState, useCallback } from "react"
 import '../../App.css'
 import { useDropzone } from "react-dropzone"
-import Dropzone from 'react-dropzone'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faGear, faCloudArrowUp, faPhotoFilm, faFileImport } from "@fortawesome/free-solid-svg-icons"
 

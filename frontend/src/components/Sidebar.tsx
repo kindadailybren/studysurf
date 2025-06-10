@@ -2,7 +2,6 @@ import '../App.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faGear, faCloudArrowUp, faPhotoFilm } from "@fortawesome/free-solid-svg-icons"
 import { useState } from "react";
-import { FileUpload, SelectVideo, VideoSettings } from './sub-components/mainSub.tsx'
 
 export const Sidebar = () => {
   const [activeTab, setActiveTab] = useState("upload");
@@ -31,20 +30,4 @@ export const Sidebar = () => {
       </div>
     </>
   );
-}
-
-
-export const Main = () => {
-
-  return (
-    <>
-      <div className="flex-1 items-center justify-center border-[var(--primary-border)] w-full h-screen mb-10 p-10">
-        <form className="h-[88%] mb-10">
-          <FileUpload/>
-          <SelectVideo/>
-          <VideoSettings/>
-        </form>
-      </div>
-    </>
-  )
 }
