@@ -1,64 +1,33 @@
-import { useState } from "react"
 import '../App.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faGear, faCloudArrowUp, faPhotoFilm, faFileImport } from "@fortawesome/free-solid-svg-icons"
-import { FileUpload, SelectVideo, VideoSettings } from './sub-components/mainSub.tsx'
+import { faGear, faCloudArrowUp, faPhotoFilm } from "@fortawesome/free-solid-svg-icons"
+import { useState } from "react";
 
 export const Sidebar = () => {
-  const [selected, setSelected] = useState("upload");
-
-  const isActive = (item: string) => 
-    selected === item
-      ? "bg-[var(--highlight-bg)] text-[var(--highlight-text)]"
-      : "hover:bg-[var(--highlight-bg)] hover:text-[var(--highlight-text)]";
-  
-
-  return (
-    <div className="flex flex-col gap-y-2 w-60 h-screen pt-5 px-3">
-      <div className="flex mb-5">
-        <img src="/studysurf_final.png" className="h-8 pr-2 pl-2"></img>
-        <h1 className="text-[#82B6E0] text-2xl">StudySurf</h1>
-      </div>
-      <div
-        className={`flex items-center gap-x-5 px-4 py-3 rounded-xl cursor-pointer transition ${isActive("upload")}`}
-        onClick={() => setSelected("upload")}
-      >
-        <FontAwesomeIcon icon={faCloudArrowUp} size="2xl" />
-        <h1>Upload</h1>
-      </div>
-
-      <div
-        className={`flex items-center gap-x-5 px-4 py-3 rounded-xl cursor-pointer transition ${isActive("gallery")}`}
-        onClick={() => setSelected("gallery")}
-      >
-        <FontAwesomeIcon icon={faPhotoFilm} size="2xl" />
-        <h1>Gallery</h1>
-      </div>
-
-      <div
-        className={`flex items-center gap-x-5 px-4 py-3 rounded-xl cursor-pointer transition ${isActive("settings")}`}
-        onClick={() => setSelected("settings")}
-      >
-        <FontAwesomeIcon icon={faGear} size="2xl" />
-        <h1>Settings</h1>
-      </div>
-
-    </div>
-  );
-}
-
-
-export const Main = () => {
+  const [activeTab, setActiveTab] = useState("upload");
 
   return (
     <>
-      <div className="flex items-center justify-center border-[var(--primary-border)] w-full h-screen mb-10">
-        <form className="w-[88%] h-[88%] mb-10">
-          <FileUpload/>
-          <SelectVideo/>
-          <VideoSettings/>
-        </form>
+      <div className="group flex flex-col gap-y-2 border-r border-[var(--primary-border)] w-18 h-auto pt-5 px-2 overflow-hidden hover:w-40 transition-all duration-200">
+        <div onClick={() => setActiveTab("upload")} className={`grid grid-cols-[30px_1fr] gap-x-5 px-3 py-3 rounded-xl cursor-pointer transition duration-200 ease-in-out ${activeTab === "upload" ? "bg-[var(--highlight-bg)] text-[var(--highlight-text)]" : "hover:bg-[var(--highlight-bg)] hover:text-[var(--highlight-text)]"}`}>
+          <div className="flex justify-center">
+            <FontAwesomeIcon icon={faCloudArrowUp} size="xl" />
+          </div>
+          <h1 className="opacity-0 group-hover:opacity-100 transition-all duration-200">Upload</h1>
+        </div>
+        <div onClick={() => setActiveTab("gallery")} className={`grid grid-cols-[30px_1fr] gap-x-5 px-3 py-3 rounded-xl cursor-pointer transition duration-200 ease-in-out ${activeTab === "gallery" ? "bg-[var(--highlight-bg)] text-[var(--highlight-text)]" : "hover:bg-[var(--highlight-bg)] hover:text-[var(--highlight-text)]"}`}>
+          <div className="flex justify-center">
+            <FontAwesomeIcon icon={faPhotoFilm} size="xl" />
+          </div>
+          <h1 className="opacity-0 group-hover:opacity-100 transition-all duration-200">Gallery</h1>
+        </div>
+        <div onClick={() => setActiveTab("settings")} className={`grid grid-cols-[30px_1fr] gap-x-5 px-3 py-3 rounded-xl cursor-pointer transition duration-200 ease-in-out ${activeTab === "settings" ? "bg-[var(--highlight-bg)] text-[var(--highlight-text)]" : "hover:bg-[var(--highlight-bg)] hover:text-[var(--highlight-text)]"}`}>
+          <div className="flex justify-center">
+            <FontAwesomeIcon icon={faGear} size="xl" />
+          </div>
+          <h1 className="opacity-0 group-hover:opacity-100 transition-all duration-200">Settings</h1>
+        </div>
       </div>
     </>
-  )
+  );
 }
