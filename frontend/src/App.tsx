@@ -1,6 +1,4 @@
-import { useState, useRef } from 'react'
 import './App.css'
-import { Navbar } from './components/Navbar.tsx'
 import { Sidebar } from './components/Sidebar.tsx'
 import { Main } from './components/Main.tsx'
 
@@ -10,7 +8,7 @@ function App() {
     <>
       <div className="flex text-[var(--primary-text)] h-screen">
         <Sidebar />
-        <Main/>
+        <Main />
       </div>
     </>
   )
