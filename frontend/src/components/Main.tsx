@@ -1,30 +1,19 @@
 import api from "../api/api"
-import { useState, useCallback } from "react"
+import { useState } from "react"
 import '../App.css'
 import { useDropzone } from "react-dropzone"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFileImport } from "@fortawesome/free-solid-svg-icons"
 
 export const Main = () => {
-  const [videoId, setVideoId] = useState<string>("")
   const [files, setFiles] = useState<File[]>([])
   const [data, setData] = useState<{ text: string }>({ text: "No video selected" })
 
-  const videoIdChange = async () => {
-    try {
-      const response = await api.get('/genvid')
-      setVideoId(response.data.id)
-      console.log(response.data.id)
-    } catch (error) {
-      console.error("Error generating video ID:", error)
-    }
-  }
-
-  const onDrop = async (acceptedFiles: File[]) => {
+  const videoUpload = async () => {
     const formData = new FormData()
-    formData.append('file', acceptedFiles[0])
+    formData.append('file', files[0])
 
-    const res = await api.post('/upload', formData, {
+    const res = await api.post('/genvid', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -33,6 +22,9 @@ export const Main = () => {
     const data = await res.data
     setData(data)
     console.log(data)
+  }
+
+  const onDrop = async (acceptedFiles: File[]) => {
     setFiles(acceptedFiles)
   }
 
@@ -113,7 +105,7 @@ export const Main = () => {
               <h1 className="text-xl py-3 px-3">Quality:</h1>
             </div>
           </div>
-          <button onClick={() => videoIdChange()} className="bg-[var(--highlight-text)] duration-300 hover:bg-blue-600 text-white font-bold py-2 px-4 mx-4 text-s rounded-xl w-fit">
+          <button onClick={() => videoUpload()} className="bg-[var(--highlight-text)] duration-300 hover:bg-blue-600 text-white font-bold py-2 px-4 mx-4 text-s rounded-xl w-fit">
             Generate Video
           </button>
         </div>
