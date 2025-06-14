@@ -1,10 +1,13 @@
 import '../App.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faGear, faCloudArrowUp, faPhotoFilm } from "@fortawesome/free-solid-svg-icons"
-import { useState } from "react";
 
-export const Sidebar = () => {
-  const [activeTab, setActiveTab] = useState("upload");
+interface activeTabType {
+  activeTab: string;
+  setActiveTab: (tab: string) => void;
+}
+
+export const Sidebar: React.FC<activeTabType> = ({ activeTab, setActiveTab }) => {
 
   return (
     <>
