@@ -17,10 +17,12 @@
     "@fortawesome/react-fontawesome": "^0.2.2",
     "@tailwindcss/vite": "^4.1.8",
     "autoprefixer": "^10.4.21",
+    "pdfjs-dist": "^5.3.31",
     "postcss": "^8.5.4",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-dropzone": "^14.3.8",
+    "react-router-dom": "^7.6.2",
     "tailwindcss": "^4.1.8"
   },
   "devDependencies": {
