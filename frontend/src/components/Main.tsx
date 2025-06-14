@@ -7,7 +7,7 @@ import { faFileImport } from "@fortawesome/free-solid-svg-icons"
 
 export const Main = () => {
   const [videoId, setVideoId] = useState<string>("")
-  const [files, setFiles] = useState<[]>([])
+  const [files, setFiles] = useState<File[]>([])
 
   const videoIdChange = async () => {
     try {
@@ -19,7 +19,7 @@ export const Main = () => {
     }
   }
 
-  const onDrop = useCallback(acceptedFiles => {
+  const onDrop = useCallback((acceptedFiles: File[]) => {
     setFiles(acceptedFiles)
   }, [])
 
