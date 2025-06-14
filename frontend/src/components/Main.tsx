@@ -8,6 +8,7 @@ import { faFileImport } from "@fortawesome/free-solid-svg-icons"
 export const Main = () => {
   const [videoId, setVideoId] = useState<string>("")
   const [files, setFiles] = useState<File[]>([])
+  const [data, setData] = useState<{ text: string }>({ text: "No video selected" })
 
   const videoIdChange = async () => {
     try {
@@ -19,12 +20,25 @@ export const Main = () => {
     }
   }
 
-  const onDrop = useCallback((acceptedFiles: File[]) => {
+  const onDrop = async (acceptedFiles: File[]) => {
+    const formData = new FormData()
+    formData.append('file', acceptedFiles[0])
+
+    const res = await api.post('/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+
+    const data = await res.data
+    setData(data)
+    console.log(data)
     setFiles(acceptedFiles)
-  }, [])
+  }
 
   const clearFiles = () => {
     setFiles([])
+    setData({ text: "No video selected" })
   }
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
@@ -36,7 +50,7 @@ export const Main = () => {
         {isDragActive ? (
           <div {...getRootProps()} className="w-full h-1/6">
             <input {...getInputProps()} className="hidden" />
-            <div className="flex flex-col justify-center border border-dashed border-2 rounded-xl w-full h-full gap-2 bg-[#252525] duration-300">
+            <div className="flex flex-col justify-center border-dashed border-2 rounded-xl w-full h-full gap-2 bg-[#252525] duration-300">
               <FontAwesomeIcon icon={faFileImport} size="xl" style={{ color: "#3b94dc" }} />
               <p className="text-center">Drop the file here ...</p>
             </div>
@@ -62,7 +76,7 @@ export const Main = () => {
             <>
               <div {...getRootProps()} className="w-full h-1/6">
                 <input {...getInputProps()} className="hidden" />
-                <div className="flex flex-col justify-center border border-dashed border-2 rounded-xl w-full h-full gap-2 bg-[#151515]">
+                <div className="flex flex-col justify-center border-dashed border-2 rounded-xl w-full h-full gap-2 bg-[#151515]">
                   <FontAwesomeIcon icon={faFileImport} size="xl" style={{ color: "#3b94dc" }} />
                   <p className="text-center text-red-500">Only one file allowed</p>
                 </div>
@@ -72,7 +86,7 @@ export const Main = () => {
             <>
               <div {...getRootProps()} className="w-full h-1/6">
                 <input {...getInputProps()} className="hidden" />
-                <div className="flex flex-col justify-center border border-dashed border-2 rounded-xl w-full h-full gap-2 bg-[#151515]">
+                <div className="flex flex-col justify-center border-dashed border-2 rounded-xl w-full h-full gap-2 bg-[#151515]">
                   <FontAwesomeIcon icon={faFileImport} size="xl" style={{ color: "#3b94dc" }} />
                   <p className="text-center">Drag and drop a file here<br />or click to select one</p>
                 </div>
@@ -83,7 +97,7 @@ export const Main = () => {
         {/*Select Video*/}
         <h1 className="text-2xl py-3">Select Video:</h1>
         <div className="flex flex-col justify-center text-center w-full border border-solid h-2/6 rounded-xl">
-          <h1 className="">Video: {videoId}</h1>
+          <h1 className="">Video: {data.text}</h1>
         </div>
         {/*Video Settings*/}
         <h1 className="text-2xl py-3">Video Settings:</h1>
