@@ -5,7 +5,7 @@ import { useDropzone } from "react-dropzone"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFileImport } from "@fortawesome/free-solid-svg-icons"
 
-export const Main = () => {
+export const UploadPage = () => {
   const [files, setFiles] = useState<File[]>([])
   const [data, setData] = useState<{ text: string }>({ text: "No video selected" })
 

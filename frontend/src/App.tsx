@@ -1,24 +1,19 @@
 import './App.css'
-import { useState } from 'react';
-import { Sidebar } from './components/Sidebar.tsx'
-import { Main } from './components/Main.tsx'
-
+import { Route, Routes } from 'react-router-dom';
+import { LandingPage } from './components/LandingPage';
+import { MainPage } from './components/MainPage';
+import { NotFoundPage } from './components/NotFoundPage.tsx';
 
 function App() {
-  const [activeTab, setActiveTab] = useState<string>("upload");
-
-  const handleTabChange = (tab: string) => {
-    setActiveTab(tab)
-  }
-
   return (
     <>
-      <div className="flex text-[var(--primary-text)] h-screen">
-        <Sidebar activeTab={activeTab} setActiveTab={handleTabChange} />
-        <Main />
-      </div>
+      <Routes>
+				<Route path="/" element={<LandingPage/>}/>
+				<Route path="/mp/*" element={<MainPage/>}/>
+				<Route path="*" element={<NotFoundPage/>}/>
+			</Routes>
     </>
-  )
+  );
 }
 
 export default App
