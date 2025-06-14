@@ -1,19 +1,19 @@
 import './App.css'
-import { Routes, Route } from 'react-router-dom';
-import { Upload } from './components/Upload.tsx'
-import { LandingPage } from './components/LandingPage.tsx'
+import { Route, Routes } from 'react-router-dom';
+import { LandingPage } from './components/LandingPage';
+import { MainPage } from './components/MainPage';
 import { NotFoundPage } from './components/NotFoundPage.tsx';
 
 function App() {
   return (
-    <Routes>
-      <Route path="*" element={<NotFoundPage/>}/>
-      <Route path="/" element={<LandingPage/>}/>
-      <Route path="/upload" element={<Upload/>}/>
-      <Route path="/gallery" element={<Upload/>}/>
-      <Route path="/settings" element={<Upload/>}/>
-    </Routes>
-  )
+    <>
+      <Routes>
+				<Route path="/" element={<LandingPage/>}/>
+				<Route path="/mp/*" element={<MainPage/>}/>
+				<Route path="*" element={<NotFoundPage/>}/>
+			</Routes>
+    </>
+  );
 }
 
 export default App
