@@ -105,7 +105,7 @@ export const UploadPage = () => {
               <h1 className="text-xl py-3 px-3">Quality:</h1>
             </div>
           </div>
-          <button onClick={() => videoUpload()} className="bg-[var(--highlight-text)] duration-300 hover:bg-blue-600 text-white font-bold py-2 px-4 mx-4 text-s rounded-xl w-fit">
+          <button onClick={() => videoUpload()} className="cursor-pointer bg-[var(--highlight-text)] duration-300 hover:bg-blue-600 text-white font-bold py-2 px-4 mx-4 text-s rounded-xl w-fit">
             Generate Video
           </button>
         </div>
