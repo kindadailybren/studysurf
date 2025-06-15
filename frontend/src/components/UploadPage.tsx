@@ -7,7 +7,7 @@ import { faFileImport } from "@fortawesome/free-solid-svg-icons"
 
 export const UploadPage = () => {
   const [files, setFiles] = useState<File[]>([])
-  const [data, setData] = useState<{ text: string }>({ text: "No video selected" })
+  const [data, setData] = useState<{ text: string }>({ text: "No Answer" })
 
   const videoUpload = async () => {
     const formData = new FormData()
@@ -89,7 +89,7 @@ export const UploadPage = () => {
         {/*Select Video*/}
         <h1 className="text-2xl py-3">Select Video:</h1>
         <div className="flex flex-col justify-center text-center w-full border border-solid h-2/6 rounded-xl">
-          <h1 className="">Video: {data.text}</h1>
+          <h1 className="">Answer: {data.answer}</h1>
         </div>
         {/*Video Settings*/}
         <h1 className="text-2xl py-3">Video Settings:</h1>
