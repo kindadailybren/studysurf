@@ -1,4 +1,4 @@
-import uvicorn, logging, json, boto3
+import uvicorn, json, boto3
 from botocore.exceptions import ClientError
 from mangum import Mangum
 from fastapi import FastAPI, File, UploadFile
@@ -80,6 +80,7 @@ async def generate_video(file: UploadFile = File(...)):
 
     response = bedrock_runtime.invoke_model(**payload)
     response_body = json.loads(response.get("body").read())
+
     input_tokens = response_body["usage"]["input_tokens"]
     output_tokens = response_body["usage"]["output_tokens"]
 
