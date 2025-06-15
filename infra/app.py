@@ -25,11 +25,11 @@ bedrock_runtime = boto3.client(
 )
 
 
-def print_answer():
-    response = bedrock_runtime.invoke_model(**kwargs)
-    response_body = json.loads(response.get("body").read())
-
-    print(response_body["content"][0]["text"])
+# def print_answer():
+#     response = bedrock_runtime.invoke_model(**kwargs)
+#     response_body = json.loads(response.get("body").read())
+#
+#     print(response_body["content"][0]["text"])
 
 
 # @app.post("/upload")
@@ -71,7 +71,7 @@ async def generate_video(file: UploadFile = File(...)):
                         + "\n Summarize this whole topic in one straight paragraph for a college student trying to understand it.",
                     }
                 ],
-                "max_tokens": 500,
+                "max_tokens": 1000,
                 "temperature": 0.7,
                 "anthropic_version": "bedrock-2023-05-31",
             }
@@ -80,8 +80,14 @@ async def generate_video(file: UploadFile = File(...)):
 
     response = bedrock_runtime.invoke_model(**payload)
     response_body = json.loads(response.get("body").read())
+    input_tokens = response_body["usage"]["input_tokens"]
+    output_tokens = response_body["usage"]["output_tokens"]
 
-    return {"answer": response_body["content"][0]["text"]}
+    return {
+        "answer": response_body["content"][0]["text"],
+        "input_tokens": input_tokens,
+        "output_tokens": output_tokens,
+    }
 
 
 if __name__ == "__main__":
