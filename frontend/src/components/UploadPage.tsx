@@ -7,7 +7,7 @@ import { faFileImport } from "@fortawesome/free-solid-svg-icons"
 
 export const UploadPage = () => {
   const [files, setFiles] = useState<File[]>([])
-  const [data, setData] = useState<{ text: string }>({ text: "No Answer" })
+  const [data, setData] = useState<{ answer: string }>({ answer: "No Answer" })
 
   const videoUpload = async () => {
     const formData = new FormData()
@@ -30,7 +30,7 @@ export const UploadPage = () => {
 
   const clearFiles = () => {
     setFiles([])
-    setData({ text: "No video selected" })
+    setData({ answer: "No video selected" })
   }
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
