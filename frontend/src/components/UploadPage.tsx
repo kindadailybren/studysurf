@@ -4,6 +4,7 @@ import '../App.css'
 import { useDropzone } from "react-dropzone"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFileImport } from "@fortawesome/free-solid-svg-icons"
+import { AuthCognito } from './auth/authCognito'
 
 export const UploadPage = () => {
   const [files, setFiles] = useState<File[]>([])
@@ -38,6 +39,7 @@ export const UploadPage = () => {
   return (
     <>
       <div className="flex-1 items-center justify-center border-[var(--primary-border)] w-full h-screen mb-10 p-10">
+        <AuthCognito />
         <h1 className="text-2xl pb-3">Upload File:</h1>
         {isDragActive ? (
           <div {...getRootProps()} className="w-full h-1/6">
