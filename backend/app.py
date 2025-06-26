@@ -1,14 +1,17 @@
-import uvicorn, json, boto3
-from botocore.exceptions import ClientError
+import uvicorn
+import json
+import boto3
 from mangum import Mangum
 from fastapi import FastAPI, File, UploadFile
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-import pymupdf as fitz
+from pdfminer.high_level import extract_text
+from io import BytesIO
 
 app = FastAPI()
 handler = Mangum(app)
 
-origins = ["http://localhost:5173"]
+origins = ["*"]
 
 app.add_middleware(
     CORSMiddleware,
@@ -25,38 +28,15 @@ bedrock_runtime = boto3.client(
 )
 
 
-# def print_answer():
-#     response = bedrock_runtime.invoke_model(**kwargs)
-#     response_body = json.loads(response.get("body").read())
-#
-#     print(response_body["content"][0]["text"])
-
-
-# @app.post("/upload")
-# async def upload_file(file: UploadFile = File(...)):
-#     content = await file.read()
-#     doc = fitz.open(stream=content, filetype="pdf")
-#
-#     full_text = ""
-#     for page in doc.pages():
-#         full_text += page.get_text() + "\n"  # Optional newline between pages
-#
-#     return {"filename": file.filename, "text": full_text, "page_count": len(doc)}
-
-
-@app.get("/gallery")
-async def root():
-    return {"message": "Welcome to the Gallery API!"}
+@app.get("/hello")
+async def hello():
+    return {"message": "Hello World"}
 
 
 @app.post("/genvid")
 async def generate_video(file: UploadFile = File(...)):
     content = await file.read()
-    doc = fitz.open(stream=content, filetype="pdf")
-
-    full_text = ""
-    for page in doc.pages():
-        full_text += page.get_text() + "\n"  # Optional newline between pages
+    text = extract_text(BytesIO(content))  # Use BytesIO wrapper for in-memory reading
 
     payload = {
         "modelId": "anthropic.claude-3-haiku-20240307-v1:0",
@@ -67,8 +47,8 @@ async def generate_video(file: UploadFile = File(...)):
                 "messages": [
                     {
                         "role": "user",
-                        "content": full_text.strip()
-                        + "\n Summarize this whole topic in one straight paragraph for a college student trying to understand it.",
+                        "content": text.strip()
+                        + "\nSummarize this whole topic in one straight paragraph for a college student trying to understand it.",
                     }
                 ],
                 "max_tokens": 1000,
@@ -84,11 +64,13 @@ async def generate_video(file: UploadFile = File(...)):
     input_tokens = response_body["usage"]["input_tokens"]
     output_tokens = response_body["usage"]["output_tokens"]
 
-    return {
+    body = {
         "answer": response_body["content"][0]["text"],
         "input_tokens": input_tokens,
         "output_tokens": output_tokens,
     }
+
+    return JSONResponse(content=body)
 
 
 if __name__ == "__main__":

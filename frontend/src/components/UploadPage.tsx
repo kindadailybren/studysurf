@@ -21,7 +21,6 @@ export const UploadPage = () => {
 
     const data = await res.data
     setData(data)
-    console.log(data)
   }
 
   const onDrop = async (acceptedFiles: File[]) => {
@@ -88,8 +87,7 @@ export const UploadPage = () => {
         )}
         {/*Select Video*/}
         <h1 className="text-2xl py-3">Select Video:</h1>
-        <div className="flex flex-col justify-center text-center w-full border border-solid h-2/6 rounded-xl">
-          <h1 className="">Answer: {data.answer}</h1>
+        <div className="flex flex-col justify-center text-center w-full border border-solid h-2/6 rounded-xl"> <h1 className="">Answer: {data.text}</h1>
         </div>
         {/*Video Settings*/}
         <h1 className="text-2xl py-3">Video Settings:</h1>
