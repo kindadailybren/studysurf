@@ -1,7 +1,10 @@
+import { AuthCognito } from "./auth/authCognito";
+
 export const SettingsPage = () => {
   return (
     <>
-      <div className="flex flex-1 w-screen h-screen items-center justify-center text-[var(--primary-text)]">
+      <div className="flex-1 items-center justify-center border-[var(--primary-border)] w-full h-screen mb-10 p-10">
+        <AuthCognito />
         <h1 className="text-3xl font-semibold">Settings Page</h1>
       </div>
     </>
