@@ -11,7 +11,7 @@
 
 ---
 
-# 🎬 Study Video Generator
+# 🎬 StudySurf
 
 **Turn your study documents into visually inducing videos.**
 
@@ -49,8 +49,7 @@ This project allows users to convert their study materials (text, notes, or slid
 
 /frontend         → React App  
 /backend          → FastAPI App  
-/aws              → Infrastructure (CDK / Terraform / SAM)  
-/docs             → Markdown or study materials  
+/infra              → Infrastructure (CDK)  
 
 ---
 
