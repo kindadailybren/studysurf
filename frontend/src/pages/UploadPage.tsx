@@ -99,24 +99,6 @@ export const UploadPage = () => {
         <div className="flex flex-col justify-center text-center w-full border border-solid h-2/6 rounded-xl">
           {loading ? <h1 className="">Loading...</h1> : <h1 className="">Answer: {data.answer}</h1>}
         </div>
-        {/*Video Settings*/}
-        <h1 className="text-2xl py-3">Video Settings:</h1>
-        <div className="flex flex-col w-full border border-solid h-1/3 rounded-xl ">
-          <div className="grid grid-cols-3 h-4/5">
-            <div className="border m-3 rounded-xl">
-              <h1 className="text-xl py-3 px-3">Resolution:</h1>
-            </div>
-            <div className="border m-3 rounded-xl">
-              <h1 className="text-xl py-3 px-3">Aspect Ratio:</h1>
-            </div>
-            <div className="border m-3 rounded-xl">
-              <h1 className="text-xl py-3 px-3">Quality:</h1>
-            </div>
-          </div>
-          <button onClick={() => videoUpload()} className="cursor-pointer bg-[var(--highlight-text)] duration-300 hover:bg-blue-600 text-white font-bold py-2 px-4 mx-4 text-s rounded-xl w-fit">
-            Generate Video
-          </button>
-        </div>
       </div>
     </>
   )
