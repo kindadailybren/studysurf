@@ -12,7 +12,7 @@ export const MainPage = () => {
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
-    navigate(`/mp/${tab}`);
+    navigate(`/${tab}`);
   }
 
   return (

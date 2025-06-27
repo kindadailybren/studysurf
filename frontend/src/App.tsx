@@ -9,7 +9,7 @@ function App() {
     <>
       <Routes>
         <Route path="/" element={<LandingPage />} />
-        <Route path="/mp/*" element={<MainPage />} />
+        <Route path="/*" element={<MainPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </>
