@@ -38,7 +38,7 @@ async def hello():
 @app.post("/genvid")
 async def generate_video(request: Request):
     try:
-        # Parse the raw Lambda proxy event
+        # Parse the raw Lambda proxy events
         body = await request.body()
 
         # Extract text from PDF
