@@ -1,0 +1,12 @@
+name: Infrastracture ( AWS )  CI
+
+on:
+  push:
+    branches-ignore: [ main ]
+    paths:
+     - 'infra/**'
+
+jobs:
+  lint-and-build:
+    uses: ./.github/workflows/infra-deploy.yml
+    secrets: inherit
