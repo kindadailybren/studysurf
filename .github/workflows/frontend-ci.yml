@@ -6,6 +6,10 @@ on:
     paths:
      - 'frontend/**'
 
+  pull_request:
+    paths:
+      - 'frontend/**'
+
 jobs:
   lint-and-build:
     uses: ./.github/workflows/frontend-deploy.yml
