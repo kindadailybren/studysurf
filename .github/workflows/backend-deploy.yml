@@ -25,15 +25,11 @@ jobs:
       with:
         python-version: '3.13'
     
-    - name: Install dependencies
-      run: |
-        cd backend
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-    
     - name: Package Lambda function
       run: |
         cd backend
+        pip install --upgrade pip
+        mkdir -p lib
         pip install -t lib -r requirements.txt
         ( cd lib; zip ../aws_lambda.zip -r .)
         zip aws_lambda.zip -u app.py
