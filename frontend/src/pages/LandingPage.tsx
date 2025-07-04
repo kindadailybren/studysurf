@@ -21,15 +21,13 @@ export const LandingPage = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-[3fr_2fr] gap-x-3 px-50 py-20 text-[var(--primary-text)]">
-        <div className="p-10 text-xl">
-          <h1 className="text-3xl font-semibold">What is StudySurf?</h1>
+      <div className="grid grid-cols-[3fr_1fr] gap-x-15 px-70 py-20 text-[var(--primary-text)]">
+        <div className="px-10 py-15 text-2xl">
+          <h1 className="text-4xl font-semibold">What is StudySurf?</h1>
           <p className="mt-6">Turn your study documents into visually inducing videos.</p>
           <p className="mt-3">This project allows users to convert their study materials (text, notes, or slides) into engaging video formats using a seamless  stack of modern web and cloud technologies.</p>
         </div>
-        <div className="p-6">
-          <div className="border border-gray-100 h-full"></div>
-        </div>
+        <div className="border border-gray-100 h-full"></div>
       </div>
 
       <div className="text-center text-2xl font-semibold py-10 text-[var(--primary-text)]">
