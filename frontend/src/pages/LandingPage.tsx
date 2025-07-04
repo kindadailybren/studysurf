@@ -31,7 +31,7 @@ export const LandingPage = () => {
         <div className="flex-5 px-10 py-15 max-w-150 text-2xl">
           <h1 className="text-4xl font-semibold">What is StudySurf?</h1>
           <p className="mt-6">Turn your study documents into visually inducing videos.</p>
-          <p className="mt-3">This project allows users to convert their study materials (text, notes, or slides) into engaging video formats using a seamless  stack of modern web and cloud technologies.</p>
+          <p className="mt-3">This project allows users to convert their study materials (text, notes, or slides) into engaging video formats using a seamless  stack of modern web and cloud technologies. </p>
         </div>
         <div className="rounded-lg overflow-hidden aspect-[9/16]">
           <img src="/sample.png" className="w-full h-full object-cover brightness-20" />
