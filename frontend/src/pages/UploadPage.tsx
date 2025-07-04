@@ -99,6 +99,9 @@ export const UploadPage = () => {
         <div className="flex flex-col justify-center text-center w-full border border-solid h-2/6 rounded-xl">
           {loading ? <h1 className="">Loading...</h1> : <h1 className="">Answer: {data.answer}</h1>}
         </div>
+        <button onClick={videoUpload} className="cursor-pointer bg-[var(--highlight-text)] duration-300 hover:bg-blue-600 text-white font-bold py-2 px-4 mx-4 text-s rounded-xl w-fit">
+          Generate Video
+        </button>
       </div>
     </>
   )
