@@ -1,10 +1,7 @@
 name: Infrastructure Deploy
 
 on:
-  push:
-    branches: [ main ]
-    paths:
-      - 'infra/**'
+  workflow_call:
 
 jobs:
   validate-and-test:
