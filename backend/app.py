@@ -19,6 +19,7 @@ app.add_middleware(
 )
 
 bedrock_runtime = boto3.client("bedrock-runtime", region_name="ap-southeast-1")
+polly = boto3.client("polly", region_name="ap-southeast-1")
 
 
 # Helper function: extract text using fitz (PyMuPDF)
@@ -38,10 +39,8 @@ async def hello():
 @app.post("/genvid")
 async def generate_video(request: Request):
     try:
-        # Parse the raw Lambda proxy events
         body = await request.body()
 
-        # Extract text from PDF
         text = extract_text_pymupdf(body)
 
         if not text.strip():
@@ -69,11 +68,24 @@ async def generate_video(request: Request):
         response = bedrock_runtime.invoke_model(**payload)
         response_body = json.loads(response.get("body").read())
 
+        texttospeech = response_body["content"][0]["text"]
+
+        response = polly.start_speech_synthesis_task(
+            Engine="neural",
+            OutputFormat="mp3",
+            OutputS3BucketName="polly-practice-bren",
+            OutputS3KeyPrefix="voice/",
+            Text=texttospeech,
+            VoiceId="Matthew",
+        )
+
         return JSONResponse(
             content={
-                "answer": response_body["content"][0]["text"],
+                "answer": texttospeech,
                 "input_tokens": response_body["usage"]["input_tokens"],
                 "output_tokens": response_body["usage"]["output_tokens"],
+                "s3_audio_uri": response["SynthesisTask"]["OutputUri"],
+                "task_status": response["SynthesisTask"]["TaskStatus"],
             }
         )
 
