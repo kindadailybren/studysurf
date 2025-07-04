@@ -1,10 +1,7 @@
 name: Infrastructure Deploy
 
 on:
-  push:
-    branches: [ main ]
-    paths:
-      - 'infra/**'
+  workflow_call:
 
 jobs:
   validate-and-test:
@@ -53,6 +50,7 @@ jobs:
       continue-on-error: true
 
   deploy:
+    if: github.ref == 'refs/heads/main'
     needs: validate-and-test
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
