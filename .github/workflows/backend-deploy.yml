@@ -28,7 +28,7 @@ jobs:
           pylint app.py controllers/ usecases/
 
       - name: Launch Uvicorn in background
-        if:always()
+        if: always()
         run: |
           cd backend
           uvicorn app:app --host 127.0.0.1 --port 8000 &
@@ -36,12 +36,12 @@ jobs:
           sleep 3
 
       - name: Check server health with curl
-        if:always()
+        if: always()
         run: |
           curl --fail http://127.0.0.1:8000/ || ( echo "Health check failed" && exit 1 )
       
       - name: Shut down background server
-        if:always()
+        if: always()
         run: |
           kill $(lsof -t -i:8000) || echo "No server to kill"
 
