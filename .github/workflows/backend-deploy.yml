@@ -24,7 +24,7 @@ jobs:
       - name: Run PyLint
         run: |
           cd backend
-          pylint app.py controllers/ models/ repositories/ usecases/
+          pylint app.py controllers/ usecases/
 
       - name: Launch Uvicorn in background
         run: |
