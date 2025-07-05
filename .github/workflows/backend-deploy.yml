@@ -27,18 +27,12 @@ jobs:
           cd backend
           pylint app.py controllers/ usecases/
 
-      - name: Launch Uvicorn in background
+      - name: Launch Uvicorn and curl
         if: always()
         run: |
           cd backend
-          uvicorn app:app --host 127.0.0.1 --port 8000 &
-          # wait a few seconds for startup
-          sleep 3
-
-      - name: Check server health with curl
-        if: always()
-        run: |
-          curl --fail http://127.0.0.1:8000/ || ( echo "Health check failed" && exit 1 )
+          uvicorn app:app --host 127.0.0.1 --port 8000
+          curl --fail http://127.0.0.1:8000/hello || ( echo "Health check failed" && exit 1 )
       
       - name: Shut down background server
         if: always()
