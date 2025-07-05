@@ -23,10 +23,12 @@ jobs:
 
       - name: Run PyLint
         run: |
+          cd backend
           pylint app.py controllers/ models/ repositories/ usecases/
 
       - name: Launch Uvicorn in background
         run: |
+          cd backend
           uvicorn app:app --host 127.0.0.1 --port 8000 &
           # wait a few seconds for startup
           sleep 3
