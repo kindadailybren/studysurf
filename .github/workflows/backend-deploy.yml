@@ -30,8 +30,9 @@ jobs:
       - name: Launch Uvicorn and curl
         if: always()
         run: |
-          cd backend
-          uvicorn app:app --host 127.0.0.1 --port 8000
+          uvicorn app:app --host 127.0.0.1 --port 8000 &
+          sleep 3  # give server time to start
+          curl --fail http://127.0.0.1:8000/hello || ( echo "Health check failed" && exit 1 )
           curl --fail http://127.0.0.1:8000/hello || ( echo "Health check failed" && exit 1 )
       
       - name: Shut down background server
