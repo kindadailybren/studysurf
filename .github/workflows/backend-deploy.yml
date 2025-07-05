@@ -56,7 +56,7 @@ jobs:
         pip install \
           --platform manylinux2014_x86_64 \
           --implementation cp \
-          --python-version 3.13 \
+          --python-version 3.11 \
           --only-binary=:all: \
           -t lib/ \
           -r requirements.txt
