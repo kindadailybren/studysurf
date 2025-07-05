@@ -67,7 +67,7 @@ jobs:
         cd infra
         npm install
         # Update your Lambda function name here
-        cdk deploy prod-StatelessStack --require-approval never
+        cdk deploy prod-StatelessStack --hotswap --require-approval never
 
     - name: Verify Deployment
       run: |
