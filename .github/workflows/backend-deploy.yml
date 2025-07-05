@@ -58,11 +58,9 @@ jobs:
 
     - name: Deploy to Lambda
       run: |
-        cd backend
+        cd infra
         # Update your Lambda function name here
-        aws lambda update-function-code \
-          --function-name prod-Lambda-SampleFunction\
-          --zip-file fileb://aws_lambda.zip
+        cdk deploy prod-StatelessStack
 
     - name: Verify Deployment
       run: |
