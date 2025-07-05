@@ -53,8 +53,8 @@ jobs:
         cd backend
         pip install --upgrade pip
         mkdir -p lib
-        pip install -t lib -r requirements.txt
-        ( cd lib; zip ../aws_lambda.zip -r .)
+        pip install -t lib -r requirements.txt --platform linux_x86_64 --implementation cp --only-binary=:all: --upgrade
+        ( cd lib; zip ../aws_lambda.zip -r . )
         zip -r aws_lambda.zip app.py controllers models repositories usecases
 
     - name: Install AWS CDK CLI
