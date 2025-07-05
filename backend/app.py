@@ -7,7 +7,6 @@ import uvicorn
 app = FastAPI()
 handler = Mangum(app, lifespan="off")
 
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
