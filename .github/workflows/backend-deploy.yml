@@ -52,9 +52,15 @@ jobs:
       run: |
         cd backend
         pip install --upgrade pip
-        mkdir -p lib
-        pip install -t lib -r requirements.txt
-        ( cd lib; zip ../aws_lambda.zip -r .)
+        mkdir lib
+        pip install \
+          --platform manylinux2014_x86_64 \
+          --implementation cp \
+          --python-version 3.13 \
+          --only-binary=:all: \
+          -t lib/ \
+          -r requirements.txt
+        (cd lib && zip -r ../aws_lambda.zip .)
         zip -r aws_lambda.zip app.py controllers models repositories usecases
 
     - name: Install AWS CDK CLI
@@ -67,7 +73,7 @@ jobs:
         cd infra
         npm install
         # Update your Lambda function name here
-        cdk deploy prod-StatelessStack --hotswap --require-approval never
+        cdk deploy prod-StatelessStack --require-approval never
 
     - name: Verify Deployment
       run: |
