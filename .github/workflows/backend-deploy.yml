@@ -28,7 +28,7 @@ jobs:
           pylint app.py controllers/ usecases/ --exit-zero
 
   deploy:
-    needs: lint-and-healthcheck
+    needs: lint-code
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     
