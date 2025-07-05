@@ -2,7 +2,8 @@ name: Backend ( FastAPI ) CI
 
 on:
   pull_request:
-    branches-ignore: [ main ]
+    branches:
+      - main
     paths:
       - 'backend/**'
 
