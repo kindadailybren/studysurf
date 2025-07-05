@@ -45,7 +45,8 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '18'
+        node-version: 'latest'
+        check-latest: true
     
     - name: Package Lambda function
       run: |
@@ -66,7 +67,7 @@ jobs:
         cd infra
         npm install
         # Update your Lambda function name here
-        cdk deploy prod-StatelessStack
+        cdk deploy prod-StatelessStack --require-approval never
 
     - name: Verify Deployment
       run: |
