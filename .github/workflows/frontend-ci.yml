@@ -1,16 +1,48 @@
 name: Frontend CI
 
 on:
-  push:
-    branches-ignore: [ main ]
-    paths:
-     - 'frontend/**'
-
   pull_request:
+    branches-ignore: [ main ]
     paths:
       - 'frontend/**'
 
 jobs:
   lint-and-build:
-    uses: ./.github/workflows/frontend-deploy.yml
-    secrets: inherit
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+    
+    - name: Install dependencies
+      run: |
+        cd frontend
+        npm ci
+    
+    - name: Lint code
+      run: |
+        cd frontend
+        npm run lint
+    
+    - name: Type check
+      run: |
+        cd frontend
+        npx tsc --noEmit
+    
+    - name: Build application
+      run: |
+        cd frontend
+        npm run build
+    
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: frontend-build
+        path: frontend/dist/
+        retention-days: 1
+
