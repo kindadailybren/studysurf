@@ -39,7 +39,7 @@ jobs:
           kill $(lsof -t -i:8000) || echo "No server to kill"
 
   deploy:
-    needs: lint-and-healthcheck
+    needs: lint_and_healthcheck
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     
