@@ -27,19 +27,6 @@ This directory contains GitHub Actions workflows for the StudySurf project, orga
   - Deploys to S3
   - Invalidates CloudFront cache
 
-### 4. `infra-deploy.yml` - Infrastructure Pipeline
-- **Triggers**: Changes in `infra/` directory
-- **Actions**:
-  - Builds TypeScript CDK code
-  - Runs CDK tests
-  - Validates CloudFormation templates with `cdk synth`
-  - Shows infrastructure changes with `cdk diff`
-  - Deploys infrastructure with `cdk deploy`
-
-## Required GitHub Secrets
-
-Add these secrets to your GitHub repository settings:
-
 ### AWS Credentials
 - `AWS_ACCESS_KEY_ID` - AWS access key for deployment
 - `AWS_SECRET_ACCESS_KEY` - AWS secret key for deployment
