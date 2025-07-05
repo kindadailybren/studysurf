@@ -4,8 +4,6 @@ from usecases.genvid_usecase import extract_text_pymupdf
 import json
 import boto3
 
-bedrock_runtime = boto3.client("bedrock-runtime", region_name="ap-southeast-1")
-polly = boto3.client("polly", region_name="ap-southeast-1")
 
 genvid_router = APIRouter()
 
@@ -17,6 +15,8 @@ async def hello():
 
 @genvid_router.post("/genvid")
 async def generate_video(request: Request):
+    bedrock_runtime = boto3.client("bedrock-runtime", region_name="ap-southeast-1")
+    polly = boto3.client("polly", region_name="ap-southeast-1")
     try:
         body = await request.body()
 

@@ -1,5 +1,4 @@
 import * as lambda from "aws-cdk-lib/aws-lambda";
-import * as sqs from "aws-cdk-lib/aws-sqs";
 import * as integrations from "aws-cdk-lib/aws-apigatewayv2-integrations";
 import * as path from "path";
 import { Construct } from "constructs";
@@ -32,7 +31,6 @@ export class LambdaConstruct extends Construct {
   private createLambdaFunction(
     functionName: string,
     props: LambdaConstructProps,
-    deadLetterQueue?: sqs.Queue,
   ) {
     return new lambda.Function(this, `${props.stage}-Lambda-${functionName}`, {
       functionName: `${props.stage}-Lambda-SampleFunction`,
@@ -44,6 +42,7 @@ export class LambdaConstruct extends Construct {
           `../../../../backend/aws_lambda.zip`,
         ),
       ),
+      memorySize: 512,
     });
   }
 }
