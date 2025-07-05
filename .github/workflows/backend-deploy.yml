@@ -4,7 +4,7 @@ on:
   workflow_call:
 
 jobs:
-  lint_and_healthcheck:
+  lint-and-healthcheck:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
