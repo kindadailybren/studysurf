@@ -1,8 +1,8 @@
+import json
+import boto3
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
 from usecases.genvid_usecase import extract_text_pymupdf
-import json
-import boto3
 
 
 genvid_router = APIRouter()
@@ -27,7 +27,8 @@ async def generate_video(request: Request):
 
         prompt = (
             text.strip()
-            + "\nSummarize this whole topic in one straight paragraph for a college student trying to understand it. Don't say anything like 'Here is a summary.'"
+            + "\nSummarize this whole topic in one straight paragraph for a college student trying to understand it.\
+                Don't say anything like 'Here is a summary.'"
         )
 
         payload = {
