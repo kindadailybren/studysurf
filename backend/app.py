@@ -5,7 +5,7 @@ from controllers.app_router import app_router
 import uvicorn
 
 app = FastAPI()
-handler = Mangum(app)
+handler = Mangum(app, lifespan="off")
 
 app.add_middleware(
     CORSMiddleware,
