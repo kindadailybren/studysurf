@@ -10,6 +10,6 @@ on:
       - 'backend/**'
 
 jobs:
-  lint-and-healthcheck:
+  lint-code:
     uses: ./.github/workflows/backend-deploy.yml
     secrets: inherit

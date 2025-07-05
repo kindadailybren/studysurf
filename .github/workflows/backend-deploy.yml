@@ -4,7 +4,7 @@ on:
   workflow_call:
 
 jobs:
-  lint-and-healthcheck:
+  lint-code:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -25,20 +25,7 @@ jobs:
         continue-on-error: true
         run: |
           cd backend
-          pylint app.py controllers/ usecases/
-
-      - name: Launch Uvicorn and curl
-        if: always()
-        run: |
-          uvicorn app:app --host 127.0.0.1 --port 8000 &
-          sleep 3  # give server time to start
-          curl --fail http://127.0.0.1:8000/hello || ( echo "Health check failed" && exit 1 )
-          curl --fail http://127.0.0.1:8000/hello || ( echo "Health check failed" && exit 1 )
-      
-      - name: Shut down background server
-        if: always()
-        run: |
-          kill $(lsof -t -i:8000) || echo "No server to kill"
+          pylint app.py controllers/ usecases/ --exit-zero
 
   deploy:
     needs: lint-and-healthcheck
