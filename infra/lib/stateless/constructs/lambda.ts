@@ -1,3 +1,4 @@
+import { Duration } from "aws-cdk-lib";
 import * as lambda from "aws-cdk-lib/aws-lambda";
 import * as integrations from "aws-cdk-lib/aws-apigatewayv2-integrations";
 import * as path from "path";
@@ -43,6 +44,7 @@ export class LambdaConstruct extends Construct {
         ),
       ),
       memorySize: 512,
+      timeout: Duration.seconds(30),
     });
   }
 }
