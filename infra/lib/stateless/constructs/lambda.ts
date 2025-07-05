@@ -36,7 +36,7 @@ export class LambdaConstruct extends Construct {
   ) {
     return new lambda.Function(this, `${props.stage}-Lambda-${functionName}`, {
       functionName: `${props.stage}-Lambda-SampleFunction`,
-      runtime: lambda.Runtime.PYTHON_3_13,
+      runtime: lambda.Runtime.PYTHON_3_11,
       handler: "app.handler",
       code: lambda.Code.fromAsset(
         path.resolve(
