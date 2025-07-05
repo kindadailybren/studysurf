@@ -42,10 +42,10 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ secrets.AWS_REGION }}
     
-    - name: Set up Python
-      uses: actions/setup-python@v4
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
       with:
-        python-version: '3.13'
+        node-version: '18'
     
     - name: Package Lambda function
       run: |
@@ -56,9 +56,15 @@ jobs:
         ( cd lib; zip ../aws_lambda.zip -r .)
         zip -r aws_lambda.zip app.py controllers models repositories usecases
 
+    - name: Install AWS CDK CLI
+      run: |
+        npm install -g aws-cdk@latest
+        cdk --version
+
     - name: Deploy to Lambda
       run: |
         cd infra
+        npm install
         # Update your Lambda function name here
         cdk deploy prod-StatelessStack
 
