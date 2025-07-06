@@ -3,7 +3,7 @@ import * as cognito from "aws-cdk-lib/aws-cognito";
 import { Construct } from "constructs";
 import { BaseConstructProps } from "../../types";
 
-interface CognitoConstructProps extends BaseConstructProps {}
+interface CognitoConstructProps extends BaseConstructProps { }
 
 export class CognitoConstruct extends Construct {
   public userPool: cognito.UserPool;
@@ -19,12 +19,19 @@ export class CognitoConstruct extends Construct {
   private createUserPool(props: CognitoConstructProps) {
     this.userPool = new cognito.UserPool(
       this,
-      `${props.stage}-Cognito-UserPool`,
+      `${props.stage}-Cognito-UserPool-v3`,
       {
-        userPoolName: `${props.stage}-Cognito-UserPool`,
+        userPoolName: `StudySurf-Cognito-UserPool`,
         selfSignUpEnabled: true,
         signInAliases: {
+          username: true,
           email: true,
+        },
+        standardAttributes: {
+          email: {
+            required: true,
+            mutable: true,
+          }
         },
         customAttributes: {
           role: new cognito.StringAttribute({ mutable: true }),
