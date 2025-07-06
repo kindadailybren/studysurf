@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { Sidebar } from '../components/Sidebar.tsx';
-import { UploadPage } from '../pages/UploadPage.tsx'
-import { GalleryPage } from '../pages/GalleryPage.tsx';
-import { SettingsPage } from './SettingsPage.tsx';
+import { UploadPage } from './main-subpages/UploadPage.tsx'
+import { GalleryPage } from './main-subpages/GalleryPage.tsx';
+import { SettingsPage } from './main-subpages/SettingsPage.tsx';
 import { NotFoundPage } from './NotFoundPage.tsx';
 
 export const MainPage = () => {
