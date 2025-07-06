@@ -21,7 +21,7 @@ export const AuthCognito = () => {
   if (auth.isAuthenticated) {
     return (
       <div className="flex flex-row-reverse justify-right w-full gap-5">
-        <p> {auth.user?.profile.email} </p>
+        <p> {auth.user?.profile.preferred_username} </p>
         {/* <pre> ID Token: {auth.user?.id_token} </pre> */}
         {/* <pre> Access Token: {auth.user?.access_token} </pre> */}
         {/* <pre> Refresh Token: {auth.user?.refresh_token} </pre> */}
