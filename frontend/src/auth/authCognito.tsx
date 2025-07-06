@@ -4,7 +4,7 @@ export const AuthCognito = () => {
   const auth = useAuth();
 
   const signOutRedirect = () => {
-    const clientId = "2624i7473vacjrqr90a4km7hde";
+    const clientId = "47pmikn806tnk2lrs484kfgaq7";
     const logoutUri = window.location.origin; // Redirect to the home page after logout
     const cognitoDomain = "https://studysurf.auth.ap-southeast-1.amazoncognito.com";
     window.location.href = `${cognitoDomain}/logout?client_id=${clientId}&logout_uri=${encodeURIComponent(logoutUri)}`;
