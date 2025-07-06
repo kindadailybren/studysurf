@@ -1,4 +1,4 @@
-import { AuthCognito } from "../auth/authCognito";
+import { AuthCognito } from "../../auth/authCognito";
 
 export const SettingsPage = () => {
   return (
