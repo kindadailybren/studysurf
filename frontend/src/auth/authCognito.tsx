@@ -5,7 +5,7 @@ export const AuthCognito = () => {
 
   const signOutRedirect = () => {
     const clientId = "47pmikn806tnk2lrs484kfgaq7";
-    const logoutUri = window.location.origin; // Redirect to the home page after logout
+    const logoutUri = "https://d21pfsk9g7745y.cloudfront.net/";
     const cognitoDomain = "https://studysurf.auth.ap-southeast-1.amazoncognito.com";
     window.location.href = `${cognitoDomain}/logout?client_id=${clientId}&logout_uri=${encodeURIComponent(logoutUri)}`;
   };
@@ -21,12 +21,12 @@ export const AuthCognito = () => {
   if (auth.isAuthenticated) {
     return (
       <div className="flex flex-row-reverse justify-right w-full gap-5">
-        <p> {auth.user?.profile.preferred_username} </p>
+        <p>{((auth.user?.profile as any)['cognito:username']) as React.ReactNode}</p>
         {/* <pre> ID Token: {auth.user?.id_token} </pre> */}
         {/* <pre> Access Token: {auth.user?.access_token} </pre> */}
         {/* <pre> Refresh Token: {auth.user?.refresh_token} </pre> */}
 
-        <button onClick={() => { auth.removeUser(); signOutRedirect() }}>Sign out</button>
+        <button onClick={() => { auth.removeUser(); signOutRedirect(); }}>Sign out</button>
       </div>
     );
   }
