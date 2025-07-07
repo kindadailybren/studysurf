@@ -13,4 +13,4 @@ async def hello():
 @genvid_router.post("/genvid")
 async def generate_video(request: Request):
     uc = GenVidUseCase()
-    return await uc.generate_video(request)
+    return await uc.generate_video_usecase(request)
