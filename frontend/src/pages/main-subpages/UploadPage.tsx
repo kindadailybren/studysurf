@@ -1,5 +1,4 @@
 import { useState } from "react"
-import { AuthCognito } from '../../auth/authCognito'
 import { FileDrop } from "../../components/uploadComponents/FileDrop"
 import { SelectVideoStyle } from "../../components/uploadComponents/selectVideoStyle"
 import { GenVidButton } from "../../components/uploadComponents/GenerateVidButton"
@@ -18,7 +17,6 @@ export const UploadPage = () => {
   return (
     <>
       <div className="flex-1 items-center justify-center border-[var(--primary-border)] w-full h-screen mb-10 p-10">
-        <AuthCognito />
         <FileDrop {...FileDropProps} />
         <SelectVideoStyle {...SelectVideoStyleProps} />
         <GenVidButton {...GenVidButtonProps} />
