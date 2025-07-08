@@ -1,19 +1,17 @@
-from fastapi import Request
 from fastapi.responses import JSONResponse
-from services.AWS.bedrock_service import AWS_Bedrock
-from services.AWS.polly_service import AWS_Polly
 
 
 class GenVidUseCase:
-    async def generate_video_usecase(self, request: Request):
+    def __init__(self, bedrock_service, polly_service):
+        self.AI = bedrock_service
+        self.VoiceGenerator = polly_service
+
+    async def generate_video_usecase(self, file):
         try:
-            file = await request.body()
-
-            VoiceGenerator = AWS_Polly()
-            AI = AWS_Bedrock()
-
-            generatedSummary = AI.gen_summarization(file)
-            audioGenerated, textReference = VoiceGenerator.gen_audio(generatedSummary)
+            generatedSummary = self.AI.gen_summarization(file)
+            audioGenerated, textReference = self.VoiceGenerator.gen_audio(
+                generatedSummary
+            )
 
             return JSONResponse(
                 content={
