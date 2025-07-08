@@ -1,14 +1,6 @@
-import fitz
+from utils.pdf_utils.pdfparse import PDFParser
 import json
 import boto3
-
-
-def extract_text_pymupdf(pdf_bytes: bytes) -> str:
-    try:
-        doc = fitz.open(stream=pdf_bytes, filetype="pdf")
-        return "\n".join([page.get_text() for page in doc])
-    except Exception as e:
-        raise ValueError("PDF extraction failed") from e
 
 
 class AWS_Bedrock:
@@ -16,9 +8,10 @@ class AWS_Bedrock:
         self.bedrock_runtime = boto3.client(
             "bedrock-runtime", region_name="ap-southeast-1"
         )
+        self.pdf_parser = PDFParser()
 
     def gen_summarization(self, file):
-        text = extract_text_pymupdf(file)
+        text = self.pdf_parser.extract_text_pymupdf(file)
 
         if not text.strip():
             raise ValueError("No text found in the PDF")
