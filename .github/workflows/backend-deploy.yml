@@ -37,7 +37,7 @@ jobs:
           -t lib/ \
           -r requirements.txt
         (cd lib && zip -r ../aws_lambda.zip .)
-        zip -r aws_lambda.zip app.py controllers models repositories usecases
+        zip -r aws_lambda.zip app.py controllers models repositories usecases utils
 
     - name: Install AWS CDK CLI
       run: |
