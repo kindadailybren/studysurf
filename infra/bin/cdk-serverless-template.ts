@@ -46,7 +46,7 @@ const prodStatefulStack = new StatefulStack(
   app,
   `${ProdProps.Stateful.stage}-StatefulStack`,
   {
-    ...DevProps.Stateful,
+    ...ProdProps.Stateful,
   },
 );
 

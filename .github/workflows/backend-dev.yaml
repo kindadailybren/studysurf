@@ -1,13 +1,35 @@
-name: Backend Deploy
+name: Backend deploy to Dev Environment
 
 on:
   workflow_call:
 
 jobs:
-  deploy:
+  backend-ci-dev:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.13'
+
+      - name: Install Dependencies
+        run: |
+          cd infra/lambdaFunctions/backend
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run PyLint
+        continue-on-error: true
+        run: |
+          pylint app.py
+
+  backend-deploy-dev:
+    needs: backend-ci-dev
+    runs-on: ubuntu-latest
+
     steps:
     - uses: actions/checkout@v4
     
@@ -26,7 +48,7 @@ jobs:
     
     - name: Package Lambda function
       run: |
-        cd backend
+        cd infra/lambdaFunctions/backend
         pip install --upgrade pip
         mkdir lib
         pip install \
@@ -49,8 +71,8 @@ jobs:
         cd infra
         npm install
         # Update your Lambda function name here
-        cdk deploy prod-StatelessStack --require-approval never
+        cdk deploy dev-StatelessStack --require-approval never
 
     - name: Verify Deployment
       run: |
-        aws lambda get-function --function-name prod-Lambda-SampleFunction
+        aws lambda get-function --function-name dev-Lambda-SampleFunction

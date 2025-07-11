@@ -11,7 +11,7 @@ class AWS_Bedrock:
         self.pdf_parser = PDFParser()
 
     def gen_summarization(self, file):
-        text = self.pdf_parser.extract_text_pymupdf(file)
+        text = self.pdf_parser.extract_text_util(file)
 
         if not text.strip():
             raise ValueError("No text found in the PDF")
