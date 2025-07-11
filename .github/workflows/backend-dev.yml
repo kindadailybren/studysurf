@@ -6,7 +6,7 @@ on:
     branches:
       - main
     paths:
-      - 'backend/**'
+      - 'infra/lambdaFunctions/backend/**'
 
 jobs:
   lint-code:

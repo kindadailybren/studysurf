@@ -4,7 +4,7 @@ import { Construct } from "constructs";
 import { RemovalPolicy } from "aws-cdk-lib";
 import { BaseConstructProps } from "../../../types";
 
-interface DynamoDbConstructProps extends BaseConstructProps {}
+interface DynamoDbConstructProps extends BaseConstructProps { }
 
 export class DynamoDbConstruct extends Construct {
   public dataDb: dynamodb.Table;
@@ -16,8 +16,8 @@ export class DynamoDbConstruct extends Construct {
   }
 
   private createDynamoDbTable(props: DynamoDbConstructProps) {
-    this.dataDb = new dynamodb.Table(this, Data.TableName, {
-      tableName: Data.TableName,
+    this.dataDb = new dynamodb.Table(this, `${props.stage}-DynamoDB-DataTable`, {
+      tableName: `${Data.TableName}-${props.stage}`,
       partitionKey: {
         name: Data.KeyAttributes.PartitionKey.AttributeName,
         type: dynamodb.AttributeType.STRING,
@@ -41,9 +41,9 @@ export class DynamoDbConstruct extends Construct {
         },
         sortKey: index.KeyAttributes.SortKey
           ? {
-              name: index.KeyAttributes.SortKey.AttributeName,
-              type: dynamodb.AttributeType.STRING,
-            }
+            name: index.KeyAttributes.SortKey.AttributeName,
+            type: dynamodb.AttributeType.STRING,
+          }
           : undefined,
         projectionType: dynamodb.ProjectionType.ALL,
       });

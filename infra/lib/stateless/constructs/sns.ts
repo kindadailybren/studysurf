@@ -22,7 +22,7 @@ export class SnsConstruct extends Construct {
 
   private createTopic(props: SnsConstructProps, topicName: string) {
     return new sns.Topic(this, `${props.stage}-SNS-Topic-${topicName}`, {
-      topicName,
+      topicName: `${props.stage}-${topicName}`,
     });
   }
 }

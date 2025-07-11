@@ -20,6 +20,12 @@ export class ApiGatewayConstruct extends Construct {
   private createApiGateway(props: ApiGatewayConstructProps): void {
     this.api = new api.HttpApi(this, `${props.stage}-ApiGateway-HttpApi`, {
       apiName: `${props.stage}-ApiGateway-HttpApi`,
+      corsPreflight: {
+        allowHeaders: ['*'],
+        allowMethods: [api.CorsHttpMethod.GET, api.CorsHttpMethod.POST, api.CorsHttpMethod.OPTIONS],
+        allowOrigins: ['*'], // Or specify your frontend domain
+        allowCredentials: false,
+      },
     });
   }
 
