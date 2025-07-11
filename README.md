@@ -71,7 +71,6 @@ npm run dev
 1. Create a virtual environment and activate it:
 
 ```bash
-```bash
 python -m venv env
 source env/bin/activate  # On Windows use `env\Scripts\activate`
 ```
@@ -83,7 +82,3 @@ cd infra/lambdaFunctions/backend
 pip install -r requirements.txt
 uvicorn app:app --reload
 ```
-```
-
-
-
