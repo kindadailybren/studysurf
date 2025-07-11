@@ -1,28 +1,10 @@
-name: Manual Deploy on Staging Enviroment
+name: Manual Deployment to Staging Env
 
 on:
   workflow_dispatch:
 
 jobs:
-  detect-changes:
-    runs-on: ubuntu-latest
-    outputs:
-      backend: ${{ steps.changes.outputs.backend }} # Check changes on the backend directory
-      frontend: ${{ steps.changes.outputs.frontend }}
-    steps:
-    - uses: actions/checkout@v4
-    - uses: dorny/paths-filter@v2
-      id: changes
-      with:
-        filters: |
-          backend:
-            - 'infra/lambdafunctions/backend/**'
-          frontend:
-            - 'frontend/**'
-
-  backend-deploy:
-    needs: detect-changes
-    if: needs.detect-changes.outputs.backend == 'true'
+  backend-staging:
     runs-on: ubuntu-latest
     
     steps:
@@ -72,11 +54,9 @@ jobs:
       run: |
         aws lambda get-function --function-name staging-Lambda-SampleFunction
 
-  frontend-deploy:
-    needs: detect-changes
-    if: needs.detect-changes.outputs.frontend == 'true'
+  frontend-staging:
     runs-on: ubuntu-latest
-    
+
     steps:
     - uses: actions/checkout@v4
 
@@ -96,7 +76,7 @@ jobs:
       run: |
         cd frontend
         npm run build
-    
+
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
@@ -104,34 +84,28 @@ jobs:
         path: frontend/dist/
         retention-days: 1
 
-    
+
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v4
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ secrets.AWS_REGION }}
-    
+
     - name: Download build artifacts
       uses: actions/download-artifact@v4
       with:
         name: frontend-build
         path: frontend/dist/
-    
+
     - name: Deploy to S3
       run: |
         # Update your S3 bucket name here
-        aws s3 sync frontend/dist/ s3://${{ secrets.S3_BUCKET_NAME }} --delete
-    
-    - name: Invalidate CloudFront
-      run: |
-        # Update your CloudFront distribution ID here
-        aws cloudfront create-invalidation \
-          --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
-          --paths "/*"
-    
+        aws s3 sync frontend/dist/ s3://${{ secrets.S3_BUCKET_NAME_STAGING }} --delete
+
     - name: Verify deployment
       run: |
         echo "Frontend deployed successfully!"
         echo "Checking if S3 bucket is accessible..."
-        aws s3 ls s3://${{ secrets.S3_BUCKET_NAME }} --recursive | head -10
+        aws s3 ls s3://${{ secrets.S3_BUCKET_NAME_STAGING }} --recursive | head -10
+
