@@ -24,11 +24,6 @@ This project allows users to convert their study materials (text, notes, or slid
 - 📄 Upload study documents (PDFs, text, or markdown)
 - 🧠 AI-enhanced visual & text segmentation
 - 🎨 Generate dynamic video scenes with narration
-- ☁️ Cloud-native deployment (AWS-powered infrastructure)
-- 🔐 Secure user authentication via AWS Cognito
-- 🗂️ Scalable data storage with DynamoDB and S3
-- ⚡ Fast, modern frontend with React and Vite
-- 🚀 Lightning-fast backend APIs with FastAPI
 
 ---
 
@@ -48,8 +43,7 @@ This project allows users to convert their study materials (text, notes, or slid
 ## 📦 Project Structure
 
 /frontend         → React App  
-/backend          → FastAPI App  
-/infra              → Infrastructure (CDK)  
+/infra              → Infrastructure (CDK), Backend  
 
 ---
 
@@ -60,3 +54,36 @@ This project allows users to convert their study materials (text, notes, or slid
 ```bash
 git clone https://github.com/your-username/your-repo-name.git
 cd your-repo-name
+```
+
+---
+## Frontend Testing
+
+1. Go to the frontend directory and use vite to run the React app
+
+```bash
+cd frontend
+npm run dev
+```
+
+## Backend Testing
+
+1. Create a virtual environment and activate it:
+
+```bash
+```bash
+python -m venv env
+source env/bin/activate  # On Windows use `env\Scripts\activate`
+```
+
+2. Use uvicorn to run the FastAPI server:
+
+```bash
+cd infra/lambdaFunctions/backend
+pip install -r requirements.txt
+uvicorn app:app --reload
+```
+```
+
+
+
