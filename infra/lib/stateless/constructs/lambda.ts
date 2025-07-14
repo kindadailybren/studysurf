@@ -66,6 +66,14 @@ export class LambdaConstruct extends Construct {
       }),
     );
 
+    fn.addToRolePolicy(
+      new iam.PolicyStatement({
+        effect: iam.Effect.ALLOW,
+        actions: ["cognito-idp:ListUsers"],
+        resources: ["*"], // or scope to a specific S3 bucket if needed
+      }),
+    );
+
     return fn;
   }
 }
