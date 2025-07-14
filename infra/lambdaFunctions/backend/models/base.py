@@ -12,7 +12,7 @@ class SubscriptionTier(str, Enum):
 
 
 class User(BaseModel):
-    user_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
     username: str
     email: EmailStr
     subscription_tier: SubscriptionTier = SubscriptionTier.FREE
