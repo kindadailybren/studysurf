@@ -1,6 +1,5 @@
 export const GalleryPage = () => {
   // temporary lang ang borders
-
   return (
     <>
       <div className="flex-1 p-10">
