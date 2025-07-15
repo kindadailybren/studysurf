@@ -1,0 +1,88 @@
+name: Frontend deploy to Dev Environment
+
+on:
+  workflow_call:
+
+jobs:
+  frontend-ci-dev:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+
+    - name: Install dependencies
+      run: |
+        cd frontend
+        npm ci
+
+    - name: Lint code
+      run: |
+        cd frontend
+        npm run lint
+
+    - name: Type check
+      run: |
+        cd frontend
+        npx tsc --noEmit
+
+  frontend-deploy-dev:
+    needs: frontend-ci-dev
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+
+    - name: Install dependencies
+      run: |
+        cd frontend
+        npm ci
+
+    - name: Build application
+      run: |
+        cd frontend
+        npm run build
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: frontend-build
+        path: frontend/dist/
+        retention-days: 1
+
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: frontend-build
+        path: frontend/dist/
+
+    - name: Deploy to S3
+      run: |
+        # Update your S3 bucket name here
+        aws s3 sync frontend/dist/ s3://${{ secrets.S3_BUCKET_NAME_DEV }} --delete
+
+    - name: Verify deployment
+      run: |
+        echo "Frontend deployed successfully!"
+        echo "Checking if S3 bucket is accessible..."
+        aws s3 ls s3://${{ secrets.S3_BUCKET_NAME_DEV }} --recursive | head -10

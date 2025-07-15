@@ -1,5 +1,6 @@
 import { Duration } from "aws-cdk-lib";
 import * as lambda from "aws-cdk-lib/aws-lambda";
+import * as iam from "aws-cdk-lib/aws-iam";
 import * as integrations from "aws-cdk-lib/aws-apigatewayv2-integrations";
 import * as path from "path";
 import { Construct } from "constructs";
@@ -33,18 +34,46 @@ export class LambdaConstruct extends Construct {
     functionName: string,
     props: LambdaConstructProps,
   ) {
-    return new lambda.Function(this, `${props.stage}-Lambda-${functionName}`, {
+    const fn = new lambda.Function(this, `${props.stage}-Lambda-${functionName}`, {
       functionName: `${props.stage}-Lambda-SampleFunction`,
       runtime: lambda.Runtime.PYTHON_3_13,
       handler: "app.handler",
       code: lambda.Code.fromAsset(
         path.resolve(
           __dirname,
-          `../../../../backend/aws_lambda.zip`,
+          `../../../lambdaFunctions/backend/aws_lambda.zip`,
         ),
       ),
       memorySize: 512,
       timeout: Duration.seconds(30),
     });
+
+    fn.addToRolePolicy(
+      new iam.PolicyStatement({
+        effect: iam.Effect.ALLOW,
+        actions: ["bedrock:InvokeModel"],
+        resources: [
+          "arn:aws:bedrock:ap-southeast-1::foundation-model/anthropic.claude-3-haiku-20240307-v1:0",
+        ],
+      }),
+    );
+
+    fn.addToRolePolicy(
+      new iam.PolicyStatement({
+        effect: iam.Effect.ALLOW,
+        actions: ["polly:StartSpeechSynthesisTask"],
+        resources: ["*"], // or scope to a specific S3 bucket if needed
+      }),
+    );
+
+    fn.addToRolePolicy(
+      new iam.PolicyStatement({
+        effect: iam.Effect.ALLOW,
+        actions: ["cognito-idp:ListUsers"],
+        resources: ["*"], // or scope to a specific S3 bucket if needed
+      }),
+    );
+
+    return fn;
   }
 }

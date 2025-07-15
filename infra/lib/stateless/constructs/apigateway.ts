@@ -20,6 +20,12 @@ export class ApiGatewayConstruct extends Construct {
   private createApiGateway(props: ApiGatewayConstructProps): void {
     this.api = new api.HttpApi(this, `${props.stage}-ApiGateway-HttpApi`, {
       apiName: `${props.stage}-ApiGateway-HttpApi`,
+      corsPreflight: {
+        allowHeaders: ['*'],
+        allowMethods: [api.CorsHttpMethod.GET, api.CorsHttpMethod.POST, api.CorsHttpMethod.OPTIONS],
+        allowOrigins: ['*'], // Or specify your frontend domain
+        allowCredentials: false,
+      },
     });
   }
 
@@ -32,6 +38,18 @@ export class ApiGatewayConstruct extends Construct {
 
     this.api.addRoutes({
       path: "/genvid",
+      methods: [api.HttpMethod.POST],
+      integration: props.sampleIntegration,
+    });
+
+    this.api.addRoutes({
+      path: "/get-users",
+      methods: [api.HttpMethod.GET],
+      integration: props.sampleIntegration,
+    });
+
+    this.api.addRoutes({
+      path: "/create-user",
       methods: [api.HttpMethod.POST],
       integration: props.sampleIntegration,
     });

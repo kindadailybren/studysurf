@@ -1,0 +1,44 @@
+name: Automated Deployment to Dev
+
+#Trigger
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+    branches:
+      - main
+    paths:
+      - 'frontend/**'
+      - 'infra/**'
+
+jobs:
+  detect-changes:
+    #runner - environment Linux Windows
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    outputs:
+      backend: ${{ steps.changes.outputs.backend }} # Check changes on the backend directory
+      frontend: ${{ steps.changes.outputs.frontend }}
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            backend:
+              - 'infra/**'
+            frontend:
+              - 'frontend/**'
+
+  backend-dev:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.backend == 'true'
+    uses: ./.github/workflows/backend-dev.yaml
+    secrets: inherit
+
+  frontend-dev:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.frontend == 'true'
+    uses: ./.github/workflows/frontend-dev.yaml
+    secrets: inherit
