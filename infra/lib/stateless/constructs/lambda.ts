@@ -65,6 +65,7 @@ export class LambdaConstruct extends Construct {
         effect: iam.Effect.ALLOW,
         actions: [
           "polly:StartSpeechSynthesisTask",
+          "cognito-idp:AdminGetUser",
           "cognito-idp:ListUsers",
           "dynamodb:PutItem",
           "dynamodb:UpdateItem",
