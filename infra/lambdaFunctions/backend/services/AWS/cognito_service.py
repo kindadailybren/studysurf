@@ -1,26 +1,72 @@
 import boto3
-from models.user import UserCreate
+from models.user import UserCreate, UserLogin, UserConfirm, UserConfirmPasswordChange
 
 
 class AWS_Cognito:
     def __init__(self):
-        self.cognito_client = boto3.client("cognito-idp", region_name="ap-southeast-1")
+        self.cognitoClient = boto3.client("cognito-idp", region_name="ap-southeast-1")
+        self.userPoolId = "ap-southeast-1_BJK9jXo9C"
+        self.cognitoAppClientId = "25ch5mniuhjv9t64oqtlbhmnmq"
 
-    def get_users(self):
-        users = self.cognito_client.list_users(
-            UserPoolId="ap-southeast-1_BJK9jXo9C",
+    def getUsers(self):
+        users = self.cognitoClient.list_users(
+            UserPoolId=self.userPoolId,
             Limit=60,
         )
         return users
 
-    def create_user(self, credentials: UserCreate):
-        created_user = self.cognito_client.admin_create_user(
-            UserPoolId="ap-southeast-1_BJK9jXo9C",
+    def createUser(self, credentials: UserCreate):
+        createdUser = self.cognitoClient.sign_up(
+            ClientId=self.cognitoAppClientId,
             Username=credentials.username,
+            Password=credentials.password,
             UserAttributes=[
                 {"Name": "email", "Value": credentials.email},
             ],
-            TemporaryPassword=credentials.password,
         )
 
-        return created_user
+        return createdUser
+
+    def confirmUser(self, credentials: UserConfirm):
+        confirmedUser = self.cognitoClient.confirm_sign_up(
+            ClientId=self.cognitoAppClientId,
+            Username=credentials.username,
+            ConfirmationCode=credentials.confirmationCode,
+        )
+
+        return confirmedUser
+
+    def loginUser(self, credentials: UserLogin):
+        userLogin = self.cognitoClient.initiate_auth(
+            AuthFlow="USER_PASSWORD_AUTH",
+            AuthParameters={
+                "USERNAME": credentials.username,
+                "PASSWORD": credentials.password,
+            },
+            ClientId=self.cognitoAppClientId,
+        )
+
+        return userLogin
+
+    def deleteUser(self, accessToken):
+        userDelete = self.cognitoClient.delete_user(AccessToken=accessToken)
+
+        return userDelete
+
+    def forgotPassword(self, username):
+        userDelete = self.cognitoClient.forgot_password(
+            ClientId=self.cognitoAppClientId,
+            Username=username,
+        )
+
+        return userDelete
+
+    def confirmForgotPassword(self, credentials: UserConfirmPasswordChange):
+        userConfirm = self.cognitoClient.confirm_forgot_password(
+            ClientId=self.cognitoAppClientId,
+            Username=credentials.username,
+            ConfirmationCode=credentials.confirmationCode,
+            Password=credentials.password,
+        )
+
+        return userConfirm

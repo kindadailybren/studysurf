@@ -1,21 +1,57 @@
-from fastapi import APIRouter, Request, Depends
+from fastapi import APIRouter, Depends
 from usecases.auth_usecase import AuthUsecase
 from services.AWS.cognito_service import AWS_Cognito
-from models.user import UserCreate
+from models.user import UserConfirmPasswordChange, UserCreate, UserLogin, UserConfirm
 
 
 auth_router = APIRouter()
 
 
-@auth_router.get("/get-users")
-async def get_user(request: Request, cognito: AWS_Cognito = Depends(AWS_Cognito)):
+@auth_router.get("/getUsers")
+async def getUser(cognito: AWS_Cognito = Depends(AWS_Cognito)):
     uc = AuthUsecase(cognito)
-    return await uc.listusers()
+    return await uc.listUsers()
 
 
-@auth_router.post("/create-user")
-async def create_user(
+@auth_router.post("/createUser")
+async def createUser(
     credentials: UserCreate, cognito: AWS_Cognito = Depends(AWS_Cognito)
 ):
     uc = AuthUsecase(cognito)
-    return await uc.createuser(credentials)
+    return await uc.createUser(credentials)
+
+
+@auth_router.post("/confirmUser")
+async def confirmUser(
+    credentials: UserConfirm, cognito: AWS_Cognito = Depends(AWS_Cognito)
+):
+    uc = AuthUsecase(cognito)
+    return await uc.confirmUser(credentials)
+
+
+@auth_router.post("/login")
+async def loginUser(
+    credentials: UserLogin, cognito: AWS_Cognito = Depends(AWS_Cognito)
+):
+    uc = AuthUsecase(cognito)
+    return await uc.loginUser(credentials)
+
+
+@auth_router.post("/deleteUser")
+async def deleteUser(accessToken, cognito: AWS_Cognito = Depends(AWS_Cognito)):
+    uc = AuthUsecase(cognito)
+    return await uc.deleteUser(accessToken)
+
+
+@auth_router.post("/forgetPass")
+async def forgetPass(username, cognito: AWS_Cognito = Depends(AWS_Cognito)):
+    uc = AuthUsecase(cognito)
+    return await uc.forgotPassword(username)
+
+
+@auth_router.post("/forgetPassConfirm")
+async def confirmForgetPass(
+    credentials: UserConfirmPasswordChange, cognito: AWS_Cognito = Depends(AWS_Cognito)
+):
+    uc = AuthUsecase(cognito)
+    return await uc.confirmForgotPassword(credentials)

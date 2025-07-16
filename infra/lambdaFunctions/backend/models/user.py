@@ -5,3 +5,19 @@ class UserCreate(BaseModel):
     email: EmailStr
     username: str
     password: str
+
+
+class UserConfirm(BaseModel):
+    username: str
+    confirmationCode: str
+
+
+class UserConfirmPasswordChange(BaseModel):
+    username: str
+    password: str
+    confirmationCode: str
+
+
+class UserLogin(BaseModel):
+    username: str
+    password: str
