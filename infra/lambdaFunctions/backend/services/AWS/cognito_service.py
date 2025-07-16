@@ -8,10 +8,17 @@ class AWS_Cognito:
         self.userPoolId = "ap-southeast-1_BJK9jXo9C"
         self.cognitoAppClientId = "25ch5mniuhjv9t64oqtlbhmnmq"
 
-    def getUsers(self):
+    def listUsers(self):
         users = self.cognitoClient.list_users(
             UserPoolId=self.userPoolId,
             Limit=60,
+        )
+        return users
+
+    def getUser(self, username):
+        users = self.cognitoClient.admin_get_user(
+            UserPoolId=self.userPoolId,
+            Username=username,
         )
         return users
 
