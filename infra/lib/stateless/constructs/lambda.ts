@@ -67,6 +67,7 @@ export class LambdaConstruct extends Construct {
           "polly:StartSpeechSynthesisTask",
           "cognito-idp:ListUsers",
           "dynamodb:PutItem",
+          "dynamodb:UpdateItem",
         ],
         resources: ["*"], // optionally scope per service if needed
       }),
