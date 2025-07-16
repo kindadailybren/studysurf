@@ -43,13 +43,43 @@ export class ApiGatewayConstruct extends Construct {
     });
 
     this.api.addRoutes({
-      path: "/get-users",
+      path: "/getUsers",
       methods: [api.HttpMethod.GET],
       integration: props.sampleIntegration,
     });
 
     this.api.addRoutes({
-      path: "/create-user",
+      path: "/createUser",
+      methods: [api.HttpMethod.POST],
+      integration: props.sampleIntegration,
+    });
+
+    this.api.addRoutes({
+      path: "/confirmUser",
+      methods: [api.HttpMethod.POST],
+      integration: props.sampleIntegration,
+    });
+
+    this.api.addRoutes({
+      path: "/login",
+      methods: [api.HttpMethod.POST],
+      integration: props.sampleIntegration,
+    });
+
+    this.api.addRoutes({
+      path: "/deleteUser",
+      methods: [api.HttpMethod.POST],
+      integration: props.sampleIntegration,
+    });
+
+    this.api.addRoutes({
+      path: "/forgetPass",
+      methods: [api.HttpMethod.POST],
+      integration: props.sampleIntegration,
+    });
+
+    this.api.addRoutes({
+      path: "/forgetPassConfirm",
       methods: [api.HttpMethod.POST],
       integration: props.sampleIntegration,
     });
