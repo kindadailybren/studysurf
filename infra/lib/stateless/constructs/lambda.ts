@@ -51,7 +51,9 @@ export class LambdaConstruct extends Construct {
     fn.addToRolePolicy(
       new iam.PolicyStatement({
         effect: iam.Effect.ALLOW,
-        actions: ["bedrock:InvokeModel"],
+        actions: [
+          "bedrock:InvokeModel",
+        ],
         resources: [
           "arn:aws:bedrock:ap-southeast-1::foundation-model/anthropic.claude-3-haiku-20240307-v1:0",
         ],
@@ -61,16 +63,14 @@ export class LambdaConstruct extends Construct {
     fn.addToRolePolicy(
       new iam.PolicyStatement({
         effect: iam.Effect.ALLOW,
-        actions: ["polly:StartSpeechSynthesisTask"],
-        resources: ["*"], // or scope to a specific S3 bucket if needed
-      }),
-    );
-
-    fn.addToRolePolicy(
-      new iam.PolicyStatement({
-        effect: iam.Effect.ALLOW,
-        actions: ["cognito-idp:ListUsers"],
-        resources: ["*"], // or scope to a specific S3 bucket if needed
+        actions: [
+          "polly:StartSpeechSynthesisTask",
+          "cognito-idp:AdminGetUser",
+          "cognito-idp:ListUsers",
+          "dynamodb:PutItem",
+          "dynamodb:UpdateItem",
+        ],
+        resources: ["*"], // optionally scope per service if needed
       }),
     );
 

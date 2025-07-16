@@ -17,7 +17,7 @@ class User(BaseModel):
     email: EmailStr
     subscription_tier: SubscriptionTier = SubscriptionTier.FREE
     created_at: datetime = Field(default_factory=datetime.now)
-    updated_at: datetime = Field(default_factory=datetime.now)
+    confirmed: bool = False
 
 
 class Video(BaseModel):
