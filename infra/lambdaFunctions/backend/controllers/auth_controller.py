@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from fastapi import HTTPException
 from botocore.exceptions import ClientError
 from usecases.auth_usecase import AuthUsecase
@@ -66,6 +66,25 @@ async def loginUser(
     try:
         uc = AuthUsecase(cognito, dynamodb)
         return uc.loginUser(credentials)
+    except ClientError as err:
+        errorMessage = err.response["Error"]["Message"]
+        raise HTTPException(status_code=400, detail=errorMessage)
+
+
+@auth_router.post("/refresh-token")
+async def refreshToken(
+    request: Request,
+    cognito: AWS_Cognito = Depends(AWS_Cognito),
+    dynamodb: AWS_DynamoDB_User = Depends(AWS_DynamoDB_User),
+):
+    refreshToken = request.cookies.get("refresh_token")
+
+    if not refreshToken:
+        raise HTTPException(status_code=401, detail="No Refresh Token")
+
+    try:
+        uc = AuthUsecase(cognito, dynamodb)
+        return uc.refreshAccessToken(refreshToken)
     except ClientError as err:
         errorMessage = err.response["Error"]["Message"]
         raise HTTPException(status_code=400, detail=errorMessage)

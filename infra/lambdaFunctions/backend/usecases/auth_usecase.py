@@ -7,7 +7,10 @@ from models.user import (
     UserDelete,
 )
 from models.base import User
+from fastapi.responses import JSONResponse
 from utils.jsonreturn_util import jsonResponse
+from utils.jwt_util import usernameFromIdToken
+from utils.cookie_util import createRefreshTokenCookie
 
 
 class AuthUsecase:
@@ -25,13 +28,16 @@ class AuthUsecase:
     def createUser(self, credentials: UserCreate):
         try:
             user = self.auth.createUser(credentials)
+
             user_data = User(
                 user_id=user["UserSub"],
                 username=credentials.username,
                 email=credentials.email,
             )
             self.db.putUser(user_data)
+
             return jsonResponse(user)
+
         except ClientError as err:
             raise err
 
@@ -41,6 +47,7 @@ class AuthUsecase:
 
             user_data = self.auth.getUser(credentials.username)
             user_id = user_data["UserAttributes"][2]["Value"]
+
             self.db.updateUserConfirmationStatus(user_id)
 
             return jsonResponse(user)
@@ -49,8 +56,48 @@ class AuthUsecase:
 
     def loginUser(self, credentials: UserLogin):
         try:
-            user = self.auth.loginUser(credentials)
-            return jsonResponse(user)
+            loginResponse = self.auth.loginUser(credentials)
+            token = loginResponse["AuthenticationResult"]
+
+            idToken = token["IdToken"]
+            username = usernameFromIdToken(idToken)
+
+            response = JSONResponse(
+                content={
+                    "accessToken": token["AccessToken"],
+                    "idToken": idToken,
+                    "expiration": token["ExpiresIn"],
+                    "username": username,
+                }
+            )
+
+            refreshToken = token["RefreshToken"]
+            createRefreshTokenCookie(response, refreshToken)
+
+            return response
+
+        except ClientError as err:
+            raise err
+
+    def refreshAccessToken(self, refresh_token):
+        try:
+            loginResponse = self.auth.refreshAccessToken(refresh_token)
+            token = loginResponse["AuthenticationResult"]
+
+            idToken = token["IdToken"]
+            username = usernameFromIdToken(idToken)
+
+            response = JSONResponse(
+                content={
+                    "accessToken": token["AccessToken"],
+                    "idToken": token["IdToken"],
+                    "expiration": token["ExpiresIn"],
+                    "username": username,
+                }
+            )
+
+            return response
+
         except ClientError as err:
             raise err
 
@@ -58,6 +105,7 @@ class AuthUsecase:
         try:
             user = self.auth.forgotPassword(username)
             return jsonResponse(user)
+
         except ClientError as err:
             raise err
 
@@ -65,6 +113,7 @@ class AuthUsecase:
         try:
             user = self.auth.confirmForgotPassword(credentials)
             return jsonResponse(user)
+
         except ClientError as err:
             raise err
 
@@ -77,5 +126,6 @@ class AuthUsecase:
             self.db.deleteUserDynamo(user_id)
 
             return jsonResponse(userDelete)
+
         except ClientError as err:
             raise err

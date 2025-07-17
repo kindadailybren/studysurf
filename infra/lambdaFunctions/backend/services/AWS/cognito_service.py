@@ -44,7 +44,7 @@ class AWS_Cognito:
         return confirmedUser
 
     def loginUser(self, credentials: UserLogin):
-        userLogin = self.cognitoClient.initiate_auth(
+        loginResponse = self.cognitoClient.initiate_auth(
             AuthFlow="USER_PASSWORD_AUTH",
             AuthParameters={
                 "USERNAME": credentials.username,
@@ -53,7 +53,18 @@ class AWS_Cognito:
             ClientId=self.cognitoAppClientId,
         )
 
-        return userLogin
+        return loginResponse
+
+    def refreshAccessToken(self, refresh_token):
+        loginResponse = self.cognitoClient.initiate_auth(
+            AuthFlow="REFRESH_TOKEN_AUTH",
+            AuthParameters={
+                "REFRESH_TOKEN": refresh_token,
+            },
+            ClientId=self.cognitoAppClientId,
+        )
+
+        return loginResponse
 
     def deleteUserCognito(self, accessToken):
         userDelete = self.cognitoClient.delete_user(AccessToken=accessToken)
