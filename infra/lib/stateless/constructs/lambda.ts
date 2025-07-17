@@ -67,6 +67,7 @@ export class LambdaConstruct extends Construct {
           "polly:StartSpeechSynthesisTask",
           "cognito-idp:AdminGetUser",
           "cognito-idp:ListUsers",
+          "cognito-idp:DeleteUser",
           "dynamodb:PutItem",
           "dynamodb:UpdateItem",
         ],
