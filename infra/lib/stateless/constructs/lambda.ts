@@ -69,6 +69,7 @@ export class LambdaConstruct extends Construct {
           "cognito-idp:ListUsers",
           "cognito-idp:DeleteUser",
           "dynamodb:PutItem",
+          "dynamodb:DeleteItem",
           "dynamodb:UpdateItem",
         ],
         resources: ["*"], // optionally scope per service if needed
