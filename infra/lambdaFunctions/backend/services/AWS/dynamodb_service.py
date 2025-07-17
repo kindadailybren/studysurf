@@ -35,6 +35,16 @@ class AWS_DynamoDB_User:
 
         return response
 
+    def deleteUserDynamo(self, user_id):
+        response = self.dynamodb.delete_item(
+            TableName=self.table,
+            Key={
+                "PK": {"S": "USER#" + user_id},
+                "SK": {"S": "USER#" + user_id},
+            },
+        )
+        return response
+
 
 class AWS_DynamoDB_Video:
     pass

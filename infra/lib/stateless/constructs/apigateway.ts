@@ -67,6 +67,12 @@ export class ApiGatewayConstruct extends Construct {
     });
 
     this.api.addRoutes({
+      path: "/refreshToken",
+      methods: [api.HttpMethod.POST],
+      integration: props.sampleIntegration,
+    });
+
+    this.api.addRoutes({
       path: "/deleteUser",
       methods: [api.HttpMethod.POST],
       integration: props.sampleIntegration,
