@@ -61,7 +61,6 @@ class AuthUsecase:
 
             idToken = token["IdToken"]
             username = usernameFromIdToken(idToken)
-
             response = JSONResponse(
                 content={
                     "accessToken": token["AccessToken"],
@@ -90,7 +89,7 @@ class AuthUsecase:
             response = JSONResponse(
                 content={
                     "accessToken": token["AccessToken"],
-                    "idToken": token["IdToken"],
+                    "idToken": idToken,
                     "expiration": token["ExpiresIn"],
                     "username": username,
                 }
