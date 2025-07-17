@@ -71,7 +71,7 @@ async def loginUser(
         raise HTTPException(status_code=400, detail=errorMessage)
 
 
-@auth_router.post("/refresh-token")
+@auth_router.post("/refreshToken")
 async def refreshToken(
     request: Request,
     cognito: AWS_Cognito = Depends(AWS_Cognito),
