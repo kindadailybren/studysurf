@@ -1,6 +1,12 @@
-from models.user import UserCreate, UserLogin, UserConfirm, UserConfirmPasswordChange
+from botocore.exceptions import ClientError
+from models.user import (
+    UserCreate,
+    UserLogin,
+    UserConfirm,
+    UserConfirmPasswordChange,
+    UserDelete,
+)
 from models.base import User
-from utils.exception_util import handleException, handleExceptionLogin
 from utils.jsonreturn_util import jsonResponse
 
 
@@ -9,14 +15,14 @@ class AuthUsecase:
         self.auth = cognito_service
         self.db = dynamodb_service
 
-    async def listUsers(self):
+    def listUsers(self):
         try:
-            users = self.auth.getUsers()
+            users = self.auth.listUsers()
             return jsonResponse(users)
-        except Exception as e:
-            return handleException(e)
+        except ClientError as err:
+            raise err
 
-    async def createUser(self, credentials: UserCreate):
+    def createUser(self, credentials: UserCreate):
         try:
             user = self.auth.createUser(credentials)
             user_data = User(
@@ -26,48 +32,50 @@ class AuthUsecase:
             )
             self.db.putUser(user_data)
             return jsonResponse(user)
-        except Exception as e:
-            return handleException(e)
+        except ClientError as err:
+            raise err
 
-    async def confirmUser(self, credentials: UserConfirm):
+    def confirmUser(self, credentials: UserConfirm):
         try:
             user = self.auth.confirmUser(credentials)
-            user_data = self.auth.getUser(credentials.username)
-            self.db.updateUserConfirmationStatus(
-                user_data["UserAttributes"][2]["Value"]
-            )
-            return jsonResponse(user_data)
-        except Exception as e:
-            return handleException(e)
 
-    async def loginUser(self, credentials: UserLogin):
+            user_data = self.auth.getUser(credentials.username)
+            user_id = user_data["UserAttributes"][2]["Value"]
+            self.db.updateUserConfirmationStatus(user_id)
+
+            return jsonResponse(user)
+        except ClientError as err:
+            raise err
+
+    def loginUser(self, credentials: UserLogin):
         try:
             user = self.auth.loginUser(credentials)
             return jsonResponse(user)
+        except ClientError as err:
+            raise err
 
-        except Exception as e:
-            return handleExceptionLogin(e)
-
-    async def forgotPassword(self, username):
+    def forgotPassword(self, username):
         try:
             user = self.auth.forgotPassword(username)
             return jsonResponse(user)
+        except ClientError as err:
+            raise err
 
-        except Exception as e:
-            return handleExceptionLogin(e)
-
-    async def confirmForgotPassword(self, credentials: UserConfirmPasswordChange):
+    def confirmForgotPassword(self, credentials: UserConfirmPasswordChange):
         try:
             user = self.auth.confirmForgotPassword(credentials)
             return jsonResponse(user)
+        except ClientError as err:
+            raise err
 
-        except Exception as e:
-            return handleExceptionLogin(e)
-
-    async def deleteUser(self, accessToken):
+    def deleteUser(self, credentials: UserDelete):
         try:
-            userDelete = self.auth.deleteUser(accessToken)
-            return jsonResponse(userDelete)
+            user_data = self.auth.getUser(credentials.username)
+            user_id = user_data["UserAttributes"][2]["Value"]
 
-        except Exception as e:
-            return handleExceptionLogin(e)
+            userDelete = self.auth.deleteUserCognito(credentials.accessCode)
+            self.db.deleteUserDynamo(user_id)
+
+            return jsonResponse(userDelete)
+        except ClientError as err:
+            raise err

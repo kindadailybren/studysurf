@@ -1,8 +1,16 @@
 from fastapi import APIRouter, Depends
+from fastapi import HTTPException
+from botocore.exceptions import ClientError
 from usecases.auth_usecase import AuthUsecase
 from services.AWS.cognito_service import AWS_Cognito
 from services.AWS.dynamodb_service import AWS_DynamoDB_User
-from models.user import UserConfirmPasswordChange, UserCreate, UserLogin, UserConfirm
+from models.user import (
+    UserConfirmPasswordChange,
+    UserCreate,
+    UserLogin,
+    UserConfirm,
+    UserDelete,
+)
 
 
 auth_router = APIRouter()
@@ -13,8 +21,12 @@ async def getUser(
     cognito: AWS_Cognito = Depends(AWS_Cognito),
     dynamodb: AWS_DynamoDB_User = Depends(AWS_DynamoDB_User),
 ):
-    uc = AuthUsecase(cognito, dynamodb)
-    return await uc.listUsers()
+    try:
+        uc = AuthUsecase(cognito, dynamodb)
+        return uc.listUsers()
+    except ClientError as err:
+        errorMessage = err.response["Error"]["Message"]
+        raise HTTPException(status_code=400, detail=errorMessage)
 
 
 @auth_router.post("/createUser")
@@ -23,8 +35,12 @@ async def createUser(
     cognito: AWS_Cognito = Depends(AWS_Cognito),
     dynamodb: AWS_DynamoDB_User = Depends(AWS_DynamoDB_User),
 ):
-    uc = AuthUsecase(cognito, dynamodb)
-    return await uc.createUser(credentials)
+    try:
+        uc = AuthUsecase(cognito, dynamodb)
+        return uc.createUser(credentials)
+    except ClientError as err:
+        errorMessage = err.response["Error"]["Message"]
+        raise HTTPException(status_code=400, detail=errorMessage)
 
 
 @auth_router.post("/confirmUser")
@@ -33,8 +49,12 @@ async def confirmUser(
     cognito: AWS_Cognito = Depends(AWS_Cognito),
     dynamodb: AWS_DynamoDB_User = Depends(AWS_DynamoDB_User),
 ):
-    uc = AuthUsecase(cognito, dynamodb)
-    return await uc.confirmUser(credentials)
+    try:
+        uc = AuthUsecase(cognito, dynamodb)
+        return uc.confirmUser(credentials)
+    except ClientError as err:
+        errorMessage = err.response["Error"]["Message"]
+        raise HTTPException(status_code=400, detail=errorMessage)
 
 
 @auth_router.post("/login")
@@ -43,18 +63,26 @@ async def loginUser(
     cognito: AWS_Cognito = Depends(AWS_Cognito),
     dynamodb: AWS_DynamoDB_User = Depends(AWS_DynamoDB_User),
 ):
-    uc = AuthUsecase(cognito, dynamodb)
-    return await uc.loginUser(credentials)
+    try:
+        uc = AuthUsecase(cognito, dynamodb)
+        return uc.loginUser(credentials)
+    except ClientError as err:
+        errorMessage = err.response["Error"]["Message"]
+        raise HTTPException(status_code=400, detail=errorMessage)
 
 
 @auth_router.post("/deleteUser")
 async def deleteUser(
-    accessToken,
+    credentials: UserDelete,
     cognito: AWS_Cognito = Depends(AWS_Cognito),
     dynamodb: AWS_DynamoDB_User = Depends(AWS_DynamoDB_User),
 ):
-    uc = AuthUsecase(cognito, dynamodb)
-    return await uc.deleteUser(accessToken)
+    try:
+        uc = AuthUsecase(cognito, dynamodb)
+        return uc.deleteUser(credentials)
+    except ClientError as err:
+        errorMessage = err.response["Error"]["Message"]
+        raise HTTPException(status_code=400, detail=errorMessage)
 
 
 @auth_router.post("/forgetPass")
@@ -63,8 +91,12 @@ async def forgetPass(
     cognito: AWS_Cognito = Depends(AWS_Cognito),
     dynamodb: AWS_DynamoDB_User = Depends(AWS_DynamoDB_User),
 ):
-    uc = AuthUsecase(cognito, dynamodb)
-    return await uc.forgotPassword(username)
+    try:
+        uc = AuthUsecase(cognito, dynamodb)
+        return uc.forgotPassword(username)
+    except ClientError as err:
+        errorMessage = err.response["Error"]["Message"]
+        raise HTTPException(status_code=400, detail=errorMessage)
 
 
 @auth_router.post("/forgetPassConfirm")
@@ -73,5 +105,9 @@ async def confirmForgetPass(
     cognito: AWS_Cognito = Depends(AWS_Cognito),
     dynamodb: AWS_DynamoDB_User = Depends(AWS_DynamoDB_User),
 ):
-    uc = AuthUsecase(cognito, dynamodb)
-    return await uc.confirmForgotPassword(credentials)
+    try:
+        uc = AuthUsecase(cognito, dynamodb)
+        return uc.confirmForgotPassword(credentials)
+    except ClientError as err:
+        errorMessage = err.response["Error"]["Message"]
+        raise HTTPException(status_code=400, detail=errorMessage)

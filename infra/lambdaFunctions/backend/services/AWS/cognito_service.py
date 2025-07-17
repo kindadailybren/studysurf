@@ -55,7 +55,7 @@ class AWS_Cognito:
 
         return userLogin
 
-    def deleteUser(self, accessToken):
+    def deleteUserCognito(self, accessToken):
         userDelete = self.cognitoClient.delete_user(AccessToken=accessToken)
 
         return userDelete

@@ -12,6 +12,11 @@ class UserConfirm(BaseModel):
     confirmationCode: str
 
 
+class UserDelete(BaseModel):
+    username: str
+    accessCode: str
+
+
 class UserConfirmPasswordChange(BaseModel):
     username: str
     password: str
