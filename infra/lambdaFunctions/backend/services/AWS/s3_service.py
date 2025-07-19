@@ -1,4 +1,5 @@
 import boto3
+import os
 
 class AWS_S3:
     def __init__(self):
