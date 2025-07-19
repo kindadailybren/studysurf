@@ -14,9 +14,7 @@ class AWS_S3:
                 Filename=file_path,
                 Bucket=self.bucket,
                 Key=key,
-                ExtraArgs={"ContentType": "video/mp4",
-                            "ACL": "public-read"
-                }
+                ExtraArgs={"ContentType": "video/mp4"}
             )
 
             return f"https://{self.bucket}.s3.{self.s3_client.meta.region_name}.amazonaws.com/{key}"
