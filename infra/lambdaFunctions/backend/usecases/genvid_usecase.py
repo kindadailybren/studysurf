@@ -15,9 +15,9 @@ class GenVidUseCase:
             )
 
             video_input = {
-                "video_path": "assets/template.mp4",
-                "summary_text": summary_text,
-                "output_path": "outputs/final_video.mp4",
+                "video_path": "ambot wala pako kabalo dawg asa ni kuhaon",
+                "summary_text": generatedSummary["summary_text"],
+                "output_path": "hahahahah",
                 "font_size": 32,
                 "font_color": "white",
                 "bg_color": "black",
