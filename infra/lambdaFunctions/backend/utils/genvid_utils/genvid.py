@@ -7,6 +7,8 @@ class MoviePy:
         video_path = audioGenerated["video_path"]
         summary_text = audioGenerated["summary_text"]
         output_path = audioGenerated["output_path"]
+
+        # Optional parameters for text styling
         font_size = audioGenerated.get("font_size", 32)
         font_color = audioGenerated.get("font_color", "white")
         bg_color = audioGenerated.get("bg_color", "black")
