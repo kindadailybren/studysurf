@@ -2,9 +2,10 @@ from fastapi.responses import JSONResponse
 
 
 class GenVidUseCase:
-    def __init__(self, bedrock_service, polly_service):
+    def __init__(self, bedrock_service, polly_service, moviepy_service):
         self.AI = bedrock_service
         self.VoiceGenerator = polly_service
+        self.VideoCreator = moviepy_service
 
     async def generate_video_usecase(self, file):
         try:
@@ -12,6 +13,18 @@ class GenVidUseCase:
             audioGenerated, textReference = self.VoiceGenerator.gen_audio(
                 generatedSummary
             )
+
+            video_input = {
+                "video_path": "assets/template.mp4",
+                "summary_text": summary_text,
+                "output_path": "outputs/final_video.mp4",
+                "font_size": 32,
+                "font_color": "white",
+                "bg_color": "black",
+                "position": "center"
+            }
+
+            self.VideoCreator.generate_video_with_text(video_input)
 
             return JSONResponse(
                 content={
