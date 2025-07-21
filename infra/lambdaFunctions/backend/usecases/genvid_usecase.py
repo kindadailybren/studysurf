@@ -16,7 +16,7 @@ class GenVidUseCase:
 
             video_input = {
                 "video_path": "ambot wala pako kabalo dawg asa ni kuhaon",
-                "summary_text": generatedSummary["summary_text"],
+                "summary_text": textReference,
                 "output_path": "hahahahah",
                 "font_size": 32,
                 "font_color": "white",
@@ -24,7 +24,7 @@ class GenVidUseCase:
                 "position": "center"
             }
 
-            self.VideoCreator.generate_video_with_text(video_input)
+            #self.VideoCreator.generate_video_with_text(video_input)
 
             return JSONResponse(
                 content={
