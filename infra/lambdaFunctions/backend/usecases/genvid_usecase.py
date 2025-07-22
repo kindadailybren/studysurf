@@ -12,7 +12,7 @@ class GenVidUseCase:
 
             audioGenerated, textReference = self.VoiceGenerator.gen_audio(generatedSummary)
 
-            filename = "a.mp4"  # Replace this with dynamic filename if needed
+            filename = "base.mp4"  # Replace this with dynamic filename if needed
 
             base_path = "infra/lambdaFunctions/backend/utils/genvid_utils/output/"
             video_input = {
@@ -24,7 +24,7 @@ class GenVidUseCase:
                 "position": "center"
             }
 
-            self.VideoCreator.generate_video_with_text(video_input)
+            #self.VideoCreator.generate_video_with_text(video_input)
 
             # 6. Return useful info
             return JSONResponse(
