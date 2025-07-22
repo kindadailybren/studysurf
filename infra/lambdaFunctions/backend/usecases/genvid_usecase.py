@@ -14,8 +14,10 @@ class GenVidUseCase:
                 generatedSummary
             )
             await asyncio.sleep(3)
-
+            localPathSubwayVideo = self.VideoStorage.grabVideoSubwayFroms3()
             localPathAudio = self.VideoStorage.grabAudioFroms3(audioGenerated["SynthesisTask"]["OutputUri"])#tmp
+
+            
 
             # videoUrl = self.VideoStorage.uploadVideo() #pass vid file path from carlos as argument?
 
@@ -27,7 +29,8 @@ class GenVidUseCase:
                     "s3_audio_uri": audioGenerated["SynthesisTask"]["OutputUri"],
                     "task_status": audioGenerated["SynthesisTask"]["TaskStatus"],
                     # "video_url": videoUrl,#notsure
-                    "local_path_tmp_audio": localPathAudio
+                    "local_path_tmp_audio": localPathAudio,
+                    "local_path_tmp_video": localPathSubwayVideo,
                 }
             )
 

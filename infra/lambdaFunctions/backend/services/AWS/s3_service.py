@@ -9,7 +9,7 @@ class AWS_S3:
         self.s3_client = boto3.client("s3", region_name="ap-southeast-1")
         self.bucket = "studysurf-outputvids"
         self.bucketAudio = "polly-practice-bren"
-        self.bucketSubwayVid = "asd"
+        self.bucketSubwayVid = "subway-background-vids"
 
     def grabAudioFroms3(self, audio_s3_link):
         parsedUrl = urllib.parse.urlparse(audio_s3_link)
@@ -56,7 +56,7 @@ class AWS_S3:
         
         except Exception as e:
 
-            print(f"Error downloading audio from S3: {e}")
+            print(f"Error downloading video from S3: {e}")
             return None
 
         
