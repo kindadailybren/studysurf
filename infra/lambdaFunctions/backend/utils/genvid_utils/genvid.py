@@ -1,15 +1,18 @@
 from moviepy import VideoFileClip, TextClip, CompositeVideoClip
+import os
 
 class MoviePy:
     def __init__(self):
         pass
 
     def generate_video_with_text(self, audioGenerated):
-        video_path = audioGenerated["TEMPORARY"]
-        summary_text = audioGenerated["summary_text"]
-        output_path = audioGenerated["TEMPORARY"]
+        # Hardcoded path within your project structure
+        base_path = "infra/lambdaFunctions/backend/utils/genvid_utils/output/"
+        video_path = base_path + audioGenerated.get("filename", "video.mp4")
+        output_path = base_path + "output_" + audioGenerated.get("filename", "video.mp4")
 
-        # Optional parameters for text styling
+        summary_text = audioGenerated["summary_text"]
+
         font_size = audioGenerated.get("font_size", 32)
         font_color = audioGenerated.get("font_color", "white")
         bg_color = audioGenerated.get("bg_color", "black")
