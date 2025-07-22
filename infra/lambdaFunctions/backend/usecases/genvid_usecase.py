@@ -13,8 +13,9 @@ class GenVidUseCase:
             audioGenerated, textReference = self.VoiceGenerator.gen_audio(
                 generatedSummary
             )
+            localPathAudio = self.VideoStorage.grabAudioFroms3(audioGenerated["SynthesisTask"]["OutputUri"])#tmp
 
-            videoUrl = self.VideoStorage.uploadVideo()#pass vid file path from carlos as argument?
+            # videoUrl = self.VideoStorage.uploadVideo() #pass vid file path from carlos as argument?
 
             return JSONResponse(
                 content={
@@ -23,7 +24,8 @@ class GenVidUseCase:
                     "output_tokens": generatedSummary["usage"]["output_tokens"],
                     "s3_audio_uri": audioGenerated["SynthesisTask"]["OutputUri"],
                     "task_status": audioGenerated["SynthesisTask"]["TaskStatus"],
-                    "video_url": videoUrl#notsure
+                    # "video_url": videoUrl,#notsure
+                    "local_path_tmp_audio": localPathAudio
                 }
             )
 

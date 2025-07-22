@@ -1,10 +1,52 @@
 import boto3
 import os
+import urllib.parse
 
 class AWS_S3:
     def __init__(self):
         self.s3_client = boto3.client("s3", region_name="ap-southeast-1")
         self.bucket = "studysurf-outputvids"
+        self.bucketAudio = "polly-practice-bren"
+        self.bucketSubwayVid = "asd"
+
+    def grabAudioFroms3(self, audio_s3_link):
+        parsedUrl = urllib.parse.urlparse(audio_s3_link)
+        pathParts = parsedUrl.path.lstrip('/').split('/', 1)
+        
+        if len(pathParts) < 2:
+            print("[ERROR] Cannot determine key from S3 URL.")
+            return None
+        
+        key = pathParts[1]
+        local_path = f"/tmp/{os.path.basename(key)}"
+
+        print(f"[DEBUG] audio_s3_link: {audio_s3_link}")
+        print(f"[DEBUG]  bucket: {self.bucketAudio}")
+        print(f"[DEBUG] parsed key: {key}")
+        print(f"[DEBUG] local path: {local_path}")
+
+
+        try:
+            self.s3_client.download_file(self.bucketAudio,key,local_path)
+            print(f"[DEBUG] Download successful")
+            return local_path
+        except Exception as e:
+            print(f"Error downloading audio from S3: {e}")
+            return None
+    
+    def grabVideoSubwayFroms3():
+        key = ""
+
+        local_path = f"/tmp/{os.path.basename(key)}"
+        try:
+            self.s3_client.download_file(self.bucketSubwayVid, key, local_path)
+
+        except Exception as e:
+            print(f"Error downloading audio from S3: {e}")
+            return None
+
+        
+
     def uploadVideo(self, file_path):
         key = os.path.basename(file_path)
 
