@@ -1,6 +1,7 @@
 import boto3
 import os
 import urllib.parse
+from utils.getFilePath_util import  get_temp_file_path
 
 class AWS_S3:
     def __init__(self):
@@ -18,7 +19,8 @@ class AWS_S3:
             return None
         
         key = pathParts[1]
-        local_path = f"/tmp/{os.path.basename(key)}"
+        local_path = get_temp_file_path(os.path.basename(key))
+
 
         print(f"[DEBUG] audio_s3_link: {audio_s3_link}")
         print(f"[DEBUG]  bucket: {self.bucketAudio}")
@@ -34,10 +36,12 @@ class AWS_S3:
             print(f"Error downloading audio from S3: {e}")
             return None
     
-    def grabVideoSubwayFroms3():
+    def grabVideoSubwayFroms3(self):
         key = ""
 
-        local_path = f"/tmp/{os.path.basename(key)}"
+        local_path = get_temp_file_path(os.path.basename(key))
+
+
         try:
             self.s3_client.download_file(self.bucketSubwayVid, key, local_path)
 

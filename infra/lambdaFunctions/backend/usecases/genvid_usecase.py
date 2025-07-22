@@ -1,5 +1,5 @@
 from fastapi.responses import JSONResponse
-
+import asyncio
 
 class GenVidUseCase:
     def __init__(self, bedrock_service, polly_service, s3_service):
@@ -13,6 +13,8 @@ class GenVidUseCase:
             audioGenerated, textReference = self.VoiceGenerator.gen_audio(
                 generatedSummary
             )
+            await asyncio.sleep(3)
+
             localPathAudio = self.VideoStorage.grabAudioFroms3(audioGenerated["SynthesisTask"]["OutputUri"])#tmp
 
             # videoUrl = self.VideoStorage.uploadVideo() #pass vid file path from carlos as argument?
