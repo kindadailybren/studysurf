@@ -2,7 +2,7 @@ from fastapi import APIRouter, Request, Depends
 from usecases.genvid_usecase import GenVidUseCase
 from services.AWS.bedrock_service import AWS_Bedrock
 from services.AWS.polly_service import AWS_Polly
-from utils.genvid_utils.genvid import MoviePy
+from utils.genvid_utils.moviepy_service import MoviePy
 
 
 genvid_router = APIRouter()

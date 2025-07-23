@@ -1,5 +1,6 @@
+import os
+os.environ["IMAGEMAGICK_BINARY"] = r"C:\Program Files\ImageMagick-7.1.2-Q16-HDRI\magick.exe"
 from fastapi.responses import JSONResponse
-
 class GenVidUseCase:
     def __init__(self, bedrock_service, polly_service, moviepy_service):
         self.AI = bedrock_service
@@ -14,7 +15,7 @@ class GenVidUseCase:
 
             filename = "base.mp4"  # Replace this with dynamic filename if needed
 
-            base_path = "infra/lambdaFunctions/backend/utils/genvid_utils/output/"
+            base_path = ""
             video_input = {
                 "filename": filename,
                 "summary_text": textReference,
@@ -24,11 +25,13 @@ class GenVidUseCase:
                 "position": "center"
             }
 
-            #self.VideoCreator.generate_video_with_text(video_input)
+            self.VideoCreator.generate_video_with_text(video_input)
 
             # 6. Return useful info
             return JSONResponse(
                 content={
+                    "status": "success",
+                    "message": "Video generated successfully.",
                     "answer": textReference,
                     "input_tokens": generatedSummary["usage"]["input_tokens"],
                     "output_tokens": generatedSummary["usage"]["output_tokens"],
