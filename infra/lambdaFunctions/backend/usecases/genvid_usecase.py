@@ -1,5 +1,6 @@
 from fastapi.responses import JSONResponse
 import asyncio
+import os
 
 class GenVidUseCase:
     def __init__(self, bedrock_service, polly_service, s3_service):
@@ -13,12 +14,17 @@ class GenVidUseCase:
             audioGenerated, textReference = self.VoiceGenerator.gen_audio(
                 generatedSummary
             )
-            await asyncio.sleep(3)
+            await asyncio.sleep(1)
             localPathSubwayVideo = self.VideoStorage.grabVideoSubwayFroms3()
+            await asyncio.sleep(1)
             localPathAudio = self.VideoStorage.grabAudioFroms3(audioGenerated["SynthesisTask"]["OutputUri"])#tmp
 
-            
-
+            try:
+                os.remove(localPathAudio)
+                os.remove(localPathSubwayVideo)
+                print("File deleted successfully.")
+            except Exception as e:
+                print(f"Error deleting file: {e}")
             # videoUrl = self.VideoStorage.uploadVideo() #pass vid file path from carlos as argument?
 
             return JSONResponse(
