@@ -2,6 +2,7 @@ from fastapi.responses import JSONResponse
 import time
 import os
 
+
 class GenVidUseCase:
     def __init__(self, bedrock_service, polly_service, s3_service):
         self.AI = bedrock_service
@@ -14,10 +15,11 @@ class GenVidUseCase:
             audioGenerated, textReference = self.VoiceGenerator.gen_audio(
                 generatedSummary
             )
-            
+
             localPathSubwayVideo = self.VideoStorage.grabVideoSubwayFroms3()
-            time.sleep(5)
-            localPathAudio = self.VideoStorage.grabAudioFroms3(audioGenerated["SynthesisTask"]["OutputUri"])#tmp
+            localPathAudio = self.VideoStorage.grabAudioFroms3(
+                audioGenerated["SynthesisTask"]["OutputUri"]
+            )  # tmp
 
             try:
                 os.remove(localPathAudio)
@@ -25,7 +27,7 @@ class GenVidUseCase:
                 print("File deleted successfully.")
             except Exception as e:
                 print(f"Error deleting file: {e}")
-            #videoUrl = self.VideoStorage.uploadVideo() #pass vid file path from carlos as argument?
+            # videoUrl = self.VideoStorage.uploadVideo() #pass vid file path from carlos as argument?
 
             return JSONResponse(
                 content={
@@ -34,7 +36,7 @@ class GenVidUseCase:
                     "output_tokens": generatedSummary["usage"]["output_tokens"],
                     "s3_audio_uri": audioGenerated["SynthesisTask"]["OutputUri"],
                     "task_status": audioGenerated["SynthesisTask"]["TaskStatus"],
-                    #"video_url": videoUrl,#notsure
+                    # "video_url": videoUrl,#notsure
                     "local_path_tmp_audio": localPathAudio,
                     "local_path_tmp_video": localPathSubwayVideo,
                 }
