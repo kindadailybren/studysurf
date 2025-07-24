@@ -1,3 +1,4 @@
+from fastapi.responses import JSONResponse
 import boto3
 import os
 import random
@@ -30,7 +31,7 @@ class AWS_S3:
 
         try:
             self.s3_client.download_file(self.bucketAudio, key, local_path)
-            print(f"[DEBUG] Download successful")
+            print("[DEBUG] Download successful")
             return local_path
         except Exception as e:
             print(f"Error downloading audio from S3: {e}")
@@ -72,4 +73,4 @@ class AWS_S3:
             return f"https://{self.bucket}.s3.{self.s3_client.meta.region_name}.amazonaws.com/{key}"
 
         except Exception as e:
-            return None
+            return JSONResponse(status_code=500, content={"error": str(e)})

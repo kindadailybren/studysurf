@@ -17,7 +17,7 @@ class GenVidUseCase:
             )
 
             localPathSubwayVideo = self.VideoStorage.grabVideoSubwayFroms3()
-            time.sleep(3)
+            time.sleep(5)
             localPathAudio = self.VideoStorage.grabAudioFroms3(
                 audioGenerated["SynthesisTask"]["OutputUri"]
             )  # tmp
