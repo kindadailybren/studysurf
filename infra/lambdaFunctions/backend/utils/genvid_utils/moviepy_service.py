@@ -1,4 +1,4 @@
-from moviepy.editor import VideoFileClip, TextClip, CompositeVideoClip
+from moviepy import VideoFileClip, TextClip, CompositeVideoClip
 import os
 
 class MoviePy:
@@ -21,13 +21,13 @@ class MoviePy:
         video = VideoFileClip(video_path)
         wrapped_text = "\n".join(summary_text.strip().splitlines())
         text_clip = TextClip(
-            wrapped_text,
-            fontsize=font_size,
+            text = wrapped_text,
+            font_size=font_size,
             color=font_color,
             bg_color=bg_color,
             size=video.size,
             method='caption'
-        ).set_duration(video.duration).set_position(position)
+        ).with_duration(video.duration).with_position(position)
 
         final = CompositeVideoClip([video, text_clip])
         final.write_videofile(output_path, codec="libx264", audio_codec="aac")
