@@ -13,6 +13,7 @@ class GenVidUseCase:
     async def generate_video_usecase(self, file):
         try:
             generatedSummary = self.AI.gen_summarization(file)
+            audioGenerated, textReference = self.VoiceGenerator.gen_audio(generatedSummary)
 
             localPathSubwayVideo = self.VideoStorage.grabVideoSubwayFroms3()
             time.sleep(5)
@@ -20,21 +21,12 @@ class GenVidUseCase:
                 audioGenerated["SynthesisTask"]["OutputUri"]
             )  # tmp
 
-            try:
-                os.remove(localPathAudio)
-                os.remove(localPathSubwayVideo)
-                print("File deleted successfully.")
-            except Exception as e:
-                print(f"Error deleting file: {e}")
-            # videoUrl = self.VideoStorage.uploadVideo() #pass vid file path from carlos as argument?
-            
-            audioGenerated, textReference = self.VoiceGenerator.gen_audio(generatedSummary)
-
             filename = "base.mp4"  # Replace this with dynamic filename if needed
 
-            base_path = ""
             video_input = {
                 "filename": filename,
+                "bgVidLocalPath": localPathSubwayVideo,
+                "audioLocalPath": localPathAudio,
                 "summary_text": textReference,
                 "font_size": 32,
                 "font_color": "white",
@@ -43,8 +35,16 @@ class GenVidUseCase:
             }
 
             self.VideoCreator.generate_video_with_text(video_input)
+            
+            # videoUrl = self.VideoStorage.uploadVideo() #pass vid file path from carlos as argument?
 
-            # 6. Return useful info
+            try:
+                os.remove(localPathAudio)
+                os.remove(localPathSubwayVideo)
+                print("File deleted successfully.")
+            except Exception as e:
+                print(f"Error deleting file: {e}")
+
             return JSONResponse(
                 content={
                     "answer": textReference,
