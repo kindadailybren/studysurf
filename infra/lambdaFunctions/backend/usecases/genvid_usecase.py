@@ -21,6 +21,7 @@ class GenVidUseCase:
             # 1. Generate Summary using Bedrock(AI)
             generatedSummary = self.AI.gen_summarization(file)
             audioGenerated, textReference = self.VoiceGenerator.gen_audio(generatedSummary)
+            audioSpeechMarks = self.VoiceGenerator.gen_speech_marks(generatedSummary)
 
             # 2. Generate voiceover audio + reference text
             localPathSubwayVideo = self.VideoStorage.grabVideoSubwayFroms3()
@@ -35,6 +36,7 @@ class GenVidUseCase:
                 "filename": filename,
                 "bgVidLocalPath": localPathSubwayVideo,
                 "audioLocalPath": localPathAudio,
+                "speechMarks": audioSpeechMarks,
                 "summary_text": textReference,
                 "font_size": 32,
                 "font_color": "white",
@@ -42,9 +44,9 @@ class GenVidUseCase:
                 "position": "center"
             }
 
-            self.VideoCreator.generate_video_with_text(video_input)
+            videoPathOutput = self.VideoCreator.generate_video_with_text(video_input)
             
-            # videoUrl = self.VideoStorage.uploadVideo() #pass vid file path from carlos as argument?
+            videoUrl = self.VideoStorage.uploadVideo(videoPathOutput) 
 
             try:
                 os.remove(localPathAudio)
@@ -60,9 +62,10 @@ class GenVidUseCase:
                     "output_tokens": generatedSummary["usage"]["output_tokens"],
                     "s3_audio_uri": audioGenerated["SynthesisTask"]["OutputUri"],
                     "task_status": audioGenerated["SynthesisTask"]["TaskStatus"],
-                     # "video_url": videoUrl,#notsure
                     "local_path_tmp_audio": localPathAudio,
                     "local_path_tmp_video": localPathSubwayVideo,
+                    "local_path_tmp_output": videoPathOutput,
+                    "video_url": videoUrl,
                 }
             )
 

@@ -18,7 +18,7 @@ async def generate_video(
     bedrock: AWS_Bedrock = Depends(AWS_Bedrock),
     polly: AWS_Polly = Depends(AWS_Polly),
     moviepy: MoviePy = Depends(MoviePy),
-    s3: AWS_S3 = Depends(AWS_S3)
+    s3: AWS_S3 = Depends(AWS_S3),
 ):
     file = await request.body()
 
