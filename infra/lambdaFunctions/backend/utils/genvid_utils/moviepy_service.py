@@ -11,6 +11,7 @@ class MoviePy:
         #TO BE EDITED: for s3 integration
         bgVid = audioGenerated["bgVidLocalPath"]
         audio = audioGenerated["audioLocalPath"]
+        speechMarks = audioGenerated["speechMarks"]
         key = audioGenerated.get("filename", "video.mp4")
         
         output_path = get_temp_file_path(os.path.basename(key))
@@ -34,3 +35,5 @@ class MoviePy:
 
         final = CompositeVideoClip([video, text_clip])
         final.write_videofile(output_path, codec="libx264", audio_codec="aac")
+
+        return output_path
