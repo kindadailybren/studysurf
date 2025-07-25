@@ -1,8 +1,14 @@
 import os
 import time
-os.environ["IMAGEMAGICK_BINARY"] = r"C:\Program Files\ImageMagick-7.1.2-Q16-HDRI\magick.exe"
 from fastapi.responses import JSONResponse
 
+#Subtitle Tools
+from utils.srt_utils.timestamps_util import estimate_timings
+from utils.srt_utils.subtitle_util import generate_srt_from_timestamps 
+from utils.srt_utils.sentence_splitter import split_sentences
+
+#ImageMagick for MoviePy - TO BE FIXED SINCE THIS CANNOT BE HOSTED
+os.environ["IMAGEMAGICK_BINARY"] = r"C:\Program Files\ImageMagick-7.1.2-Q16-HDRI\magick.exe"
 class GenVidUseCase:
     def __init__(self, bedrock_service, polly_service, moviepy_service, s3_service):
         self.AI = bedrock_service
@@ -12,9 +18,11 @@ class GenVidUseCase:
 
     async def generate_video_usecase(self, file):
         try:
+            # 1. Generate Summary using Bedrock(AI)
             generatedSummary = self.AI.gen_summarization(file)
             audioGenerated, textReference = self.VoiceGenerator.gen_audio(generatedSummary)
 
+            # 2. Generate voiceover audio + reference text
             localPathSubwayVideo = self.VideoStorage.grabVideoSubwayFroms3()
             time.sleep(5)
             localPathAudio = self.VideoStorage.grabAudioFroms3(
@@ -52,7 +60,6 @@ class GenVidUseCase:
                     "output_tokens": generatedSummary["usage"]["output_tokens"],
                     "s3_audio_uri": audioGenerated["SynthesisTask"]["OutputUri"],
                     "task_status": audioGenerated["SynthesisTask"]["TaskStatus"],
-                    "video_path": base_path + "output_" + filename,
                      # "video_url": videoUrl,#notsure
                     "local_path_tmp_audio": localPathAudio,
                     "local_path_tmp_video": localPathSubwayVideo,
