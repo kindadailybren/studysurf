@@ -1,30 +1,32 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { LoadingBar } from "../LoadingBar";
 import { api } from "../../api/LoginApi";
 
 interface ForgotPassProps {
   setIsOpenForgotPass: (state: boolean) => void;
+  username: string;
 }
 
-export const ForgotPassModal = ({setIsOpenForgotPass}: ForgotPassProps) => {
+export const ForgotPassModal = ({setIsOpenForgotPass, username}: ForgotPassProps) => {
+  const [password, setPassword] = useState("");
+  const [confirmationCode, setConfirmationCode] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const sendConfirmation = async () => {
-      try {
-        const response = await api.post('/fogetPass')
-        console.log('sent');
-        handleClose();
-      } catch (error) {
-        console.error(error);
-      }
-    }
-    sendConfirmation();
-  }, [])
+  const isValid = confirmationCode && password;
 
   const handleClose = () => setIsOpenForgotPass(false);
 
-  const forgetPassword = () => {
-    
-    handleClose();
+  const fogetPassConfirm = async () => {
+    try {
+      setLoading(true);
+      const response = await api.post('/forgetPassConfirm', {username, password, confirmationCode})
+
+      handleClose();
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   }
   
   return(
@@ -39,18 +41,25 @@ export const ForgotPassModal = ({setIsOpenForgotPass}: ForgotPassProps) => {
           </div>
           <form onSubmit={(e) => {
             e.preventDefault(); 
-            forgetPassword();
+            fogetPassConfirm();
           }}>
+
+            <div>
+              <label className="block mb-1">Confirmation Code</label>
+              <input type="text" placeholder="Enter confirmation Code" value={confirmationCode} onChange={e => setConfirmationCode(e.target.value)} className="w-full px-4 py-2 mb-2 rounded-md bg-transparent border border-[var(--primary-border)] focus:outline-none focus:ring-1 focus:ring-[var(--highlight-text)]" required/>
+            </div>
+
             <div>
               <label className="block mb-1">New Password</label>
-              <input type="password" placeholder="Enter New Password" className="w-full px-4 py-2 mb-2 rounded-md bg-transparent border border-[var(--primary-border)] focus:outline-none focus:ring-1 focus:ring-[var(--highlight-text)]" required/>
+              <input type="password" placeholder="Enter New Password" value={password} onChange={e => setPassword(e.target.value)} className="w-full px-4 py-2 mb-2 rounded-md bg-transparent border border-[var(--primary-border)] focus:outline-none focus:ring-1 focus:ring-[var(--highlight-text)]" required/>
             </div>
-            <div className="relative">
-              <label className="block mb-1">Verification Code</label>
-              <input type="text" placeholder="Enter Verification Code" className="w-full px-4 py-2 mb-2 rounded-md bg-transparent border border-[var(--primary-border)] focus:outline-none focus:ring-1 focus:ring-[var(--highlight-text)]" required/>
-            </div>
-            
-            <button type="submit" className="border px-5 py-2 mt-2 rounded-lg font-semibold transition-all duration-150 text-[var(--highlight-text)] hover:bg-[var(--highlight-text)] cursor-pointer hover:text-[var(--secondary-bg)]">Submit</button>
+
+            <button disabled={!isValid} type="submit" className={`border px-5 py-2 mt-2 rounded-lg font-semibold transition-all duration-150 ${isValid ? "text-[var(--highlight-text)] hover:bg-[var(--highlight-text)] cursor-pointer hover:text-[var(--secondary-bg)]" : "opacity-20"}`}>{loading ?
+              <div className="flex items-center gap-2">
+                Submit
+                <LoadingBar/>
+              </div> : "Submit"}
+            </button>
           </form>
         </div>
       </div>

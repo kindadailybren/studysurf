@@ -1,14 +1,15 @@
 import { useState } from "react";
 import { api } from "../../api/LoginApi";
 import { useAuthStore } from "../../stores/authStore";
+import { LoadingBar } from "../LoadingBar";
 
 interface SignInModalProps {
   setIsOpenSignIn: (state:boolean) => void;
   setIsOpenSignUp: (state:boolean) => void;
-  setIsOpenForgotPass: (state:boolean) => void;
+  setIsOpenForgotPassUsername: (state:boolean) => void;
 }
 
-export const SignInModal = ({setIsOpenSignIn, setIsOpenSignUp, setIsOpenForgotPass}: SignInModalProps) => {
+export const SignInModal = ({setIsOpenSignIn, setIsOpenSignUp, setIsOpenForgotPassUsername}: SignInModalProps) => {
   const setAccessTokenStore = useAuthStore((state) => state.setAccessToken);
   const setIdTokenStore = useAuthStore((state) => state.setIdToken);
   const setExpirationStore = useAuthStore((state) => state.setExpiration);
@@ -16,6 +17,7 @@ export const SignInModal = ({setIsOpenSignIn, setIsOpenSignUp, setIsOpenForgotPa
   
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const isValid = username && password;
   
   const handleClose = () => setIsOpenSignIn(false);
@@ -26,11 +28,12 @@ export const SignInModal = ({setIsOpenSignIn, setIsOpenSignUp, setIsOpenForgotPa
 
   const handleForgotPass = () => {
     handleClose();
-    setIsOpenForgotPass(true);
+    setIsOpenForgotPassUsername(true);
   }
   
   const loginUser = async () => {
     try {
+      setLoading(true);
       const response = await api.post('/login', {
         username,
         password
@@ -43,8 +46,11 @@ export const SignInModal = ({setIsOpenSignIn, setIsOpenSignUp, setIsOpenForgotPa
       setExpirationStore(expiration);
       setUsernameStore(newUsername);
 
+      setLoading(false);
+      handleClose();
     } catch (error) {
       console.error(error)
+      setLoading(false);
     }
   }
 
@@ -66,7 +72,7 @@ export const SignInModal = ({setIsOpenSignIn, setIsOpenSignUp, setIsOpenForgotPa
             {/* username */}
             <div>
               <label className="block mb-1">Username</label>
-              <input type="text" placeholder="Enter Username" value={username} onChange={e => setUsername(e.target.value)} className="w-full px-4 py-2 mb-2 rounded-md bg-transparent border border-[var(--primary-border)] focus:outline-none focus:ring-1 focus:ring-[var(--highlight-text)]" required/>
+              <input type="text" value={username} onChange={e => setUsername(e.target.value)} placeholder="Enter Username" className="w-full px-4 py-2 mb-2 rounded-md bg-transparent border border-[var(--primary-border)] focus:outline-none focus:ring-1 focus:ring-[var(--highlight-text)]" required/>
             </div>
             {/* password */}
             <div className="relative">
@@ -75,7 +81,12 @@ export const SignInModal = ({setIsOpenSignIn, setIsOpenSignUp, setIsOpenForgotPa
               <span className="absolute hover:underline text-xs cursor-pointer right-0 -bottom-4" onClick={handleForgotPass}>Forgot Password?</span>
             </div>
             
-            <button disabled={!isValid} type="submit" className={`border px-5 py-2 mt-2 rounded-lg font-semibold transition-all duration-150 ${isValid ? "text-[var(--highlight-text)] hover:bg-[var(--highlight-text)] cursor-pointer hover:text-[var(--secondary-bg)]" : "opacity-20"}`}>Sign in</button>
+            <button disabled={!isValid} type="submit" className={`border px-5 py-2 mt-2 rounded-lg font-semibold transition-all duration-150 ${isValid ? "text-[var(--highlight-text)] hover:bg-[var(--highlight-text)] cursor-pointer hover:text-[var(--secondary-bg)]" : "opacity-20"}`}>{loading ?
+              <div className="flex items-center gap-2">
+                Sign up
+                <LoadingBar/>
+              </div> : "Sign up"}
+            </button>
           </form>
           
           {/* or */}

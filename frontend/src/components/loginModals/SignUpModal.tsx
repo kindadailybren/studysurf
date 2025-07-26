@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { api } from "../../api/LoginApi";
+import { LoadingBar } from "../LoadingBar";
 
 interface SignUpModalProps {
   setIsOpenSignUp: (state: boolean) => void;
@@ -47,8 +48,8 @@ export const SignUpModal = ({setIsOpenSignUp, setIsOpenSignIn, setIsOpenAccConfi
       setIsOpenAccConfirm(true);
 
     } catch (error) {
-      setLoading(false);
       console.error(error);
+      setLoading(false);
     }
   } 
 
@@ -70,7 +71,7 @@ export const SignUpModal = ({setIsOpenSignUp, setIsOpenSignIn, setIsOpenAccConfi
             {/* email */}
             <div>
               <label className="block mb-1">Email</label>
-              <input type="email" placeholder="Enter Email" value={email} onChange={e => setEmail(e.target.value)} autoComplete="off" className="w-full px-4 py-2 mb-2 rounded-md bg-transparent border border-[var(--primary-border)] focus:outline-none focus:ring-1 focus:ring-[var(--highlight-text)]" required/>
+              <input type="email" placeholder="Enter Email" pattern="^[^@]+@[^@.]+(\.[^@.]+)+$" value={email} onChange={e => setEmail(e.target.value)} autoComplete="off" className="w-full px-4 py-2 mb-2 rounded-md bg-transparent border border-[var(--primary-border)] focus:outline-none focus:ring-1 focus:ring-[var(--highlight-text)]" required/>
             </div>
             {/* username */}
             <div>
@@ -78,7 +79,7 @@ export const SignUpModal = ({setIsOpenSignUp, setIsOpenSignIn, setIsOpenAccConfi
               <input type="text" value={username} onChange={e => setUsername(e.target.value)} placeholder="Enter Username" className="w-full px-4 py-2 mb-2 rounded-md bg-transparent border border-[var(--primary-border)] focus:outline-none focus:ring-1 focus:ring-[var(--highlight-text)]" required/>
             </div>
             {/* password */}
-            <div className="relative">
+            <div>
               <label className="block mb-1">Password</label>
               <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Enter Password" className="w-full px-4 py-2 mb-2 rounded-md bg-transparent border border-[var(--primary-border)] focus:outline-none focus:ring-1 focus:ring-[var(--highlight-text)]" required/>
             </div>
@@ -97,7 +98,12 @@ export const SignUpModal = ({setIsOpenSignUp, setIsOpenSignIn, setIsOpenAccConfi
               </li>
             </ul>
             
-            <button disabled={!isValid} type="submit" className={`border px-5 py-2 mt-2 rounded-lg font-semibold transition-all duration-150 ${isValid ? "text-[var(--highlight-text)] hover:bg-[var(--highlight-text)] cursor-pointer hover:text-[var(--secondary-bg)]" : "opacity-20"}`}>{loading ? "Signing up" : "Sign up"}</button>            
+            <button disabled={!isValid} type="submit" className={`border px-5 py-2 mt-2 rounded-lg font-semibold transition-all duration-150 ${isValid ? "text-[var(--highlight-text)] hover:bg-[var(--highlight-text)] cursor-pointer hover:text-[var(--secondary-bg)]" : "opacity-20"}`}>{loading ?
+              <div className="flex items-center gap-2">
+                Sign up
+                <LoadingBar/>
+              </div> : "Sign up"}
+            </button>
           </form>
           
           {/* or */}

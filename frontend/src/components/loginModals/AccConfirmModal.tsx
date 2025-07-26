@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { api } from "../../api/LoginApi";
+import { LoadingBar } from "../LoadingBar";
 
 interface AccConfirmModalProps {
   setIsOpenAccConfirm: (state:boolean) => void;
@@ -44,12 +45,17 @@ export const AccConfirmModal = ({setIsOpenAccConfirm, setIsOpenSignIn, username}
             e.preventDefault(); 
             confirmUser();
           }}>
-            <div className="relative">
+            <div>
               <label className="block mb-1">Confirmation Code</label>
               <input type="text" placeholder="Enter Confirmation Code" value={confirmationCode} onChange={e => setConfirmationCode(e.target.value)} className="w-full px-4 py-2 mb-2 rounded-md bg-transparent border border-[var(--primary-border)] focus:outline-none focus:ring-1 focus:ring-[var(--highlight-text)]" required/>
             </div>
             
-            <button disabled={!confirmationCode} type="submit" className={`border px-5 py-2 mt-2 rounded-lg font-semibold transition-all duration-150 ${confirmationCode ? "text-[var(--highlight-text)] hover:bg-[var(--highlight-text)] cursor-pointer hover:text-[var(--secondary-bg)]" : "opacity-20"}`}>{loading ? 'Loading' : 'Submit'}</button>
+            <button disabled={!confirmationCode} type="submit" className={`border px-5 py-2 mt-2 rounded-lg font-semibold transition-all duration-150 ${confirmationCode ? "text-[var(--highlight-text)] hover:bg-[var(--highlight-text)] cursor-pointer hover:text-[var(--secondary-bg)]" : "opacity-20"}`}>{loading ?
+              <div className="flex items-center gap-2">
+                Sign up
+                <LoadingBar/>
+              </div> : "Sign up"}
+            </button>
           </form>
         </div>
       </div>
