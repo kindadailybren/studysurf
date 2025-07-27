@@ -1,6 +1,6 @@
 from moviepy import VideoFileClip, TextClip, CompositeVideoClip, AudioFileClip
-import os
 from utils.getFilePath_util import get_temp_file_path
+import os
 
 
 class MoviePy:
@@ -21,10 +21,10 @@ class MoviePy:
         font_color = audioGenerated.get("font_color", "white")
         position = audioGenerated.get("position", "center")
 
-        video = VideoFileClip(bgVid)
         narration = AudioFileClip(audio)
-
+        video = VideoFileClip(bgVid)
         video = video.with_audio(narration)
+        video = video.cutout(0, narration.duration)
 
         wrapped_text = "\n".join(summary_text.strip().splitlines())
         text_clip = (
