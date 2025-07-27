@@ -67,9 +67,6 @@ jobs:
         find lib/ -type d -name "__pycache__" -exec rm -rf {} +
         find lib/ -type f -name "*.pyc" -delete
 
-        # Delete dist-info folders (if not required)
-        find lib/ -type d -name "*.dist-info" -exec rm -rf {} +
-
         (cd lib && zip -r ../aws_lambda.zip .)
         zip -r aws_lambda.zip app.py controllers models repositories usecases services utils
 
