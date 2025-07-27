@@ -44,8 +44,8 @@ export class LambdaConstruct extends Construct {
           `../../../lambdaFunctions/backend/aws_lambda.zip`,
         ),
       ),
-      memorySize: 512,
-      timeout: Duration.seconds(30),
+      memorySize: 1000,
+      timeout: Duration.minutes(15),
     });
 
     fn.addToRolePolicy(
@@ -65,6 +65,7 @@ export class LambdaConstruct extends Construct {
         effect: iam.Effect.ALLOW,
         actions: [
           "polly:StartSpeechSynthesisTask",
+          "polly:SynthesizeSpeech",
           "cognito-idp:AdminGetUser",
           "cognito-idp:ListUsers",
           "cognito-idp:DeleteUser",
