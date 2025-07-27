@@ -55,6 +55,13 @@ class AWS_Cognito:
 
         return loginResponse
 
+    def logoutUser(self, accessToken: str):
+        loginResponse = self.cognitoClient.global_sign_out(
+            AccessToken=accessToken,
+        )
+
+        return loginResponse
+
     def refreshAccessToken(self, refresh_token):
         loginResponse = self.cognitoClient.initiate_auth(
             AuthFlow="REFRESH_TOKEN_AUTH",

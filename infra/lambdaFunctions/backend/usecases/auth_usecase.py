@@ -10,7 +10,7 @@ from models.base import User
 from fastapi.responses import JSONResponse
 from utils.jsonreturn_util import jsonResponse
 from utils.jwt_util import usernameFromIdToken
-from utils.cookie_util import createRefreshTokenCookie
+from utils.cookie_util import createRefreshTokenCookie, deleteRefreshTokenCookie
 
 
 class AuthUsecase:
@@ -125,6 +125,18 @@ class AuthUsecase:
             self.db.deleteUserDynamo(user_id)
 
             return jsonResponse(userDelete)
+
+        except ClientError as err:
+            raise err
+
+    def logoutUser(self, accessToken):
+        try:
+            response = self.auth.logoutUser(accessToken)
+            deleteRefreshTokenCookie(
+                response=JSONResponse(content={"message": "Logout successful"})
+            )
+
+            return response
 
         except ClientError as err:
             raise err
