@@ -24,7 +24,7 @@ class MoviePy:
         narration = AudioFileClip(audio)
         video = VideoFileClip(bgVid)
         video = video.with_audio(narration)
-        video = video.cutout(0, narration.duration)
+        video = video.subclip(0, narration.duration)
 
         wrapped_text = "\n".join(summary_text.strip().splitlines())
         text_clip = (
