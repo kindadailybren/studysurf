@@ -20,22 +20,31 @@ class GenVidUseCase:
         try:
             # 1. Generate Summary using Bedrock(AI)
             generatedSummary = self.AI.gen_summarization(file)
-            audioGenerated, textReference = self.VoiceGenerator.gen_audio(generatedSummary)
-            audioSpeechMarks = self.VoiceGenerator.gen_speech_marks(generatedSummary)
 
             # 2. Generate voiceover audio + reference text
+            audioGenerated, textReference = self.VoiceGenerator.gen_audio(generatedSummary)
+            audioSpeechMarks = self.VoiceGenerator.gen_speech_marks(generatedSummary)
+            
+            # 3.Prepare the Subtitles
+            sentences = split_sentences(textReference)
+            timestamps = estimate_timings(sentences)
+            srt_path = "output.srt"
+            generate_srt_from_timestamps(sentences, timestamps, srt_path)
+
+            # 4. Fetch Media Assets from S3
             localPathSubwayVideo = self.VideoStorage.grabVideoSubwayFroms3()
             time.sleep(5)
             localPathAudio = self.VideoStorage.grabAudioFroms3(
                 audioGenerated["SynthesisTask"]["OutputUri"]
             )  # tmp
 
+            # 5. Generate Video Using MoviePy
             filename = "base.mp4"  # Replace this with dynamic filename if needed
-
             video_input = {
                 "filename": filename,
                 "bgVidLocalPath": localPathSubwayVideo,
                 "audioLocalPath": localPathAudio,
+                "subtitle": srt_path,  # Use the SRT file as speech marks
                 "speechMarks": audioSpeechMarks,
                 "summary_text": textReference,
                 "font_size": 32,
@@ -48,6 +57,7 @@ class GenVidUseCase:
             
             videoUrl = self.VideoStorage.uploadVideo(videoPathOutput) 
 
+            # 6.CleanUp
             try:
                 os.remove(localPathAudio)
                 os.remove(localPathSubwayVideo)
