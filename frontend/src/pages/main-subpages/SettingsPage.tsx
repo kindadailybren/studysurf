@@ -1,4 +1,4 @@
-import { Login } from "../../components/Login";
+import { User } from "../../components/User";
 
 export const SettingsPage = () => {
   return (
@@ -6,7 +6,7 @@ export const SettingsPage = () => {
       <div className="flex-1 items-center justify-center border-[var(--primary-border)] w-full h-screen mb-10 p-10">
 
         <h1 className="text-3xl font-semibold">Settings Page</h1>
-        <Login/>
+        <User/>
         
       </div>
     </>

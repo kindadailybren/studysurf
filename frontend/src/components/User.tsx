@@ -1,11 +1,15 @@
 import { useState } from "react";
-import { SignUpModal } from "../components/loginModals/SignUpModal";
-import { SignInModal } from "../components/loginModals/SignInModal";
-import { AccConfirmModal } from "../components/loginModals/AccConfirmModal";
-import { ForgotPassModal } from "../components/loginModals/ForgotPassModal";
+import { useAuthStore } from "../stores/authStore";
+
+import { SignUpModal } from "./loginModals/SignUpModal";
+import { SignInModal } from "./loginModals/SignInModal";
+import { AccConfirmModal } from "./loginModals/AccConfirmModal";
+import { ForgotPassModal } from "./loginModals/ForgotPassModal";
 import { ForgotPassUsernameModal } from "./loginModals/ForgotPassUsernameModal";
 
-export const Login = () => {
+export const User = () => {
+  const username = useAuthStore((state) => state.username);
+
   const [isOpenSignIn, setIsOpenSignIn] = useState(false);
   const [isOpenSignUp, setIsOpenSignUp] = useState(false);
   const [isOpenAccConfirm, setIsOpenAccConfirm] = useState(false);
@@ -19,18 +23,29 @@ export const Login = () => {
   
   return (
     <>
-      <span className="cursor-pointer text-[var(--highlight-text)]" onClick={handleOpenSignIn}>
-        Sign In
-      </span><br/>
+      {username ?
+      <span className="cursor-pointer text-[var(--highlight-text)]">
+        {username}
+      </span>
+      :
+      <>
+        <span className="cursor-pointer text-[var(--highlight-text)]" onClick={handleOpenSignIn}>
+          Sign In
+        </span><br/>
+        <span className="cursor-pointer text-[var(--highlight-text)]" onClick={handleOpenSignUp}>
+          Sign Up
+        </span>
+      </>
+      }
+
       {isOpenSignIn && <SignInModal setIsOpenSignIn={setIsOpenSignIn} setIsOpenSignUp={setIsOpenSignUp} setIsOpenForgotPassUsername={setIsOpenForgotPassUsername}/>}
 
-      <span className="cursor-pointer text-[var(--highlight-text)]" onClick={handleOpenSignUp}>
-        Sign Up
-      </span><br/>
       {isOpenSignUp && <SignUpModal setIsOpenSignUp={setIsOpenSignUp} setIsOpenSignIn={setIsOpenSignIn} setIsOpenAccConfirm={setIsOpenAccConfirm} setUsernameInput={setUsernameInput}/>}
 
       {isOpenAccConfirm && <AccConfirmModal setIsOpenAccConfirm={setIsOpenAccConfirm} setIsOpenSignIn={setIsOpenSignIn} username={usernameInput}/>}
+
       {isOpenForgotPassUsername && <ForgotPassUsernameModal setIsOpenForgotPass={setIsOpenForgotPass} setIsOpenForgotPassUsername={setIsOpenForgotPassUsername} setUsernameInput={setUsernameInput}/>}
+      
       {isOpenForgotPass && <ForgotPassModal setIsOpenForgotPass={setIsOpenForgotPass} username={usernameInput}/>}
     </>
   );

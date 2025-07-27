@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { api } from "../../api/LoginApi";
 import { useAuthStore } from "../../stores/authStore";
 import { LoadingBar } from "../LoadingBar";
@@ -10,17 +10,31 @@ interface SignInModalProps {
 }
 
 export const SignInModal = ({setIsOpenSignIn, setIsOpenSignUp, setIsOpenForgotPassUsername}: SignInModalProps) => {
+//  STATES:
+
+  // accessing auth store
   const setAccessTokenStore = useAuthStore((state) => state.setAccessToken);
   const setIdTokenStore = useAuthStore((state) => state.setIdToken);
-  const setExpirationStore = useAuthStore((state) => state.setExpiration);
   const setUsernameStore = useAuthStore((state) => state.setUsername);
   
+  // inputs and error handling 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const isValid = username && password;
+  const [isHovered, setIsHovered] = useState(false);
   
+  // accidental exit, highlighting problem
+  const modalRef = useRef<HTMLDivElement>(null);
+  const [mouseDownInside, setMouseDownInside] = useState(false);
+  
+  const isValid = username && password;
+
+
+// FUNCTIONS: 
+
+  // opening and closing modals
   const handleClose = () => setIsOpenSignIn(false);
+
   const handleOpenSignUp = () => {
     handleClose();
     setIsOpenSignUp(true);
@@ -31,19 +45,16 @@ export const SignInModal = ({setIsOpenSignIn, setIsOpenSignUp, setIsOpenForgotPa
     setIsOpenForgotPassUsername(true);
   }
   
+  // api fetching, and storing states
   const loginUser = async () => {
     try {
       setLoading(true);
-      const response = await api.post('/login', {
-        username,
-        password
-      })
+      const response = await api.post('/login', {username, password})
       
-      const { accessToken, idToken, expiration, username: newUsername } = response.data;
+      const { accessToken, idToken, username: newUsername } = response.data;
       
       setAccessTokenStore(accessToken);
       setIdTokenStore(idToken);
-      setExpirationStore(expiration);
       setUsernameStore(newUsername);
 
       setLoading(false);
@@ -56,8 +67,20 @@ export const SignInModal = ({setIsOpenSignIn, setIsOpenSignUp, setIsOpenForgotPa
 
   return(
     <>
-      <div className="fixed inset-0 flex justify-center items-center z-50 bg-black/70" onClick={handleClose}>
-        <div className="bg-[var(--secondary-bg)] border border-[var(--primary-border)] rounded-xl mx-5 p-8 w-100 overflow-hidden" onClick={(e) => e.stopPropagation()}>
+      <div className="fixed inset-0 flex justify-center items-center z-50 bg-black/70" 
+        onMouseDown={(e) => {
+          if (modalRef.current?.contains(e.target as Node)) {
+            setMouseDownInside(true);
+          } else {
+            setMouseDownInside(false);
+          }
+        }}
+        onMouseUp={() => {
+          if (!mouseDownInside) {
+            handleClose();
+          }
+        }}>
+        <div className="bg-[var(--secondary-bg)] border border-[var(--primary-border)] rounded-xl mx-5 p-8 w-100 overflow-hidden" ref={modalRef}>
           <div className="flex justify-center items-center mb-2">
             <div className="w-12">
               <img src="/studysurf_final.png" className="object-contain" alt="StudySurf Logo" />
@@ -69,11 +92,13 @@ export const SignInModal = ({setIsOpenSignIn, setIsOpenSignUp, setIsOpenForgotPa
             e.preventDefault();
             loginUser();
           }}>
+
             {/* username */}
             <div>
               <label className="block mb-1">Username</label>
               <input type="text" value={username} onChange={e => setUsername(e.target.value)} placeholder="Enter Username" className="w-full px-4 py-2 mb-2 rounded-md bg-transparent border border-[var(--primary-border)] focus:outline-none focus:ring-1 focus:ring-[var(--highlight-text)]" required/>
             </div>
+            
             {/* password */}
             <div className="relative">
               <label className="block mb-1">Password</label>
@@ -81,15 +106,24 @@ export const SignInModal = ({setIsOpenSignIn, setIsOpenSignUp, setIsOpenForgotPa
               <span className="absolute hover:underline text-xs cursor-pointer right-0 -bottom-4" onClick={handleForgotPass}>Forgot Password?</span>
             </div>
             
-            <button disabled={!isValid} type="submit" className={`border px-5 py-2 mt-2 rounded-lg font-semibold transition-all duration-150 ${isValid ? "text-[var(--highlight-text)] hover:bg-[var(--highlight-text)] cursor-pointer hover:text-[var(--secondary-bg)]" : "opacity-20"}`}>{loading ?
-              <div className="flex items-center gap-2">
-                Sign up
-                <LoadingBar/>
-              </div> : "Sign up"}
+            {/* button */}
+            <button disabled={!isValid} type="submit" onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)} className={`border px-5 py-2 mt-2 rounded-lg font-semibold transition-all duration-150 group ${
+              isValid
+                ? "text-[var(--highlight-text)] hover:bg-[var(--highlight-text)] cursor-pointer hover:text-[var(--secondary-bg)]"
+                : "opacity-20"
+            }`}>
+              {loading ? (
+                <div className="flex items-center gap-2">
+                  Submit
+                  <LoadingBar color={isHovered ? "var(--secondary-bg)" : "var(--highlight-text)"} />
+                </div>
+              ) : (
+                "Submit"
+              )}
             </button>
           </form>
           
-          {/* or */}
+          {/* or line */}
           <div className="flex items-center gap-2 my-4">
             <div className="flex-grow h-px bg-[var(--primary-border)]"></div>
             <span className="text-[var(--primary-border)]">or</span>
