@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useAuthStore } from "../stores/authStore";
+import { DeleteUserButton } from "./DeleteUserButton";
+import { LogoutUserButton } from "./LogoutUserButton";
 
 import { SignUpModal } from "./loginModals/SignUpModal";
 import { SignInModal } from "./loginModals/SignInModal";
@@ -24,9 +26,14 @@ export const User = () => {
   return (
     <>
       {username ?
-      <span className="cursor-pointer text-[var(--highlight-text)]">
-        {username}
-      </span>
+      <>
+        <span className="cursor-pointer text-[var(--highlight-text)]">
+          {username}
+        </span>
+        <br/>
+        <LogoutUserButton/>
+        <DeleteUserButton/>
+      </>
       :
       <>
         <span className="cursor-pointer text-[var(--highlight-text)]" onClick={handleOpenSignIn}>

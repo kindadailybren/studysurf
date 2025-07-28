@@ -1,6 +1,8 @@
 import { useState, useRef } from "react";
 import { api } from "../../api/LoginApi";
 import { useAuthStore } from "../../stores/authStore";
+import axios from "axios";
+
 import { LoadingBar } from "../LoadingBar";
 
 interface SignInModalProps {
@@ -57,10 +59,15 @@ export const SignInModal = ({setIsOpenSignIn, setIsOpenSignUp, setIsOpenForgotPa
       setIdTokenStore(idToken);
       setUsernameStore(newUsername);
 
-      setLoading(false);
       handleClose();
     } catch (error) {
-      console.error(error)
+      if (axios.isAxiosError(error)) {
+        console.error("Error status:", error.response?.status);
+        console.error("Error body:", error.response?.data);
+      } else {
+        console.error("Non-Axios error:", error);
+      }
+    } finally {
       setLoading(false);
     }
   }
@@ -107,7 +114,7 @@ export const SignInModal = ({setIsOpenSignIn, setIsOpenSignUp, setIsOpenForgotPa
             </div>
             
             {/* button */}
-            <button disabled={!isValid} type="submit" onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)} className={`border px-5 py-2 mt-2 rounded-lg font-semibold transition-all duration-150 group ${
+            <button disabled={!isValid || loading} type="submit" onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)} className={`border px-5 py-2 mt-2 rounded-lg font-semibold transition-all duration-150 group ${
               isValid
                 ? "text-[var(--highlight-text)] hover:bg-[var(--highlight-text)] cursor-pointer hover:text-[var(--secondary-bg)]"
                 : "opacity-20"

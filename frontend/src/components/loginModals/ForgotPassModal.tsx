@@ -15,8 +15,14 @@ export const ForgotPassModal = ({setIsOpenForgotPass, username}: ForgotPassProps
   const [confirmationCode, setConfirmationCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+
+  // password validation
+  const hasLowercase = /[a-z]/.test(password);
+  const hasUppercase = /[A-Z]/.test(password);
+  const hasNumber = /\d/.test(password);
+  const hasMinLength = password.length >= 8;
   
-  const isValid = password && confirmationCode;
+  const isValid = hasLowercase && hasUppercase && hasNumber && hasMinLength && confirmationCode;
 
 // FUNCTIONS:
 
@@ -61,6 +67,20 @@ export const ForgotPassModal = ({setIsOpenForgotPass, username}: ForgotPassProps
               <label className="block mb-1">New Password</label>
               <input type="password" placeholder="Enter New Password" value={password} onChange={e => setPassword(e.target.value)} className="w-full px-4 py-2 mb-2 rounded-md bg-transparent border border-[var(--primary-border)] focus:outline-none focus:ring-1 focus:ring-[var(--highlight-text)]" required/>
             </div>
+            <ul className={`text-xs ${password || "hidden"}`}>
+              <li className={hasMinLength ? "text-green-400" : "text-red-400"}>
+                {hasMinLength ? "✓" : "✗"} At least 8 characters
+              </li>
+              <li className={hasLowercase ? "text-green-400" : "text-red-400"}>
+                {hasLowercase ? "✓" : "✗"} At least one lowercase letter (a-z)
+              </li>
+              <li className={hasUppercase ? "text-green-400" : "text-red-400"}>
+                {hasUppercase ? "✓" : "✗"} At least one uppercase letter (A-Z)
+              </li>
+              <li className={hasNumber ? "text-green-400" : "text-red-400"}>
+                {hasNumber ? "✓" : "✗"} At least one number (0-9)
+              </li>
+            </ul>
 
             <button disabled={!isValid} type="submit" onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)} className={`border px-5 py-2 mt-2 rounded-lg font-semibold transition-all duration-150 group ${
               isValid

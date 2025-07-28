@@ -30,14 +30,13 @@ export const AccConfirmModal = ({setIsOpenAccConfirm, setIsOpenSignIn, username}
       const response = await api.post('/confirmUser', {username, confirmationCode})
       if (response.status === 200) console.log('nice!!!');
       
-      setLoading(false);
-
       handleClose();
       setIsOpenSignIn(true);
 
     } catch (error) {
-      setLoading(false);
       console.error(error);
+    } finally {
+      setLoading(false);
     }
   } 
 

@@ -1,5 +1,6 @@
 import './styles/App.css'
 import { useEffect } from 'react';
+import axios from 'axios';
 import { api } from './api/LoginApi.ts';
 import { useAuthStore } from "./stores/authStore";
 
@@ -17,13 +18,18 @@ function App() {
     const refreshToken = async () => {
       try {
         const response = await api.post('/refreshToken');
-        const { accessToken, idToken, username} = response.data;
+        const { accessToken, idToken, username } = response.data;
       
         setAccessTokenStore(accessToken);
         setIdTokenStore(idToken);
         setUsernameStore(username);
       } catch (error) {
-        console.error(error);
+        if (axios.isAxiosError(error)) {
+          console.error("Error status:", error.response?.status);
+          console.error("Error body:", error.response?.data);
+        } else {
+          console.error("Non-Axios error:", error);
+        }
       }
     }
     refreshToken();

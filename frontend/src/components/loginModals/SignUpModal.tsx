@@ -1,5 +1,7 @@
 import { useState, useRef } from "react";
 import { api } from "../../api/LoginApi";
+import axios from "axios";
+
 import { LoadingBar } from "../LoadingBar";
 
 interface SignUpModalProps {
@@ -57,14 +59,19 @@ export const SignUpModal = ({setIsOpenSignUp, setIsOpenSignIn, setIsOpenAccConfi
 
       if (response.status === 200) console.log('sent');
       
-      setUsernameInput(username)
-      setLoading(false);
+      setUsernameInput(username);
 
       handleClose();
       setIsOpenAccConfirm(true);
 
     } catch (error) {
-      console.error(error);
+      if (axios.isAxiosError(error)) {
+        console.error("Error status:", error.response?.status);
+        console.error("Error body:", error.response?.data);
+      } else {
+        console.error("Non-Axios error:", error);
+      }
+    } finally {
       setLoading(false);
     }
   } 
