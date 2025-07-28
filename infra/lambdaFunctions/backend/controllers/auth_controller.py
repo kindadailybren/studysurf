@@ -71,6 +71,20 @@ async def loginUser(
         raise HTTPException(status_code=400, detail=errorMessage)
 
 
+@auth_router.post("/logout")
+async def logoutUser(
+    accessToken: str,
+    cognito: AWS_Cognito = Depends(AWS_Cognito),
+    dynamodb: AWS_DynamoDB_User = Depends(AWS_DynamoDB_User),
+):
+    try:
+        uc = AuthUsecase(cognito, dynamodb)
+        return uc.logoutUser(accessToken)
+    except ClientError as err:
+        errorMessage = err.response["Error"]["Message"]
+        raise HTTPException(status_code=400, detail=errorMessage)
+
+
 @auth_router.post("/refreshToken")
 async def refreshToken(
     request: Request,

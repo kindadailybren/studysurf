@@ -10,3 +10,10 @@ def createRefreshTokenCookie(response, refreshToken):
         path="/",
         max_age=max_age,
     )
+
+
+def deleteRefreshTokenCookie(response):
+    response.delete_cookie(
+        key="refresh_token",
+        path="/",
+    )
