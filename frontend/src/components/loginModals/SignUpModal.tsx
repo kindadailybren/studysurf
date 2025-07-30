@@ -1,18 +1,18 @@
-import { useState, useRef } from "react";
-import { api } from "../../api/LoginApi";
 import axios from "axios";
+import { useState, useRef, useEffect } from "react";
+import { api } from "../../api/LoginApi";
+import { useLoginModalStore } from "../../stores/loginModalStore";
 
 import { LoadingBar } from "../LoadingBar";
 
-interface SignUpModalProps {
-  setIsOpenSignUp: (state: boolean) => void;
-  setIsOpenSignIn: (state: boolean) => void;
-  setIsOpenAccConfirm: (state: boolean) => void;
-  setUsernameInput: (state: string) => void;
-}
+export const SignUpModal = () => {
+//  STATES:
 
-export const SignUpModal = ({setIsOpenSignUp, setIsOpenSignIn, setIsOpenAccConfirm, setUsernameInput}: SignUpModalProps) => {
-// STATES:
+  // login modal store
+  const setIsOpenSignIn = useLoginModalStore((state) => state.setIsOpenSignIn);
+  const setIsOpenSignUp = useLoginModalStore((state) => state.setIsOpenSignUp);
+  const setIsOpenAccConfirm = useLoginModalStore((state) => state.setIsOpenAccConfirm);
+  const setUsernameInput = useLoginModalStore((state) => state.setUsernameInput);
 
   // inputs and error handling 
   const [email, setEmail] = useState("");
@@ -31,13 +31,27 @@ export const SignUpModal = ({setIsOpenSignUp, setIsOpenSignIn, setIsOpenAccConfi
   const hasNumber = /\d/.test(password);
   const hasMinLength = password.length >= 8;
 
-  const isValid = hasLowercase && hasUppercase && hasNumber && hasMinLength && username && email;
+  const isValid = hasLowercase && hasUppercase && hasNumber && hasMinLength && username.trim() && email.trim();
 
+  // modal transition
+  const [isVisible, setIsVisible] = useState(false);
+
+  // error handling
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    requestAnimationFrame(() => {
+      setIsVisible(true);
+    });
+  }, [])
 
 // FUNCTIONS:
 
   // opening and closing modals
-  const handleClose = () => setIsOpenSignUp(false);
+  const handleClose = () => {
+    setIsVisible(false);
+    setIsOpenSignUp(false);
+  }
 
   const handleOpenSignIn = () => {
     handleClose();
@@ -51,13 +65,11 @@ export const SignUpModal = ({setIsOpenSignUp, setIsOpenSignIn, setIsOpenAccConfi
       const trimmedEmail = email.trim();
       const trimmedUsername = username.trim();
       
-      const response = await api.post('/createUser', {
+      await api.post('/createUser', {
         email: trimmedEmail,
         username: trimmedUsername,
         password: password
       })
-
-      if (response.status === 200) console.log('sent');
       
       setUsernameInput(username);
 
@@ -66,15 +78,22 @@ export const SignUpModal = ({setIsOpenSignUp, setIsOpenSignIn, setIsOpenAccConfi
 
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        console.error("Error status:", error.response?.status);
-        console.error("Error body:", error.response?.data);
+        const status = error.response?.status;
+        const data = error.response?.data;
+
+        if (status === 400) {
+          setError(data?.detail);
+        } else {
+          setError("Something went wrong.");
+        }
       } else {
+        setError("Unexpected error.");
         console.error("Non-Axios error:", error);
       }
     } finally {
       setLoading(false);
     }
-  } 
+  }
 
   return(
     <>
@@ -91,7 +110,7 @@ export const SignUpModal = ({setIsOpenSignUp, setIsOpenSignIn, setIsOpenAccConfi
             handleClose();
           }
         }}>
-        <div className="bg-[var(--secondary-bg)] border border-[var(--primary-border)] rounded-xl mx-5 p-8 w-100 overflow-hidden" ref={modalRef}>
+        <div className={`bg-[var(--secondary-bg)] border border-[var(--primary-border)] rounded-xl mx-5 p-8 w-100 overflow-hidden transform transition-all duration-200 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-6'}`} ref={modalRef}>
           <div className="flex justify-center items-center mb-2">
             <div className="w-12">
               <img src="/studysurf_final.png" className="object-contain" alt="StudySurf Logo" />
@@ -150,6 +169,9 @@ export const SignUpModal = ({setIsOpenSignUp, setIsOpenSignIn, setIsOpenAccConfi
                 "Submit"
               )}
             </button>
+            {error && (
+              <p className="text-xs text-red-400 mt-1 ml-1">{error}</p>
+            )}
           </form>
           
           {/* or */}

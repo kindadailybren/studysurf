@@ -1,15 +1,16 @@
-import { useState, useRef } from "react";
-import { LoadingBar } from "../LoadingBar";
+import axios from "axios";
+import { useState, useRef, useEffect } from "react";
+import { useLoginModalStore } from "../../stores/loginModalStore";
 import { api } from "../../api/LoginApi";
+import { LoadingBar } from "../LoadingBar";
 
-interface ForgotPassUsernameProps {
-  setIsOpenForgotPass: (state: boolean) => void;
-  setIsOpenForgotPassUsername: (state: boolean) => void;
-  setUsernameInput: (state: string) => void;
-}
-
-export const ForgotPassUsernameModal = ({setIsOpenForgotPass, setIsOpenForgotPassUsername, setUsernameInput}: ForgotPassUsernameProps) => {
+export const ForgotPassUsernameModal = () => {
 // STATES:
+
+  // login modal store
+  const setIsOpenForgotPassUsername = useLoginModalStore((state) => state.setIsOpenForgotPassUsername);
+  const setIsOpenForgotPass = useLoginModalStore((state) => state.setIsOpenForgotPass);
+  const setUsernameInput = useLoginModalStore((state) => state.setUsernameInput);
 
   // inputs and error handling 
   const [username, setUsername] = useState("");
@@ -20,12 +21,27 @@ export const ForgotPassUsernameModal = ({setIsOpenForgotPass, setIsOpenForgotPas
   const modalRef = useRef<HTMLDivElement>(null);
   const [mouseDownInside, setMouseDownInside] = useState(false);
 
-  const isValid = username;
+  // modal transition
+  const [isVisible, setIsVisible] = useState(false);
+
+  // error handling
+  const [error, setError] = useState('');
+
+  const isValid = username.trim();
+  
+  useEffect(() => {
+    requestAnimationFrame(() => {
+      setIsVisible(true);
+    });
+  }, [])
 
 // FUNCTIONS:
 
   // opening and closing modals
-  const handleClose = () => setIsOpenForgotPassUsername(false);
+  const handleClose = () => {
+    setIsVisible(false);
+    setIsOpenForgotPassUsername(false);
+  }
 
   // api fetching
   const forgetPass = async () => {
@@ -36,13 +52,20 @@ export const ForgotPassUsernameModal = ({setIsOpenForgotPass, setIsOpenForgotPas
       });
       setUsernameInput(username);
       setIsOpenForgotPass(true);
-      console.log('u sent username')
       handleClose();
     } catch (error) {
-      const status = error.response?.status;
-      console.log(error);
-      if (status === 400) {
-        console.log('user not found');
+      if (axios.isAxiosError(error)) {
+        const status = error.response?.status;
+        const data = error.response?.data;
+
+        if (status === 400) {
+          setError(data?.detail);
+        } else {
+          setError("Something went wrong.");
+        }
+      } else {
+        setError("Unexpected error.");
+        console.error("Non-Axios error:", error);
       }
     } finally {
       setLoading(false);
@@ -51,7 +74,7 @@ export const ForgotPassUsernameModal = ({setIsOpenForgotPass, setIsOpenForgotPas
   
   return(
     <>
-      <div className="fixed inset-0 flex justify-center items-center z-50 bg-black/70" 
+      <div className="fixed inset-0 flex justify-center items-center z-50 bg-black/70"
         onMouseDown={(e) => {
           if (modalRef.current?.contains(e.target as Node)) {
             setMouseDownInside(true);
@@ -64,7 +87,7 @@ export const ForgotPassUsernameModal = ({setIsOpenForgotPass, setIsOpenForgotPas
             handleClose();
           }
         }}>
-        <div className="bg-[var(--secondary-bg)] border border-[var(--primary-border)] rounded-xl mx-5 p-8 w-100 overflow-hidden" ref={modalRef}>
+        <div className={`bg-[var(--secondary-bg)] border border-[var(--primary-border)] rounded-xl mx-5 p-8 w-100 overflow-hidden transform transition-all duration-200 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-6'}`} ref={modalRef}>
           <div className="flex justify-center items-center mb-2">
             <div className="w-12">
               <img src="/studysurf_final.png" className="object-contain" alt="StudySurf Logo" />
@@ -93,6 +116,9 @@ export const ForgotPassUsernameModal = ({setIsOpenForgotPass, setIsOpenForgotPas
                 "Submit"
               )}
             </button>
+            {error && (
+              <p className="text-xs text-red-400 mt-1 ml-1">{error}</p>
+            )}
           </form>
         </div>
       </div>

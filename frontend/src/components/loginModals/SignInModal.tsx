@@ -1,20 +1,21 @@
-import { useState, useRef } from "react";
+import axios from "axios";
+import { useState, useRef, useEffect } from "react";
 import { api } from "../../api/LoginApi";
 import { useAuthStore } from "../../stores/authStore";
-import axios from "axios";
+import { useLoginModalStore } from "../../stores/loginModalStore";
 
 import { LoadingBar } from "../LoadingBar";
 
-interface SignInModalProps {
-  setIsOpenSignIn: (state:boolean) => void;
-  setIsOpenSignUp: (state:boolean) => void;
-  setIsOpenForgotPassUsername: (state:boolean) => void;
-}
 
-export const SignInModal = ({setIsOpenSignIn, setIsOpenSignUp, setIsOpenForgotPassUsername}: SignInModalProps) => {
+export const SignInModal = () => {
 //  STATES:
 
-  // accessing auth store
+  // login modal store
+  const setIsOpenForgotPassUsername = useLoginModalStore((state) => state.setIsOpenForgotPassUsername);
+  const setIsOpenSignIn = useLoginModalStore((state) => state.setIsOpenSignIn);
+  const setIsOpenSignUp = useLoginModalStore((state) => state.setIsOpenSignUp);
+
+  // auth store
   const setAccessTokenStore = useAuthStore((state) => state.setAccessToken);
   const setIdTokenStore = useAuthStore((state) => state.setIdToken);
   const setUsernameStore = useAuthStore((state) => state.setUsername);
@@ -29,13 +30,27 @@ export const SignInModal = ({setIsOpenSignIn, setIsOpenSignUp, setIsOpenForgotPa
   const modalRef = useRef<HTMLDivElement>(null);
   const [mouseDownInside, setMouseDownInside] = useState(false);
   
-  const isValid = username && password;
+  const isValid = username.trim() && password.trim();
+  
+  // modal transition
+  const [isVisible, setIsVisible] = useState(false);
 
+  // error handling
+  const [error, setError] = useState('');
+  
+  useEffect(() => {
+    requestAnimationFrame(() => {
+      setIsVisible(true);
+    });
+  }, [])
 
-// FUNCTIONS: 
+// FUNCTIONS:
 
   // opening and closing modals
-  const handleClose = () => setIsOpenSignIn(false);
+  const handleClose = () => {
+    setIsVisible(false);
+    setIsOpenSignIn(false);
+  }
 
   const handleOpenSignUp = () => {
     handleClose();
@@ -62,9 +77,16 @@ export const SignInModal = ({setIsOpenSignIn, setIsOpenSignUp, setIsOpenForgotPa
       handleClose();
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        console.error("Error status:", error.response?.status);
-        console.error("Error body:", error.response?.data);
+        const status = error.response?.status;
+        const data = error.response?.data;
+
+        if (status === 400) {
+          setError(data?.detail);
+        } else {
+          setError("Something went wrong.");
+        }
       } else {
+        setError("Unexpected error.");
         console.error("Non-Axios error:", error);
       }
     } finally {
@@ -87,7 +109,7 @@ export const SignInModal = ({setIsOpenSignIn, setIsOpenSignUp, setIsOpenForgotPa
             handleClose();
           }
         }}>
-        <div className="bg-[var(--secondary-bg)] border border-[var(--primary-border)] rounded-xl mx-5 p-8 w-100 overflow-hidden" ref={modalRef}>
+        <div className={`bg-[var(--secondary-bg)] border border-[var(--primary-border)] rounded-xl mx-5 p-8 w-100 overflow-hidden transform transition-all duration-200 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-6'}`} ref={modalRef}>
           <div className="flex justify-center items-center mb-2">
             <div className="w-12">
               <img src="/studysurf_final.png" className="object-contain" alt="StudySurf Logo" />
@@ -128,6 +150,9 @@ export const SignInModal = ({setIsOpenSignIn, setIsOpenSignUp, setIsOpenForgotPa
                 "Submit"
               )}
             </button>
+            {error && (
+              <p className="text-xs text-red-400 mt-1 ml-1">{error}</p>
+            )}
           </form>
           
           {/* or line */}

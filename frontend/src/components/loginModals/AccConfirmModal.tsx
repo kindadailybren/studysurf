@@ -1,27 +1,43 @@
-import { useState } from "react";
+import axios from "axios";
+import { useState, useEffect } from "react";
 import { api } from "../../api/LoginApi";
+import { useLoginModalStore } from "../../stores/loginModalStore";
 import { LoadingBar } from "../LoadingBar";
 
-interface AccConfirmModalProps {
-  setIsOpenAccConfirm: (state:boolean) => void;
-  setIsOpenSignIn: (state:boolean) => void;
-  username: string
-}
-
-export const AccConfirmModal = ({setIsOpenAccConfirm, setIsOpenSignIn, username}: AccConfirmModalProps) => {
+export const AccConfirmModal = () => {
 // STATES:
+
+  // login modal store
+  const setIsOpenAccConfirm = useLoginModalStore((state) => state.setIsOpenAccConfirm);
+  const setIsOpenSignIn = useLoginModalStore((state) => state.setIsOpenSignIn);
+  const username = useLoginModalStore((state) => state.usernameInput);
 
   // inputs and error handling 
   const [confirmationCode, setConfirmationCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
-  const isValid = confirmationCode;
+  const isValid = confirmationCode.trim();
+  
+  // modal transition
+  const [isVisible, setIsVisible] = useState(false);
+
+  // error handling
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    requestAnimationFrame(() => {
+      setIsVisible(true);
+    });
+  }, [])
 
 // FUNCTIONS:
 
   // opening and closing modals
-  const handleClose = () => setIsOpenAccConfirm(false);
+  const handleClose = () => {
+    setIsVisible(false);
+    setIsOpenAccConfirm(false);
+  }
 
   // api fetching, and storing states
   const confirmUser = async () => {
@@ -34,7 +50,19 @@ export const AccConfirmModal = ({setIsOpenAccConfirm, setIsOpenSignIn, username}
       setIsOpenSignIn(true);
 
     } catch (error) {
-      console.error(error);
+      if (axios.isAxiosError(error)) {
+        const status = error.response?.status;
+        const data = error.response?.data;
+
+        if (status === 400) {
+          setError(data?.detail);
+        } else {
+          setError("Something went wrong.");
+        }
+      } else {
+        setError("Unexpected error.");
+        console.error("Non-Axios error:", error);
+      }
     } finally {
       setLoading(false);
     }
@@ -43,7 +71,7 @@ export const AccConfirmModal = ({setIsOpenAccConfirm, setIsOpenSignIn, username}
   return(
     <>
       <div className="fixed inset-0 flex justify-center items-center z-50 bg-black/70">
-        <div className="bg-[var(--secondary-bg)] border border-[var(--primary-border)] rounded-xl mx-5 p-8 w-100 overflow-hidden">
+        <div className={`bg-[var(--secondary-bg)] border border-[var(--primary-border)] rounded-xl mx-5 p-8 w-100 overflow-hidden transform transition-all duration-200 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-6'}`}>
           <div className="flex justify-center items-center mb-2">
             <div className="w-12">
               <img src="/studysurf_final.png" className="object-contain" alt="StudySurf Logo" />
@@ -73,6 +101,9 @@ export const AccConfirmModal = ({setIsOpenAccConfirm, setIsOpenSignIn, username}
                 "Submit"
               )}
             </button>
+            {error && (
+              <p className="text-xs text-red-400 mt-1 ml-1">{error}</p>
+            )}
           </form>
         </div>
       </div>

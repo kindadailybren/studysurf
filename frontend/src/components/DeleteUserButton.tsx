@@ -13,7 +13,7 @@ export const DeleteUserButton = () => {
   const deleteUser = async () => {
     try {
       setLoading(true);
-      await api.post('/logout', { username, accessCode: accessToken })
+      await api.post('/deleteUser', { username, accessCode: accessToken })
     } catch (error) {
       console.error(error)
     } finally {
@@ -26,11 +26,11 @@ export const DeleteUserButton = () => {
       <button onClick={deleteUser} onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)} className="border px-5 py-2 mt-2 rounded-lg font-semibold transition-all duration-150 group text-[var(--highlight-text)] hover:bg-[var(--highlight-text)] cursor-pointer hover:text-[var(--secondary-bg)]">
         {loading ? 
           <div className="flex items-center gap-2">
-            Delete User
+            Delete Account
             <LoadingBar color={isHovered ? "var(--secondary-bg)" : "var(--highlight-text)"} />
           </div>
         : 
-          "Delete User"
+          "Delete Account"
         }
       </button>
     </>

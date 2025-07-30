@@ -31,7 +31,7 @@ export const LogoutUserButton = () => {
             <LoadingBar color={isHovered ? "var(--secondary-bg)" : "var(--highlight-text)"} />
           </div>
         : 
-          "Delete User"
+          "Logout"
         }
       </button>
     </>

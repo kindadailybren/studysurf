@@ -1,14 +1,15 @@
-import { useState } from "react";
-import { LoadingBar } from "../LoadingBar";
+import axios from "axios";
+import { useState, useEffect } from "react";
 import { api } from "../../api/LoginApi";
+import { useLoginModalStore } from "../../stores/loginModalStore";
+import { LoadingBar } from "../LoadingBar";
 
-interface ForgotPassProps {
-  setIsOpenForgotPass: (state: boolean) => void;
-  username: string;
-}
-
-export const ForgotPassModal = ({setIsOpenForgotPass, username}: ForgotPassProps) => {
+export const ForgotPassModal = () => {
 // STATES:
+
+  // login modal store
+  const setIsOpenForgotPass = useLoginModalStore((state) => state.setIsOpenForgotPass);
+  const username = useLoginModalStore((state) => state.usernameInput);
 
   // inputs and error handling 
   const [password, setPassword] = useState("");
@@ -22,22 +23,49 @@ export const ForgotPassModal = ({setIsOpenForgotPass, username}: ForgotPassProps
   const hasNumber = /\d/.test(password);
   const hasMinLength = password.length >= 8;
   
-  const isValid = hasLowercase && hasUppercase && hasNumber && hasMinLength && confirmationCode;
+  const isValid = hasLowercase && hasUppercase && hasNumber && hasMinLength && confirmationCode.trim() && password.trim();
+  
+  // modal transition
+  const [isVisible, setIsVisible] = useState(false);
+
+  // error handling
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    requestAnimationFrame(() => {
+      setIsVisible(true);
+    });
+  }, [])
 
 // FUNCTIONS:
 
   // opening and closing modals
-  const handleClose = () => setIsOpenForgotPass(false);
+  const handleClose = () => {
+    setIsVisible(false);
+    setIsOpenForgotPass(false);
+  }
 
   // api fetching
-  const fogetPassConfirm = async () => {
+  const forgetPassConfirm = async () => {
     try {
       setLoading(true);
-      const response = await api.post('/forgetPassConfirm', {username, password, confirmationCode})
+      await api.post('/forgetPassConfirm', {username, password, confirmationCode})
 
       handleClose();
     } catch (error) {
-      console.error(error);
+      if (axios.isAxiosError(error)) {
+        const status = error.response?.status;
+        const data = error.response?.data;
+
+        if (status === 400) {
+          setError(data?.detail);
+        } else {
+          setError("Something went wrong.");
+        }
+      } else {
+        setError("Unexpected error.");
+        console.error("Non-Axios error:", error);
+      }
     } finally {
       setLoading(false);
     }
@@ -46,7 +74,7 @@ export const ForgotPassModal = ({setIsOpenForgotPass, username}: ForgotPassProps
   return(
     <>
       <div className="fixed inset-0 flex justify-center items-center z-50 bg-black/70">
-        <div className="bg-[var(--secondary-bg)] border border-[var(--primary-border)] rounded-xl mx-5 p-8 w-100 overflow-hidden">
+        <div className={`bg-[var(--secondary-bg)] border border-[var(--primary-border)] rounded-xl mx-5 p-8 w-100 overflow-hidden transform transition-all duration-200 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-6'}`}>
           <div className="flex justify-center items-center mb-2">
             <div className="w-12">
               <img src="/studysurf_final.png" className="object-contain" alt="StudySurf Logo" />
@@ -55,7 +83,7 @@ export const ForgotPassModal = ({setIsOpenForgotPass, username}: ForgotPassProps
           </div>
           <form onSubmit={(e) => {
             e.preventDefault(); 
-            fogetPassConfirm();
+            forgetPassConfirm();
           }}>
 
             <div>
@@ -96,6 +124,9 @@ export const ForgotPassModal = ({setIsOpenForgotPass, username}: ForgotPassProps
                 "Submit"
               )}
             </button>
+            {error && (
+              <p className="text-xs text-red-400 mt-1 ml-1">{error}</p>
+            )}
           </form>
         </div>
       </div>

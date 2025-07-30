@@ -1,7 +1,5 @@
-import { useState } from "react";
 import { useAuthStore } from "../stores/authStore";
-import { DeleteUserButton } from "./DeleteUserButton";
-import { LogoutUserButton } from "./LogoutUserButton";
+import { useLoginModalStore } from "../stores/loginModalStore";
 
 import { SignUpModal } from "./loginModals/SignUpModal";
 import { SignInModal } from "./loginModals/SignInModal";
@@ -12,13 +10,14 @@ import { ForgotPassUsernameModal } from "./loginModals/ForgotPassUsernameModal";
 export const User = () => {
   const username = useAuthStore((state) => state.username);
 
-  const [isOpenSignIn, setIsOpenSignIn] = useState(false);
-  const [isOpenSignUp, setIsOpenSignUp] = useState(false);
-  const [isOpenAccConfirm, setIsOpenAccConfirm] = useState(false);
-  const [isOpenForgotPass, setIsOpenForgotPass] = useState(false);
-  const [isOpenForgotPassUsername, setIsOpenForgotPassUsername] = useState(false);
+  const isOpenSignIn = useLoginModalStore((state) => state.isOpenSignIn);
+  const isOpenSignUp = useLoginModalStore((state) => state.isOpenSignUp);
+  const isOpenAccConfirm = useLoginModalStore((state) => state.isOpenAccConfirm);
+  const isOpenForgotPass = useLoginModalStore((state) => state.isOpenForgotPass);
+  const isOpenForgotPassUsername = useLoginModalStore((state) => state.isOpenForgotPassUsername);
 
-  const [usernameInput, setUsernameInput] = useState('');
+  const setIsOpenSignIn = useLoginModalStore((state) => state.setIsOpenSignIn);
+  const setIsOpenSignUp = useLoginModalStore((state) => state.setIsOpenSignUp);
 
   const handleOpenSignIn = () => setIsOpenSignIn(true);
   const handleOpenSignUp = () => setIsOpenSignUp(true);
@@ -31,8 +30,6 @@ export const User = () => {
           {username}
         </span>
         <br/>
-        <LogoutUserButton/>
-        <DeleteUserButton/>
       </>
       :
       <>
@@ -45,15 +42,15 @@ export const User = () => {
       </>
       }
 
-      {isOpenSignIn && <SignInModal setIsOpenSignIn={setIsOpenSignIn} setIsOpenSignUp={setIsOpenSignUp} setIsOpenForgotPassUsername={setIsOpenForgotPassUsername}/>}
+      {isOpenSignIn && <SignInModal/>}
 
-      {isOpenSignUp && <SignUpModal setIsOpenSignUp={setIsOpenSignUp} setIsOpenSignIn={setIsOpenSignIn} setIsOpenAccConfirm={setIsOpenAccConfirm} setUsernameInput={setUsernameInput}/>}
+      {isOpenSignUp && <SignUpModal/>}
 
-      {isOpenAccConfirm && <AccConfirmModal setIsOpenAccConfirm={setIsOpenAccConfirm} setIsOpenSignIn={setIsOpenSignIn} username={usernameInput}/>}
+      {isOpenAccConfirm && <AccConfirmModal/>}
 
-      {isOpenForgotPassUsername && <ForgotPassUsernameModal setIsOpenForgotPass={setIsOpenForgotPass} setIsOpenForgotPassUsername={setIsOpenForgotPassUsername} setUsernameInput={setUsernameInput}/>}
+      {isOpenForgotPassUsername && <ForgotPassUsernameModal/>}
       
-      {isOpenForgotPass && <ForgotPassModal setIsOpenForgotPass={setIsOpenForgotPass} username={usernameInput}/>}
+      {isOpenForgotPass && <ForgotPassModal/>}
     </>
   );
 }
