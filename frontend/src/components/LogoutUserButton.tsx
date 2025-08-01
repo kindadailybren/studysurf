@@ -16,12 +16,12 @@ export const LogoutUserButton = () => {
   const logoutUser = async () => {
     try {
       setLoading(true);
-      await api.post('/logout', null, {
-        params: {accessToken}
-      })
       setAccessTokenStore('');
       setIdTokenStore('');
       setUsernameStore('');
+      await api.post('/logout', null, {
+        params: {accessToken}
+      })
     } catch (error) {
       console.error(error)
     } finally {
