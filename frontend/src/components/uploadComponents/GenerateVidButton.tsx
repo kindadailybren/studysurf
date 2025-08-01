@@ -14,7 +14,7 @@ export const GenVidButton = ({ file, setLoading, setData }: GenVidButtonProps) =
 
     try {
       const response = await api.post("/genvid", file[0], {
-        timeout: 50000,
+        timeout: 500000,
         headers: {
           "Content-Type": "application/pdf",
         },
