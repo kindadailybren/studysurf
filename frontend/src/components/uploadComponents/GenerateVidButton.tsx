@@ -14,11 +14,11 @@ export const GenVidButton = ({ file, setLoading, setData }: GenVidButtonProps) =
 
     try {
       const response = await api.post("/genvid", file[0], {
+        timeout: 50000,
         headers: {
           "Content-Type": "application/pdf",
         },
       });
-
       setData(response.data);
     } catch (error) {
       console.error(error);

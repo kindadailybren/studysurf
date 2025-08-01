@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { api } from "../../api/Api";
 import { useLoginModalStore } from "../../stores/loginModalStore";
 import { LoadingBar } from "../LoadingBar";
@@ -16,6 +16,10 @@ export const ForgotPassModal = () => {
   const [confirmationCode, setConfirmationCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+
+  // accidental exit, highlighting problem
+  const modalRef = useRef<HTMLDivElement>(null);
+  const [mouseDownInside, setMouseDownInside] = useState(false);
 
   // password validation
   const hasLowercase = /[a-z]/.test(password);
@@ -73,8 +77,20 @@ export const ForgotPassModal = () => {
   
   return(
     <>
-      <div className="fixed inset-0 flex justify-center items-center z-50 bg-black/70">
-        <div className={`bg-[var(--secondary-bg)] border border-[var(--primary-border)] rounded-xl mx-5 p-8 w-100 overflow-hidden transform transition-all duration-200 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-6'}`}>
+      <div className="fixed inset-0 flex justify-center items-center z-50 bg-black/70" 
+        onMouseDown={(e) => {
+          if (modalRef.current?.contains(e.target as Node)) {
+            setMouseDownInside(true);
+          } else {
+            setMouseDownInside(false);
+          }
+        }}
+        onMouseUp={() => {
+          if (!mouseDownInside) {
+            handleClose();
+          }
+        }}>
+        <div className={`bg-[var(--secondary-bg)] border border-[var(--primary-border)] rounded-xl mx-5 p-8 w-100 overflow-hidden transform transition-all duration-200 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-6'}`} ref={modalRef}>
           <div className="flex justify-center items-center mb-2">
             <div className="w-12">
               <img src="/studysurf_final.png" className="object-contain" alt="StudySurf Logo" />

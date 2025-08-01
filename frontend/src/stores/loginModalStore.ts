@@ -29,5 +29,3 @@ export const useLoginModalStore = create<LoginModalStore>((set) => ({
   setIsOpenForgotPassUsername: (isOpenForgotPassUsername) => set({isOpenForgotPassUsername}),
   setUsernameInput: (usernameInput) => set({usernameInput}),
 }));
-
-// zustand my GOAT

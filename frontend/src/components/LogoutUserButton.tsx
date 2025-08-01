@@ -6,6 +6,10 @@ import { LoadingBar } from "../components/LoadingBar";
 export const LogoutUserButton = () => {
   const accessToken = useAuthStore((state) => state.accessToken);
 
+  const setAccessTokenStore = useAuthStore((state) => state.setAccessToken);
+  const setIdTokenStore = useAuthStore((state) => state.setIdToken);
+  const setUsernameStore = useAuthStore((state) => state.setUsername);
+
   const [loading, setLoading] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
@@ -15,6 +19,9 @@ export const LogoutUserButton = () => {
       await api.post('/logout', null, {
         params: {accessToken}
       })
+      setAccessTokenStore('');
+      setIdTokenStore('');
+      setUsernameStore('');
     } catch (error) {
       console.error(error)
     } finally {
