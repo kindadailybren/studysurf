@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useState, useRef, useEffect } from "react";
-import { api } from "../../api/LoginApi";
+import { api } from "../../api/Api";
 import { useLoginModalStore } from "../../stores/loginModalStore";
 
 import { LoadingBar } from "../LoadingBar";

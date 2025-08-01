@@ -1,5 +1,5 @@
 import { useAuthStore } from "../stores/authStore";
-import { api } from "../api/LoginApi";
+import { api } from "../api/Api";
 import { useState } from "react";
 import { LoadingBar } from "../components/LoadingBar";
 

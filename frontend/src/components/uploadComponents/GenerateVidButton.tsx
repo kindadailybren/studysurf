@@ -1,4 +1,4 @@
-import api from "../../api/GenvidApi"
+import { api } from "../../api/Api.ts"
 
 interface GenVidButtonProps {
   file: File[];

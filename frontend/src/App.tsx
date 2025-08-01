@@ -1,7 +1,7 @@
 import './styles/App.css'
 import { useEffect } from 'react';
 import axios from 'axios';
-import { api } from './api/LoginApi.ts';
+import { api } from './api/Api.ts';
 import { useAuthStore } from "./stores/authStore";
 
 import { Route, Routes } from 'react-router-dom';

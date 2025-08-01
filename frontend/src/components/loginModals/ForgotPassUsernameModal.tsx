@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useState, useRef, useEffect } from "react";
 import { useLoginModalStore } from "../../stores/loginModalStore";
-import { api } from "../../api/LoginApi";
+import { api } from "../../api/Api";
 import { LoadingBar } from "../LoadingBar";
 
 export const ForgotPassUsernameModal = () => {
