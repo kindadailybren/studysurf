@@ -6,7 +6,7 @@ def createRefreshTokenCookie(response, refreshToken):
         value=refreshToken,
         httponly=True,
         secure=True,
-        samesite="strict",
+        samesite="none",
         path="/",
         max_age=max_age,
     )
