@@ -17,7 +17,7 @@ function App() {
   useEffect(() => {
     const refreshToken = async () => {
       try {
-        const response = await api.post('/refreshToken', null, { withCredentials: true, });
+        const response = await api.post('/refreshToken', null);
         const { accessToken, idToken, username } = response.data;
 
         setAccessTokenStore(accessToken);

@@ -74,7 +74,11 @@ export class LambdaConstruct extends Construct {
           "dynamodb:UpdateItem",
           "s3:GetObject",
           "s3:PutObject",
-          "s3:ListBucket"
+          "s3:ListBucket",
+          "sqs:ReceiveMessage",
+          "sqs:DeleteMessage",
+          "sqs:GetQueueAttributes",
+          "sqs:ChangeMessageVisibility"
         ],
         resources: ["*"], // optionally scope per service if needed
       }),

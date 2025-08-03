@@ -66,7 +66,7 @@ export const SignInModal = () => {
   const loginUser = async () => {
     try {
       setLoading(true);
-      const response = await api.post('/login', { username, password }, { withCredentials: true })
+      const response = await api.post('/login', { username, password })
 
       const { accessToken, idToken, username: newUsername } = response.data;
 
@@ -137,8 +137,8 @@ export const SignInModal = () => {
 
             {/* button */}
             <button disabled={!isValid || loading} type="submit" onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)} className={`border px-5 py-2 mt-2 rounded-lg font-semibold transition-all duration-150 group ${isValid
-                ? "text-[var(--highlight-text)] hover:bg-[var(--highlight-text)] cursor-pointer hover:text-[var(--secondary-bg)]"
-                : "opacity-20"
+              ? "text-[var(--highlight-text)] hover:bg-[var(--highlight-text)] cursor-pointer hover:text-[var(--secondary-bg)]"
+              : "opacity-20"
               }`}>
               {loading ? (
                 <div className="flex items-center gap-2">
