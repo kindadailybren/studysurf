@@ -21,7 +21,9 @@ export const GenVidButton = ({ file, setLoading, setData, username }: GenVidButt
         },
       });
       setData(response.data);
-    } catch { } finally {
+    } catch (error) {
+      console.log(error)
+    } finally {
       setLoading(false);
     }
   };
