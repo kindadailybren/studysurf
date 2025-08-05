@@ -1,4 +1,4 @@
-import api from "../../api/api"
+import { api } from "../../api/Api.ts"
 
 interface GenVidButtonProps {
   file: File[];
@@ -18,10 +18,9 @@ export const GenVidButton = ({ file, setLoading, setData }: GenVidButtonProps) =
           "Content-Type": "application/pdf",
         },
       });
-
       setData(response.data);
-    } catch (error) {
-      console.error(error);
+    } catch {
+      // console.error(error);
     } finally {
       setLoading(false);
     }

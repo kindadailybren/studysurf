@@ -64,7 +64,7 @@ jobs:
 
     - name: Verify Deployment
       run: |
-        aws lambda get-function --function-name staging-Lambda-SampleFunction
+        aws lambda get-function --function-name staging-Lambda-StudySurf
 
   frontend-staging:
     runs-on: ubuntu-latest
