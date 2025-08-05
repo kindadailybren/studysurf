@@ -17,9 +17,9 @@ function App() {
   useEffect(() => {
     const refreshToken = async () => {
       try {
-        const response = await api.post('/refreshToken');
+        const response = await api.post('/refreshToken', null);
         const { accessToken, idToken, username } = response.data;
-      
+
         setAccessTokenStore(accessToken);
         setIdTokenStore(idToken);
         setUsernameStore(username);
@@ -34,7 +34,7 @@ function App() {
     }
     refreshToken();
   }, [])
-  
+
   return (
     <>
       <Routes>

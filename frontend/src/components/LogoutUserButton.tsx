@@ -20,7 +20,7 @@ export const LogoutUserButton = () => {
       setIdTokenStore('');
       setUsernameStore('');
       await api.post('/logout', null, {
-        params: {accessToken}
+        params: { accessToken }
       })
     } catch (error) {
       console.error(error)
@@ -32,12 +32,12 @@ export const LogoutUserButton = () => {
   return (
     <>
       <button onClick={logoutUser} onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)} className="border px-5 py-2 mt-2 rounded-lg font-semibold transition-all duration-150 group text-[var(--highlight-text)] hover:bg-[var(--highlight-text)] cursor-pointer hover:text-[var(--secondary-bg)]">
-        {loading ? 
+        {loading ?
           <div className="flex items-center gap-2">
             Logout
             <LoadingBar color={isHovered ? "var(--secondary-bg)" : "var(--highlight-text)"} />
           </div>
-        : 
+          :
           "Logout"
         }
       </button>

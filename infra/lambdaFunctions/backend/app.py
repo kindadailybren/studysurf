@@ -10,7 +10,12 @@ handler = Mangum(app, lifespan="off")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "http://localhost:5173",
+        "http://dev-s3-bucket-application-studysurf.s3-website-ap-southeast-1.amazonaws.com",
+        "http://staging-s3-bucket-application-studysurf.s3-website-ap-southeast-1.amazonaws.com",
+        "https://d3guxtdjraajgf.cloudfront.net",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

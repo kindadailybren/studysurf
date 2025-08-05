@@ -84,4 +84,4 @@ jobs:
 
     - name: Verify Deployment
       run: |
-        aws lambda get-function --function-name dev-Lambda-SampleFunction
+        aws lambda get-function --function-name dev-Lambda-StudySurf

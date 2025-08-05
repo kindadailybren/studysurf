@@ -8,7 +8,7 @@ import { LoadingBar } from "../LoadingBar";
 
 
 export const SignInModal = () => {
-//  STATES:
+  //  STATES:
 
   // login modal store
   const setIsOpenForgotPassUsername = useLoginModalStore((state) => state.setIsOpenForgotPassUsername);
@@ -19,32 +19,32 @@ export const SignInModal = () => {
   const setAccessTokenStore = useAuthStore((state) => state.setAccessToken);
   const setIdTokenStore = useAuthStore((state) => state.setIdToken);
   const setUsernameStore = useAuthStore((state) => state.setUsername);
-  
+
   // inputs and error handling 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-  
+
   // accidental exit, highlighting problem
   const modalRef = useRef<HTMLDivElement>(null);
   const [mouseDownInside, setMouseDownInside] = useState(false);
-  
+
   const isValid = username.trim() && password.trim();
-  
+
   // modal transition
   const [isVisible, setIsVisible] = useState(false);
 
   // error handling
   const [error, setError] = useState('');
-  
+
   useEffect(() => {
     requestAnimationFrame(() => {
       setIsVisible(true);
     });
   }, [])
 
-// FUNCTIONS:
+  // FUNCTIONS:
 
   // opening and closing modals
   const handleClose = () => {
@@ -61,15 +61,15 @@ export const SignInModal = () => {
     handleClose();
     setIsOpenForgotPassUsername(true);
   }
-  
+
   // api fetching, and storing states
   const loginUser = async () => {
     try {
       setLoading(true);
-      const response = await api.post('/login', {username, password})
-      
+      const response = await api.post('/login', { username, password })
+
       const { accessToken, idToken, username: newUsername } = response.data;
-      
+
       setAccessTokenStore(accessToken);
       setIdTokenStore(idToken);
       setUsernameStore(newUsername);
@@ -94,9 +94,9 @@ export const SignInModal = () => {
     }
   }
 
-  return(
+  return (
     <>
-      <div className="fixed inset-0 flex justify-center items-center z-50 bg-black/70" 
+      <div className="fixed inset-0 flex justify-center items-center z-50 bg-black/70"
         onMouseDown={(e) => {
           if (modalRef.current?.contains(e.target as Node)) {
             setMouseDownInside(true);
@@ -116,7 +116,7 @@ export const SignInModal = () => {
             </div>
             <h1 className="text-[var(--highlight-text)] text-4xl ml-3 font-semibold">StudySurf</h1>
           </div>
-          
+
           <form onSubmit={(e) => {
             e.preventDefault();
             loginUser();
@@ -125,22 +125,21 @@ export const SignInModal = () => {
             {/* username */}
             <div>
               <label className="block mb-1">Username</label>
-              <input type="text" value={username} onChange={e => setUsername(e.target.value)} placeholder="Enter Username" className="w-full px-4 py-2 mb-2 rounded-md bg-transparent border border-[var(--primary-border)] focus:outline-none focus:ring-1 focus:ring-[var(--highlight-text)]" required/>
+              <input type="text" value={username} onChange={e => setUsername(e.target.value)} placeholder="Enter Username" className="w-full px-4 py-2 mb-2 rounded-md bg-transparent border border-[var(--primary-border)] focus:outline-none focus:ring-1 focus:ring-[var(--highlight-text)]" required />
             </div>
-            
+
             {/* password */}
             <div className="relative">
               <label className="block mb-1">Password</label>
-              <input type="password" placeholder="Enter Password" value={password} onChange={e => setPassword(e.target.value)} className="w-full px-4 py-2 mb-2 rounded-md bg-transparent border border-[var(--primary-border)] focus:outline-none focus:ring-1 focus:ring-[var(--highlight-text)]" required/>
+              <input type="password" placeholder="Enter Password" value={password} onChange={e => setPassword(e.target.value)} className="w-full px-4 py-2 mb-2 rounded-md bg-transparent border border-[var(--primary-border)] focus:outline-none focus:ring-1 focus:ring-[var(--highlight-text)]" required />
               <span className="absolute hover:underline text-xs cursor-pointer right-0 -bottom-4" onClick={handleForgotPass}>Forgot Password?</span>
             </div>
-            
+
             {/* button */}
-            <button disabled={!isValid || loading} type="submit" onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)} className={`border px-5 py-2 mt-2 rounded-lg font-semibold transition-all duration-150 group ${
-              isValid
-                ? "text-[var(--highlight-text)] hover:bg-[var(--highlight-text)] cursor-pointer hover:text-[var(--secondary-bg)]"
-                : "opacity-20"
-            }`}>
+            <button disabled={!isValid || loading} type="submit" onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)} className={`border px-5 py-2 mt-2 rounded-lg font-semibold transition-all duration-150 group ${isValid
+              ? "text-[var(--highlight-text)] hover:bg-[var(--highlight-text)] cursor-pointer hover:text-[var(--secondary-bg)]"
+              : "opacity-20"
+              }`}>
               {loading ? (
                 <div className="flex items-center gap-2">
                   Submit
@@ -154,7 +153,7 @@ export const SignInModal = () => {
               <p className="text-xs text-red-400 mt-1 ml-1">{error}</p>
             )}
           </form>
-          
+
           {/* or line */}
           <div className="flex items-center gap-2 my-4">
             <div className="flex-grow h-px bg-[var(--primary-border)]"></div>
@@ -163,7 +162,7 @@ export const SignInModal = () => {
           </div>
 
           <button className="w-full flex items-center justify-center gap-2 bg-[var(--highlight-text)] text-[var(--secondary-bg)] py-2 mb-2 rounded-md cursor-pointer">
-            <img src="" className="w-4 h-4"/>
+            <img src="" className="w-4 h-4" />
             Sign in With Google
           </button>
 
