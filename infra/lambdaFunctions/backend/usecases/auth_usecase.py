@@ -44,11 +44,7 @@ class AuthUsecase:
     def confirmUser(self, credentials: UserConfirm):
         try:
             user = self.auth.confirmUser(credentials)
-
-            user_data = self.auth.getUser(credentials.username)
-            user_id = user_data["UserAttributes"][2]["Value"]
-
-            self.db.updateUserConfirmationStatus(user_id)
+            self.db.updateUserConfirmationStatus(credentials.username)
 
             return jsonResponse(user)
         except ClientError as err:

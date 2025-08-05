@@ -44,7 +44,7 @@ export class LambdaConstruct extends Construct {
           `../../../lambdaFunctions/backend/aws_lambda.zip`,
         ),
       ),
-      memorySize: 1000,
+      memorySize: 3000,
       timeout: Duration.minutes(15),
     });
 

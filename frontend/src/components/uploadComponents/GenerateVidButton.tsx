@@ -4,23 +4,25 @@ interface GenVidButtonProps {
   file: File[];
   setLoading: (state: boolean) => void;
   setData: (data: { answer: string }) => void;
+  username: string;
 }
 
-export const GenVidButton = ({ file, setLoading, setData }: GenVidButtonProps) => {
+export const GenVidButton = ({ file, setLoading, setData, username }: GenVidButtonProps) => {
   const videoUpload = async () => {
     if (!file[0]) return;
 
     setLoading(true);
 
     try {
-      const response = await api.post("/genvid", file[0], {
+      const response = await api.post(`/genvid?username=${username}`, file[0], {
+        timeout: 500000,
         headers: {
           "Content-Type": "application/pdf",
         },
       });
       setData(response.data);
     } catch {
-      // console.error(error);
+      //lul
     } finally {
       setLoading(false);
     }

@@ -11,8 +11,8 @@ class AWS_DynamoDB_User:
         response = self.dynamodb.put_item(
             TableName=self.table,
             Item={
-                "PK": {"S": "USER#" + user.user_id},
-                "SK": {"S": "USER#" + user.user_id},
+                "PK": {"S": "USER#" + user.username},
+                "SK": {"S": "USER#" + user.username},
                 "username": {"S": user.username},
                 "email": {"S": user.email},
                 "subTier": {"S": user.subscription_tier.value},
@@ -47,4 +47,17 @@ class AWS_DynamoDB_User:
 
 
 class AWS_DynamoDB_Video:
-    pass
+    def __init__(self):
+        self.dynamodb = boto3.client("dynamodb", region_name="ap-southeast-1")
+        self.table = "Data-dev"
+
+    def uploadVideoToDb(self, video):
+        response = self.dynamodb.put_item(
+            TableName=self.table,
+            Item={
+                "PK": {"S": f"USER#{video.username}"},
+                "SK": {"S": "VIDEO#" + video.video_id},
+                "videoUrl": {"S": video.video_url},
+            },
+        )
+        return response
