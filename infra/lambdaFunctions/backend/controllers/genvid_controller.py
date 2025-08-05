@@ -23,7 +23,8 @@ async def generate_video(
     s3: AWS_S3 = Depends(AWS_S3),
     dynamodb: AWS_DynamoDB_Video = Depends(AWS_DynamoDB_Video),
 ):
-    file, username = await request.body()
+    username = request.query_params.get("username")
+    file = await request.body()
 
     uc = GenVidUseCase(bedrock, polly, moviepy, s3, dynamodb)
     return await uc.generate_video_usecase(file, username)
