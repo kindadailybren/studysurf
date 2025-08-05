@@ -20,7 +20,7 @@ export class LambdaConstruct extends Construct {
   }
 
   private createLambdaFunctions(props: LambdaConstructProps) {
-    this.sampleFunction = this.createLambdaFunction("sampleFunction", props);
+    this.sampleFunction = this.createLambdaFunction("StudySurf", props);
   }
 
   private createLambdaIntegrations(props: LambdaConstructProps) {
@@ -35,7 +35,7 @@ export class LambdaConstruct extends Construct {
     props: LambdaConstructProps,
   ) {
     const fn = new lambda.Function(this, `${props.stage}-Lambda-${functionName}`, {
-      functionName: `${props.stage}-Lambda-SampleFunction`,
+      functionName: `${props.stage}-Lambda-StudySurf`,
       runtime: lambda.Runtime.PYTHON_3_13,
       handler: "app.handler",
       code: lambda.Code.fromAsset(
@@ -74,7 +74,11 @@ export class LambdaConstruct extends Construct {
           "dynamodb:UpdateItem",
           "s3:GetObject",
           "s3:PutObject",
-          "s3:ListBucket"
+          "s3:ListBucket",
+          "sqs:ReceiveMessage",
+          "sqs:DeleteMessage",
+          "sqs:GetQueueAttributes",
+          "sqs:ChangeMessageVisibility"
         ],
         resources: ["*"], // optionally scope per service if needed
       }),

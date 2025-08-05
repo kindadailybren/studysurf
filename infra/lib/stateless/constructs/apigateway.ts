@@ -21,10 +21,14 @@ export class ApiGatewayConstruct extends Construct {
     this.api = new api.HttpApi(this, `${props.stage}-ApiGateway-HttpApi`, {
       apiName: `${props.stage}-ApiGateway-HttpApi`,
       corsPreflight: {
-        allowHeaders: ['*'],
+        allowHeaders: ['content-type', 'Authorization'],
         allowMethods: [api.CorsHttpMethod.GET, api.CorsHttpMethod.POST, api.CorsHttpMethod.OPTIONS],
-        allowOrigins: ['*'], // Or specify your frontend domain
-        allowCredentials: false,
+        allowOrigins: [
+          'http://dev-s3-bucket-application-studysurf.s3-website-ap-southeast-1.amazonaws.com',
+          'http://staging-s3-bucket-application-studysurf.s3-website-ap-southeast-1.amazonaws.com',
+          'https://d3guxtdjraajgf.cloudfront.net',
+        ], // Or specify your frontend domain
+        allowCredentials: true,
       },
     });
   }
@@ -62,6 +66,12 @@ export class ApiGatewayConstruct extends Construct {
 
     this.api.addRoutes({
       path: "/login",
+      methods: [api.HttpMethod.POST],
+      integration: props.sampleIntegration,
+    });
+
+    this.api.addRoutes({
+      path: "/logout",
       methods: [api.HttpMethod.POST],
       integration: props.sampleIntegration,
     });
