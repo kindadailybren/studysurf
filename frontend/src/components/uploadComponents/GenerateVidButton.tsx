@@ -19,7 +19,7 @@ export const GenVidButton = ({ file, setLoading, setData }: GenVidButtonProps) =
         },
       });
       setData(response.data);
-    } catch (error) {
+    } catch {
       // console.error(error);
     } finally {
       setLoading(false);

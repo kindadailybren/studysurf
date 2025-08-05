@@ -33,7 +33,7 @@ function App() {
       }
     }
     refreshToken();
-  }, [])
+  }, [setAccessTokenStore, setIdTokenStore, setUsernameStore])
 
   return (
     <>
