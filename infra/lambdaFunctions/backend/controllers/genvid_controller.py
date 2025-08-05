@@ -1,3 +1,4 @@
+from typing import Optional
 from fastapi import APIRouter, Request, Depends, Query
 from usecases.genvid_usecase import GenVidUseCase
 from services.AWS.bedrock_service import AWS_Bedrock
@@ -22,7 +23,7 @@ async def generate_video(
     moviepy: MoviePy = Depends(MoviePy),
     s3: AWS_S3 = Depends(AWS_S3),
     dynamodb: AWS_DynamoDB_Video = Depends(AWS_DynamoDB_Video),
-    username: str = Query(...),
+    username: Optional[str] = Query(...),
 ):
     file = await request.body()
 
