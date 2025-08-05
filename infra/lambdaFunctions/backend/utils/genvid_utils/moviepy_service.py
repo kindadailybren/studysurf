@@ -45,6 +45,8 @@ class MoviePy:
             audio_codec="aac",
             temp_audiofile=os.path.join("/tmp", "temp-audio.m4a"),
             remove_temp=True,
+            threads=4,
+            preset="ultrafast",
         )
 
         return output_path
