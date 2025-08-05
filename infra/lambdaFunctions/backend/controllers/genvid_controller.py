@@ -23,7 +23,7 @@ async def generate_video(
     moviepy: MoviePy = Depends(MoviePy),
     s3: AWS_S3 = Depends(AWS_S3),
     dynamodb: AWS_DynamoDB_Video = Depends(AWS_DynamoDB_Video),
-    username: Optional[str] = Query(...),
+    username=Query(None),
 ):
     file = await request.body()
 

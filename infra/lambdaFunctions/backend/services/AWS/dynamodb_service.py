@@ -55,7 +55,7 @@ class AWS_DynamoDB_Video:
         response = self.dynamodb.put_item(
             TableName=self.table,
             Item={
-                "PK": {"S": "USER#" + video.username},
+                "PK": {"S": f"USER#{video.username}"},
                 "SK": {"S": "VIDEO#" + video.video_id},
                 "videoUrl": {"S": video.video_url},
             },

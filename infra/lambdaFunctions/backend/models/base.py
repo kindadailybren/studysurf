@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic import BaseModel, Field, EmailStr
 from datetime import datetime
 from enum import Enum
@@ -20,5 +21,5 @@ class User(BaseModel):
 
 class Video(BaseModel):
     video_id: str
-    username: str
+    username: Optional[str] = ""
     video_url: str
