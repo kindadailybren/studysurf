@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { useAuthStore } from "../../stores/authStore";
 import { FileDrop } from "../../components/uploadComponents/FileDrop"
 import { SelectVideoStyle } from "../../components/uploadComponents/selectVideoStyle"
 import { GenVidButton } from "../../components/uploadComponents/GenerateVidButton"
@@ -9,6 +10,8 @@ export const UploadPage = () => {
   const [file, setFile] = useState<File[]>([])
   const [loading, setLoading] = useState<boolean>(false)
   const [data, setData] = useState<{ answer: string }>({ answer: "No Answer" })
+
+  const username = useAuthStore((state) => state.username);
 
   const FileDropProps = { file, setFile, setData }
   const SelectVideoStyleProps = { loading, data }
