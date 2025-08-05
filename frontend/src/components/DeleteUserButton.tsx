@@ -6,6 +6,10 @@ import { LoadingBar } from "../components/LoadingBar";
 export const DeleteUserButton = () => {
   const username = useAuthStore((state) => state.username);
   const accessToken = useAuthStore((state) => state.accessToken);
+  
+  const setAccessTokenStore = useAuthStore((state) => state.setAccessToken);
+  const setIdTokenStore = useAuthStore((state) => state.setIdToken);
+  const setUsernameStore = useAuthStore((state) => state.setUsername);
 
   const [loading, setLoading] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -13,6 +17,9 @@ export const DeleteUserButton = () => {
   const deleteUser = async () => {
     try {
       setLoading(true);
+      setAccessTokenStore('');
+      setIdTokenStore('');
+      setUsernameStore('');
       await api.post('/deleteUser', { username, accessCode: accessToken })
     } catch (error) {
       console.error(error)
