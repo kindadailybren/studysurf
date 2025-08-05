@@ -2,6 +2,7 @@ import os
 import uuid
 import time
 from fastapi.responses import JSONResponse
+from models.base import Video
 
 
 # ImageMagick for MoviePy - TO BE FIXED SINCE THIS CANNOT BE HOSTED
@@ -11,13 +12,21 @@ os.environ["IMAGEMAGICK_BINARY"] = (
 
 
 class GenVidUseCase:
-    def __init__(self, bedrock_service, polly_service, moviepy_service, s3_service):
+    def __init__(
+        self,
+        bedrock_service,
+        polly_service,
+        moviepy_service,
+        s3_service,
+        dynamodb_service,
+    ):
         self.AI = bedrock_service
         self.VoiceGenerator = polly_service
         self.VideoCreator = moviepy_service
         self.VideoStorage = s3_service
+        self.db = dynamodb_service
 
-    async def generate_video_usecase(self, file):
+    async def generate_video_usecase(self, file, username):
         try:
             generatedSummary = self.AI.gen_summarization(file)
             audioGenerated, textReference = self.VoiceGenerator.gen_audio(
@@ -48,6 +57,11 @@ class GenVidUseCase:
             videoPathOutput = self.VideoCreator.generate_video_with_text(video_input)
 
             videoUrl = self.VideoStorage.uploadVideo(videoPathOutput)
+
+            videoDetails = Video(
+                video_id=filename, username=username, video_url=videoUrl
+            )
+            self.db.uploadVideoToDb(videoDetails)
 
             try:
                 os.remove(localPathAudio)

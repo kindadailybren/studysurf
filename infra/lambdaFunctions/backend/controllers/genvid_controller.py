@@ -2,8 +2,9 @@ from fastapi import APIRouter, Request, Depends
 from usecases.genvid_usecase import GenVidUseCase
 from services.AWS.bedrock_service import AWS_Bedrock
 from services.AWS.polly_service import AWS_Polly
-from utils.genvid_utils.moviepy_service import MoviePy
 from services.AWS.s3_service import AWS_S3
+from services.AWS.dynamodb_service import AWS_DynamoDB_Video
+from utils.genvid_utils.moviepy_service import MoviePy
 
 genvid_router = APIRouter()
 
@@ -20,8 +21,9 @@ async def generate_video(
     polly: AWS_Polly = Depends(AWS_Polly),
     moviepy: MoviePy = Depends(MoviePy),
     s3: AWS_S3 = Depends(AWS_S3),
+    dynamodb: AWS_DynamoDB_Video = Depends(AWS_DynamoDB_Video),
 ):
-    file = await request.body()
+    file, username = await request.body()
 
-    uc = GenVidUseCase(bedrock, polly, moviepy, s3)
-    return await uc.generate_video_usecase(file)
+    uc = GenVidUseCase(bedrock, polly, moviepy, s3, dynamodb)
+    return await uc.generate_video_usecase(file, username)

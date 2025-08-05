@@ -12,7 +12,7 @@ export const UploadPage = () => {
 
   const FileDropProps = { file, setFile, setData }
   const SelectVideoStyleProps = { loading, data }
-  const GenVidButtonProps = { file, setLoading, setData }
+  const GenVidButtonProps = { file, setLoading, setData, username }
 
   return (
     <>
