@@ -55,8 +55,127 @@ export const LandingPage = () => {
         </div>
       </div>
 
+      {/* How It Works Section */}
+      <div className="py-20 md:py-24 bg-gradient-to-b from-[#0E0E0E] to-[#121212]">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">How It Works</h2>
+          <p className="text-lg text-gray-400 mb-16 max-w-2xl mx-auto">
+            Transform your study materials into engaging short videos in just 3 simple steps
+          </p>
+          
+          <div className="grid md:grid-cols-3 gap-12 md:gap-8">
+            {/* Step 1 */}
+            <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 p-6 rounded-xl border border-gray-700/50 hover:border-[var(--highlight-text)]/50 transition-all duration-300 hover:-translate-y-2">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-[var(--highlight-text)] to-[var(--highlight-text)]/80 rounded-lg text-[#0E0E0E] font-bold text-xl flex-shrink-0">
+                  1
+                </div>
+                <h3 className="text-xl font-semibold text-[var(--highlight-text)]">Upload Your Study Material</h3>
+              </div>
+              <p className="text-gray-400 leading-relaxed">
+                Drop your PDF, DOCX, PPTX, or TXT files and let our AI analyze your content
+              </p>
+            </div>
+
+            {/* Step 2 */}
+            <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 p-6 rounded-xl border border-gray-700/50 hover:border-[var(--highlight-text)]/50 transition-all duration-300 hover:-translate-y-2">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-[var(--highlight-text)] to-[var(--highlight-text)]/80 rounded-lg text-[#0E0E0E] font-bold text-xl flex-shrink-0">
+                  2
+                </div>
+                <h3 className="text-xl font-semibold text-[var(--highlight-text)]">Customize Your Short</h3>
+              </div>
+              <p className="text-gray-400 leading-relaxed">
+                Choose visual style, background music, pacing, and aesthetic preferences
+              </p>
+            </div>
+
+            {/* Step 3 */}
+            <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 p-6 rounded-xl border border-gray-700/50 hover:border-[var(--highlight-text)]/50 transition-all duration-300 hover:-translate-y-2">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-[var(--highlight-text)] to-[var(--highlight-text)]/80 rounded-lg text-[#0E0E0E] font-bold text-xl flex-shrink-0">
+                  3
+                </div>
+                <h3 className="text-xl font-semibold text-[var(--highlight-text)]">Download or Share</h3>
+              </div>
+              <p className="text-gray-400 leading-relaxed">
+                Get a video ready for TikTok, Reels, or Stories in minutes
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Why StudySurf? Section */}
+      <div className="py-20 md:py-24 bg-[#121212]">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Why StudySurf?</h2>
+            <p className="text-lg text-gray-400 max-w-2xl mx-auto">
+              The perfect solution for modern learners who want to make studying more engaging
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {/* Benefit 1 */}
+            <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 p-6 rounded-xl border border-gray-700/50 hover:border-[var(--highlight-text)]/50 transition-all duration-300 hover:-translate-y-2">
+              <div className="text-4xl mb-4">🎞️</div>
+              <h3 className="text-xl font-semibold mb-3 text-[var(--highlight-text)]">Brainrot-Friendly Format</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Transform dense study material into bite-sized, visually engaging content that keeps your attention
+              </p>
+            </div>
+
+            {/* Benefit 2 */}
+            <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 p-6 rounded-xl border border-gray-700/50 hover:border-[var(--highlight-text)]/50 transition-all duration-300 hover:-translate-y-2">
+              <div className="text-4xl mb-4">⚡</div>
+              <h3 className="text-xl font-semibold mb-3 text-[var(--highlight-text)]">Fast Conversion</h3>
+              <p className="text-gray-400 leading-relaxed">
+                AI-powered processing converts your documents to videos in minutes, not hours
+              </p>
+            </div>
+
+            {/* Benefit 3 */}
+            <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 p-6 rounded-xl border border-gray-700/50 hover:border-[var(--highlight-text)]/50 transition-all duration-300 hover:-translate-y-2">
+              <div className="text-4xl mb-4">🧠</div>
+              <h3 className="text-xl font-semibold mb-3 text-[var(--highlight-text)]">Aesthetic & Memorable</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Beautiful visuals and engaging animations help improve retention and make studying enjoyable
+              </p>
+            </div>
+
+            {/* Benefit 4 */}
+            <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 p-6 rounded-xl border border-gray-700/50 hover:border-[var(--highlight-text)]/50 transition-all duration-300 hover:-translate-y-2">
+              <div className="text-4xl mb-4">📱</div>
+              <h3 className="text-xl font-semibold mb-3 text-[var(--highlight-text)]">Perfect for Social Media</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Optimized for TikTok, Instagram Reels, and Stories - share your knowledge with the world
+              </p>
+            </div>
+
+            {/* Benefit 5 */}
+            <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 p-6 rounded-xl border border-gray-700/50 hover:border-[var(--highlight-text)]/50 transition-all duration-300 hover:-translate-y-2">
+              <div className="text-4xl mb-4">🆓</div>
+              <h3 className="text-xl font-semibold mb-3 text-[var(--highlight-text)]">Free to Get Started</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Start creating engaging study videos for free - no credit card required
+              </p>
+            </div>
+
+            {/* Benefit 6 */}
+            <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 p-6 rounded-xl border border-gray-700/50 hover:border-[var(--highlight-text)]/50 transition-all duration-300 hover:-translate-y-2">
+              <div className="text-4xl mb-4">🎯</div>
+              <h3 className="text-xl font-semibold mb-3 text-[var(--highlight-text)]">Study Smarter</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Visual learning helps you understand complex concepts faster and remember them longer
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Supported File Formats Section */}
-      <div className="bg-[#121212] py-20 md:py-24">
+      <div className="bg-gradient-to-b from-[#121212] to-[#0E0E0E] py-20 md:py-24">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-12">Supported File Formats</h2>
           <div className="flex justify-center flex-wrap gap-8">
