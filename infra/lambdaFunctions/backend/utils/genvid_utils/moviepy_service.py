@@ -1,4 +1,4 @@
-from moviepy import VideoFileClip, TextClip, CompositeVideoClip, AudioFileClip
+from moviepy import VideoFileClip, TextClip, CompositeVideoClip, AudioFileClip, vfx
 from utils.getFilePath_util import get_temp_file_path
 import os
 
@@ -25,6 +25,12 @@ class MoviePy:
 
         narration = AudioFileClip(audio)
         video = VideoFileClip(bgVid)
+
+        if video.duration < narration.duration:
+            video = video.fx(vfx.loop, duration=narration.duration)
+        else:
+            video = video.subclipped(0, narration.duration)
+        
         video = video.with_audio(narration)
 
         caption_clips = []
