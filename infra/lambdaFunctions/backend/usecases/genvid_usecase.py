@@ -68,8 +68,7 @@ class GenVidUseCase:
             try:
                 os.remove(localPathAudio)
                 os.remove(localPathSubwayVideo)
-                os.remove(localPathAudio)
-                os.remove(localPathSubwayVideo)
+                os.remove(videoPathOutput)
                 print("File deleted successfully.")
             except Exception as e:
                 print(f"Error deleting file: {e}")
