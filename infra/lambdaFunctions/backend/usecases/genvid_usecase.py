@@ -48,10 +48,13 @@ class GenVidUseCase:
                 "audioLocalPath": localPathAudio,
                 "speechMarks": audioSpeechMarks,
                 "summary_text": textReference,
-                "font_size": 32,
+                "font_size": 64,
                 "font_color": "white",
+                "stroke_color": "black",
+                "stroke_width": 7,
                 "bg_color": "black",
                 "position": "center",
+
             }
 
             videoPathOutput = self.VideoCreator.generate_video_with_text(video_input)
