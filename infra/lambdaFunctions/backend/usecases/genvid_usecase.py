@@ -48,10 +48,10 @@ class GenVidUseCase:
                 "audioLocalPath": localPathAudio,
                 "speechMarks": audioSpeechMarks,
                 "summary_text": textReference,
-                "font_size": 48,
+                "font_size": 64,
                 "font_color": "yellow",
-                "stroke_color": "white",
-                "stroke_width": 3,
+                "stroke_color": "black",
+                "stroke_width": 10,
                 "bg_color": "black",
                 "position": "center",
             }
