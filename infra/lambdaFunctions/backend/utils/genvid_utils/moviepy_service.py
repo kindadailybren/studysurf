@@ -17,8 +17,10 @@ class MoviePy:
         output_path = get_temp_file_path(os.path.basename(key))
 
         summary_text = audioGenerated["summary_text"]
-        font_size = audioGenerated.get("font_size", 32)
-        font_color = audioGenerated.get("font_color", "white")
+        font_size = audioGenerated.get("font_size", 48)
+        font_color = audioGenerated.get("font_color", "yellow")
+        stroke_color = audioGenerated.get("stroke_color", "white")
+        stroke_width = audioGenerated.get("stroke_width", 3)
         position = audioGenerated.get("position", "center")
 
         narration = AudioFileClip(audio)
@@ -31,6 +33,8 @@ class MoviePy:
                 text=wrapped_text,
                 font_size=font_size,
                 color=font_color,
+                stroke_color=stroke_color,
+                stroke_width=stroke_width,
                 size=video.size,
                 method="caption",
             )
