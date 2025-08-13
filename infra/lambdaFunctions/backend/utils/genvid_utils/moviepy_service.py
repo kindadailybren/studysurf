@@ -36,7 +36,7 @@ class MoviePy:
         caption_clips = []
         for i, mark in enumerate(speechMarks):
             start_time = mark["time"] / 1000  
-            word = mark["value"]
+            word = mark["value"].upper()
 
             if i + 1 < len(speechMarks):
                 end_time = speechMarks[i + 1]["time"] / 1000
