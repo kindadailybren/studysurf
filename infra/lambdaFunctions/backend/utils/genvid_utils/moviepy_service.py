@@ -1,4 +1,4 @@
-from moviepy import VideoFileClip, TextClip, CompositeVideoClip, AudioFileClip
+from moviepy import VideoFileClip, TextClip, CompositeVideoClip, AudioFileClip, vfx
 from utils.getFilePath_util import get_temp_file_path
 import os
 
@@ -8,7 +8,7 @@ class MoviePy:
         pass
 
     def generate_video_with_text(self, audioGenerated):
-        # TO BE EDITED: for s3 integration
+        
         bgVid = audioGenerated["bgVidLocalPath"]
         audio = audioGenerated["audioLocalPath"]
         speechMarks = audioGenerated["speechMarks"]
@@ -17,33 +17,57 @@ class MoviePy:
         output_path = get_temp_file_path(os.path.basename(key))
 
         summary_text = audioGenerated["summary_text"]
-        font_size = audioGenerated.get("font_size", 32)
+        font_size = audioGenerated.get("font_size", 64)
         font_color = audioGenerated.get("font_color", "white")
+        stroke_color = audioGenerated.get("stroke_color", "black")
+        stroke_width = audioGenerated.get("stroke_width", 7)
         position = audioGenerated.get("position", "center")
 
         narration = AudioFileClip(audio)
         video = VideoFileClip(bgVid)
+
+        if video.duration < narration.duration:
+            video = video.fx(vfx.loop, duration=narration.duration)
+        else:
+            video = video.subclipped(0, narration.duration)
+        
         video = video.with_audio(narration)
 
-        wrapped_text = "\n".join(summary_text.strip().splitlines())
-        text_clip = (
-            TextClip(
-                text=wrapped_text,
-                font_size=font_size,
-                color=font_color,
-                size=video.size,
-                method="caption",
-            )
-            .with_duration(narration.duration)
-            .with_position(position)
-        )
+        caption_clips = []
+        for i, mark in enumerate(speechMarks):
+            start_time = mark["time"] / 1000  
+            word = mark["value"]
 
-        final = CompositeVideoClip([video, text_clip])
+            if i + 1 < len(speechMarks):
+                end_time = speechMarks[i + 1]["time"] / 1000
+                duration = max(0.05, end_time - start_time)  
+            else:
+                duration = 0.5
+
+            txt_clip = (
+                TextClip(
+                    text=word,
+                    font_size=font_size,
+                    color=font_color,
+                    size=video.size,
+                    stroke_color=stroke_color,
+                    stroke_width=stroke_width,
+                    method="caption",
+                )
+                .with_start(start_time)
+                .with_duration(duration)
+                .with_position(position)
+            )
+
+            caption_clips.append(txt_clip)
+
+        final = CompositeVideoClip([video] + caption_clips)
+
         final.write_videofile(
             output_path,
             codec="libx264",
             audio_codec="aac",
-            temp_audiofile=os.path.join("/tmp", "temp-audio.m4a"),
+            temp_audiofile=get_temp_file_path("temp-audio.m4a"),
             remove_temp=True,
             threads=4,
             preset="ultrafast",

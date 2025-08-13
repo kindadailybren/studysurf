@@ -1,4 +1,3 @@
-from typing import Optional
 from fastapi import APIRouter, Request, Depends, Query
 from usecases.genvid_usecase import GenVidUseCase
 from services.AWS.bedrock_service import AWS_Bedrock

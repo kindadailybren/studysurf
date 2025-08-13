@@ -61,3 +61,13 @@ class AWS_DynamoDB_Video:
             },
         )
         return response
+
+    def retrieveVideoFromDb(self, username):
+        response = self.dynamodb.query(
+            TableName=self.table,
+            KeyConditionExpression="PK = :pk",
+            ExpressionAttributeValues={":pk": {"S": f"USER#{username}"}},
+            ProjectionExpression="videoUrl",
+        )
+
+        return response

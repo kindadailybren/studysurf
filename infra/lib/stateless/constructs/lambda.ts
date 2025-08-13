@@ -72,6 +72,7 @@ export class LambdaConstruct extends Construct {
           "dynamodb:PutItem",
           "dynamodb:DeleteItem",
           "dynamodb:UpdateItem",
+          "dynamodb:Query",
           "s3:GetObject",
           "s3:PutObject",
           "s3:ListBucket",

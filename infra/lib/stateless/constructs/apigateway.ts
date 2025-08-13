@@ -47,6 +47,12 @@ export class ApiGatewayConstruct extends Construct {
     });
 
     this.api.addRoutes({
+      path: "/videos",
+      methods: [api.HttpMethod.POST],
+      integration: props.sampleIntegration,
+    });
+
+    this.api.addRoutes({
       path: "/getUsers",
       methods: [api.HttpMethod.GET],
       integration: props.sampleIntegration,
