@@ -4,7 +4,7 @@ import { Construct } from "constructs";
 import { BaseConstructProps } from "../../types";
 
 interface ApiGatewayConstructProps extends BaseConstructProps {
-  httpIntegration: integrations.HttpLambdaIntegration;
+  sampleIntegration: integrations.HttpLambdaIntegration;
 }
 
 export class ApiGatewayConstruct extends Construct {
@@ -37,73 +37,73 @@ export class ApiGatewayConstruct extends Construct {
     this.api.addRoutes({
       path: "/hello",
       methods: [api.HttpMethod.GET],
-      integration: props.httpIntegration,
+      integration: props.sampleIntegration,
     });
 
     this.api.addRoutes({
       path: "/genvid",
       methods: [api.HttpMethod.POST],
-      integration: props.httpIntegration,
+      integration: props.sampleIntegration,
     });
 
     this.api.addRoutes({
       path: "/videos",
       methods: [api.HttpMethod.POST],
-      integration: props.httpIntegration,
+      integration: props.sampleIntegration,
     });
 
     this.api.addRoutes({
       path: "/getUsers",
       methods: [api.HttpMethod.GET],
-      integration: props.httpIntegration,
+      integration: props.sampleIntegration,
     });
 
     this.api.addRoutes({
       path: "/createUser",
       methods: [api.HttpMethod.POST],
-      integration: props.httpIntegration,
+      integration: props.sampleIntegration,
     });
 
     this.api.addRoutes({
       path: "/confirmUser",
       methods: [api.HttpMethod.POST],
-      integration: props.httpIntegration,
+      integration: props.sampleIntegration,
     });
 
     this.api.addRoutes({
       path: "/login",
       methods: [api.HttpMethod.POST],
-      integration: props.httpIntegration,
+      integration: props.sampleIntegration,
     });
 
     this.api.addRoutes({
       path: "/logout",
       methods: [api.HttpMethod.POST],
-      integration: props.httpIntegration,
+      integration: props.sampleIntegration,
     });
 
     this.api.addRoutes({
       path: "/refreshToken",
       methods: [api.HttpMethod.POST],
-      integration: props.httpIntegration,
+      integration: props.sampleIntegration,
     });
 
     this.api.addRoutes({
       path: "/deleteUser",
       methods: [api.HttpMethod.POST],
-      integration: props.httpIntegration,
+      integration: props.sampleIntegration,
     });
 
     this.api.addRoutes({
       path: "/forgetPass",
       methods: [api.HttpMethod.POST],
-      integration: props.httpIntegration,
+      integration: props.sampleIntegration,
     });
 
     this.api.addRoutes({
       path: "/forgetPassConfirm",
       methods: [api.HttpMethod.POST],
-      integration: props.httpIntegration,
+      integration: props.sampleIntegration,
     });
   }
 }
