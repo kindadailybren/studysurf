@@ -1,7 +1,10 @@
 import { useState } from "react"
 
-export const VideoThumbnail = () => {
-  const videoURL = '';
+interface VideoThumbnailProps {
+  videoURL: string;
+}
+
+export const VideoThumbnail = ({videoURL}: VideoThumbnailProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleOpen = () => setIsOpen(true);
