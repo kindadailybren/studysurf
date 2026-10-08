@@ -50,6 +50,10 @@ export class StatefulStack extends cdk.Stack {
   }
 
   private createCloudFrontDistribution(props: StatefulStackProps): void {
+    const mediaOrigin = origins.S3BucketOrigin.withOriginAccessControl(
+      this.s3Construct.mediaBucket,
+    );
+
     this.distribution = new cloudfront.Distribution(
       this,
       `${props.stage}-CloudFront-Distribution`,
@@ -60,6 +64,15 @@ export class StatefulStack extends cdk.Stack {
           ),
           viewerProtocolPolicy:
             cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+        },
+        additionalBehaviors: {
+          "output-videos/*": {
+            origin: mediaOrigin,
+            viewerProtocolPolicy:
+              cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+            allowedMethods: cloudfront.AllowedMethods.ALLOW_GET_HEAD,
+            cachePolicy: cloudfront.CachePolicy.CACHING_OPTIMIZED,
+          },
         },
         defaultRootObject: "index.html",
         errorResponses: [

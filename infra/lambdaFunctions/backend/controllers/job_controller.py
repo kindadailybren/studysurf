@@ -102,11 +102,24 @@ async def create_job(
         raise HTTPException(status_code=500, detail=f"Failed to queue job: {str(e)}")
 
 
+def resolve_media_url(raw_url: Optional[str], s3: AWS_S3) -> Optional[str]:
+    if not raw_url:
+        return raw_url
+    cf_domain = os.environ.get("CLOUDFRONT_DOMAIN")
+    if "output-videos/" in raw_url:
+        key = "output-videos/" + raw_url.split("output-videos/")[1].split("?")[0]
+        if cf_domain:
+            return f"https://{cf_domain}/{key}"
+        return s3.generatePresignedDownloadUrl(key, expiration=604800)
+    return raw_url
+
+
 @job_router.get("/jobs/{job_id}")
 async def get_job_status(
     job_id: str,
     username: Optional[str] = Query(None),
     db_job: AWS_DynamoDB_Job = Depends(AWS_DynamoDB_Job),
+    s3: AWS_S3 = Depends(AWS_S3),
 ):
     job = None
     if username:
@@ -118,6 +131,9 @@ async def get_job_status(
     if not job:
         raise HTTPException(status_code=404, detail="Job not found")
 
+    if job.get("video_url"):
+        job["video_url"] = resolve_media_url(job["video_url"], s3)
+
     return job
 
 
@@ -125,13 +141,23 @@ async def get_job_status(
 async def list_user_jobs(
     username: str = Query(...),
     db_job: AWS_DynamoDB_Job = Depends(AWS_DynamoDB_Job),
+    s3: AWS_S3 = Depends(AWS_S3),
 ):
-    return db_job.listJobs(username=username)
+    jobs = db_job.listJobs(username=username)
+    for job in jobs:
+        if isinstance(job, dict) and job.get("video_url"):
+            job["video_url"] = resolve_media_url(job["video_url"], s3)
+    return jobs
 
 
 @job_router.get("/videos")
 async def list_user_videos(
     username: str = Query(...),
     db_video: AWS_DynamoDB_Video = Depends(AWS_DynamoDB_Video),
+    s3: AWS_S3 = Depends(AWS_S3),
 ):
-    return db_video.retrieveVideoFromDb(username=username)
+    videos = db_video.retrieveVideoFromDb(username=username)
+    for video in videos:
+        if isinstance(video, dict) and video.get("video_url"):
+            video["video_url"] = resolve_media_url(video["video_url"], s3)
+    return videos

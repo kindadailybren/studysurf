@@ -21,6 +21,7 @@ export interface LambdaConstructProps extends BaseConstructProps {
   userPoolClient: cognito.IUserPoolClient;
   ingestionQueue: sqs.IQueue;
   videoRenderQueue: sqs.IQueue;
+  cloudFrontDomainName?: string;
 }
 
 export class LambdaConstruct extends Construct {
@@ -77,6 +78,7 @@ export class LambdaConstruct extends Construct {
           INGESTION_QUEUE_URL: props.ingestionQueue.queueUrl,
           USER_POOL_ID: props.userPool.userPoolId,
           APP_CLIENT_ID: props.userPoolClient.userPoolClientId,
+          CLOUDFRONT_DOMAIN: props.cloudFrontDomainName || "",
           STAGE: props.stage,
         },
       },
@@ -196,6 +198,7 @@ export class LambdaConstruct extends Construct {
         environment: {
           TABLE_NAME: props.dataTable.tableName,
           MEDIA_BUCKET_NAME: props.mediaBucket.bucketName,
+          CLOUDFRONT_DOMAIN: props.cloudFrontDomainName || "",
           STAGE: props.stage,
         },
       },
