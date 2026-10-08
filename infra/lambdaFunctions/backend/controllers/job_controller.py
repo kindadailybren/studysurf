@@ -24,7 +24,9 @@ class CreateJobRequest(BaseModel):
     filename: Optional[str] = "document.pdf"
     style: Optional[str] = "subway"
     voice: Optional[str] = "Matthew"
-    s3_key: str
+    s3_key: Optional[str] = None
+    prompt_text: Optional[str] = None
+    input_type: Optional[str] = "pdf"
 
 
 @job_router.post("/jobs/upload-url")
@@ -59,14 +61,36 @@ async def create_job(
     db_job: AWS_DynamoDB_Job = Depends(AWS_DynamoDB_Job),
 ):
     try:
+        if not payload.s3_key and not payload.prompt_text:
+            raise HTTPException(
+                status_code=400,
+                detail="Either s3_key (for PDF) or prompt_text (for topic) must be provided.",
+            )
+
+        input_type = payload.input_type or ("prompt" if payload.prompt_text else "pdf")
+
+        # Auto-derive title from topic prompt if not explicitly specified
+        derived_filename = payload.filename
+        if (not derived_filename or derived_filename == "document.pdf") and payload.prompt_text:
+            clean_text = " ".join(payload.prompt_text.strip().split())
+            words = clean_text.split(" ")
+            derived = " ".join(words[:7])
+            if len(derived) > 45 and " " in derived:
+                derived = derived[:45].rsplit(" ", 1)[0]
+            derived_filename = derived.strip().title() or "Topic Study Short"
+        elif not derived_filename:
+            derived_filename = "document.pdf"
+
         job = Job(
             job_id=payload.job_id,
             username=payload.username,
-            filename=payload.filename,
+            filename=derived_filename,
             status=JobStatus.PENDING,
             style=payload.style or "subway",
             voice=payload.voice or "Matthew",
             pdf_s3_key=payload.s3_key,
+            prompt_text=payload.prompt_text,
+            input_type=input_type,
         )
 
         # 1. Save initial job in DynamoDB
@@ -84,6 +108,8 @@ async def create_job(
                 "style": job.style,
                 "voice": job.voice,
                 "pdf_s3_key": job.pdf_s3_key,
+                "prompt_text": job.prompt_text,
+                "input_type": job.input_type,
             }
             sqs.send_message(
                 QueueUrl=queue_url,
@@ -98,6 +124,8 @@ async def create_job(
             "message": "Job successfully queued for processing.",
         }
 
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to queue job: {str(e)}")
 

@@ -37,6 +37,8 @@ class Job(BaseModel):
     style: Optional[str] = "subway"  # subway, minecraft, slime
     voice: Optional[str] = "Matthew"  # Matthew, Joanna, Brian
     pdf_s3_key: Optional[str] = None
+    prompt_text: Optional[str] = None
+    input_type: Optional[str] = "pdf"  # pdf, prompt
     audio_s3_key: Optional[str] = None
     video_s3_key: Optional[str] = None
     video_url: Optional[str] = None
