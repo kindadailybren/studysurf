@@ -1,0 +1,90 @@
+name: Deploy to Prod
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy-prod:
+    name: Production Release Deployment
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials (OIDC or Secret Fallback)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME_PROD || secrets.AWS_ROLE_TO_ASSUME }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION || 'ap-southeast-1' }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: infra/package-lock.json
+
+      - name: Install CDK Dependencies
+        working-directory: infra
+        run: npm ci
+
+      - name: Deploy CDK Prod Stacks (Stateful + Stateless)
+        working-directory: infra
+        run: |
+          npx cdk deploy prod-StatefulStack prod-StatelessStack \
+            --require-approval never \
+            --outputs-file ../cdk-outputs-prod.json
+
+      - name: Parse Stack Outputs
+        id: outputs
+        run: |
+          API_URL=$(jq -r '."prod-StatelessStack"["prodStatelessStackApiUrl"] // empty' cdk-outputs-prod.json)
+          if [ -z "$API_URL" ]; then
+            API_URL=$(jq -r '."prod-StatelessStack"["ApiGatewayEndpoint"] // empty' cdk-outputs-prod.json)
+          fi
+          
+          BUCKET=$(jq -r '."prod-StatefulStack"["prodStatefulStackFrontendBucketName"] // empty' cdk-outputs-prod.json)
+          if [ -z "$BUCKET" ]; then
+            BUCKET=$(jq -r '."prod-StatefulStack"["S3BucketFrontendBucketName"] // empty' cdk-outputs-prod.json)
+          fi
+
+          DIST_ID=$(jq -r '."prod-StatefulStack"["prodStatefulStackDistributionId"] // empty' cdk-outputs-prod.json)
+          if [ -z "$DIST_ID" ]; then
+            DIST_ID=$(jq -r '."prod-StatefulStack"["CloudFrontDistributionId"] // empty' cdk-outputs-prod.json)
+          fi
+
+          echo "api_url=$API_URL" >> $GITHUB_OUTPUT
+          echo "bucket=$BUCKET" >> $GITHUB_OUTPUT
+          echo "dist_id=$DIST_ID" >> $GITHUB_OUTPUT
+
+      - name: Build Frontend Application
+        working-directory: frontend
+        env:
+          VITE_API_BASE_URL: ${{ steps.outputs.outputs.api_url }}
+        run: |
+          npm ci
+          npm run build
+
+      - name: Deploy Frontend to S3
+        run: |
+          BUCKET_NAME="${{ steps.outputs.outputs.bucket || secrets.S3_BUCKET_NAME_PROD }}"
+          echo "Syncing frontend dist to S3: s3://$BUCKET_NAME"
+          aws s3 sync frontend/dist "s3://$BUCKET_NAME" --delete
+
+      - name: Invalidate CloudFront Cache
+        run: |
+          DISTRIBUTION_ID="${{ steps.outputs.outputs.dist_id || secrets.CLOUDFRONT_DISTRIBUTION_ID_PROD || secrets.CLOUDFRONT_DISTRIBUTION_ID }}"
+          if [ -n "$DISTRIBUTION_ID" ]; then
+            echo "Invalidating CloudFront distribution: $DISTRIBUTION_ID"
+            aws cloudfront create-invalidation --distribution-id "$DISTRIBUTION_ID" --paths "/*"
+          else
+            echo "No CloudFront Distribution ID provided; skipping cache invalidation."
+          fi
