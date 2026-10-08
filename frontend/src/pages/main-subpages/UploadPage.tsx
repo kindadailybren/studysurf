@@ -33,14 +33,41 @@ export const UploadPage: React.FC = () => {
   const [uploadError, setUploadError] = useState<string | null>(null);
   const pollingRef = useRef<number | null>(null);
 
-  // Stop polling on unmount
+  // Restore any active in-progress job on mount / refresh
   useEffect(() => {
+    if (!username) return;
+
+    let isMounted = true;
+    const restoreActiveJob = async () => {
+      try {
+        const response = await api.get("/jobs", {
+          params: { username },
+        });
+        const allJobs: JobStatusData[] = response.data;
+        if (Array.isArray(allJobs) && isMounted) {
+          const activeJob = allJobs.find(
+            (j) => j.status !== "COMPLETED" && j.status !== "FAILED"
+          );
+          if (activeJob) {
+            setIsProcessing(true);
+            setCurrentJob(activeJob);
+            startJobPolling(activeJob.job_id);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to restore active job:", err);
+      }
+    };
+
+    restoreActiveJob();
+
     return () => {
+      isMounted = false;
       if (pollingRef.current) {
         clearInterval(pollingRef.current);
       }
     };
-  }, []);
+  }, [username]);
 
   const startJobPolling = (jobId: string) => {
     if (pollingRef.current) clearInterval(pollingRef.current);
