@@ -21,9 +21,33 @@ interface VideoItem {
   video_id: string;
   video_url: string;
   title?: string;
+  description?: string;
   style?: string;
   created_at?: string;
 }
+
+const DISMISSED_JOBS_KEY = "studysurf_dismissed_jobs";
+
+const getDismissedJobIds = (): string[] => {
+  try {
+    const raw = localStorage.getItem(DISMISSED_JOBS_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+};
+
+const persistDismissedJobId = (jobId: string) => {
+  try {
+    const current = getDismissedJobIds();
+    if (!current.includes(jobId)) {
+      localStorage.setItem(
+        DISMISSED_JOBS_KEY,
+        JSON.stringify([...current, jobId])
+      );
+    }
+  } catch {}
+};
 
 export const GalleryPage: React.FC = () => {
   const navigate = useNavigate();
@@ -51,10 +75,14 @@ export const GalleryPage: React.FC = () => {
               video_id: `vid-${idx}`,
               video_url: item,
               title: `Study Short #${idx + 1}`,
+              description: "",
               style: "subway",
             };
           }
-          return item;
+          return {
+            ...item,
+            description: item.description || "",
+          };
         });
         setVideos(parsedVideos);
       }
@@ -75,8 +103,9 @@ export const GalleryPage: React.FC = () => {
       });
       const allJobs: ActiveJobItem[] = response.data;
       if (Array.isArray(allJobs)) {
+        const dismissed = getDismissedJobIds();
         const uncompleted = allJobs.filter(
-          (job) => job.status !== "COMPLETED"
+          (job) => job.status !== "COMPLETED" && !dismissed.includes(job.job_id)
         );
         setActiveJobs(uncompleted);
       }
@@ -132,8 +161,9 @@ export const GalleryPage: React.FC = () => {
             });
             const allJobs: ActiveJobItem[] = response.data;
             if (Array.isArray(allJobs)) {
+              const dismissed = getDismissedJobIds();
               const uncompleted = allJobs.filter(
-                (job) => job.status !== "COMPLETED"
+                (job) => job.status !== "COMPLETED" && !dismissed.includes(job.job_id)
               );
 
               setActiveJobs((prev) => {
@@ -182,6 +212,7 @@ export const GalleryPage: React.FC = () => {
   }, [activeJobs, username]);
 
   const handleDismissJob = async (jobId: string) => {
+    persistDismissedJobId(jobId);
     setActiveJobs((prev) => prev.filter((j) => j.job_id !== jobId));
     try {
       await api.delete(`/jobs/${jobId}`, {
@@ -189,6 +220,47 @@ export const GalleryPage: React.FC = () => {
       });
     } catch (err) {
       console.error("Failed to dismiss job:", err);
+    }
+  };
+
+  const handleUpdateVideo = async (
+    videoId: string,
+    newTitle: string,
+    newDescription: string
+  ) => {
+    setVideos((prev) =>
+      prev.map((v) =>
+        v.video_id === videoId
+          ? { ...v, title: newTitle, description: newDescription }
+          : v
+      )
+    );
+    try {
+      await api.put(
+        `/videos/${videoId}`,
+        {
+          title: newTitle,
+          description: newDescription,
+        },
+        {
+          params: { username },
+        }
+      );
+    } catch (err) {
+      console.error("Failed to update video:", err);
+      fetchVideos();
+    }
+  };
+
+  const handleDeleteVideo = async (videoId: string) => {
+    setVideos((prev) => prev.filter((v) => v.video_id !== videoId));
+    try {
+      await api.delete(`/videos/${videoId}`, {
+        params: { username },
+      });
+    } catch (err) {
+      console.error("Failed to delete video:", err);
+      fetchVideos();
     }
   };
 
@@ -284,10 +356,14 @@ export const GalleryPage: React.FC = () => {
           {videos.map((vid) => (
             <VideoThumbnail
               key={vid.video_id}
+              videoId={vid.video_id}
               videoURL={vid.video_url}
               title={vid.title}
+              description={vid.description}
               style={vid.style}
               createdDate={vid.created_at}
+              onUpdate={handleUpdateVideo}
+              onDelete={handleDeleteVideo}
             />
           ))}
         </div>

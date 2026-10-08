@@ -6,7 +6,7 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from pydantic import BaseModel
 
-from models.base import Job, JobStatus
+from models.base import Job, JobStatus, VideoUpdateRequest
 from services.AWS.dynamodb_service import AWS_DynamoDB_Job, AWS_DynamoDB_Video
 from services.AWS.s3_service import AWS_S3
 
@@ -174,4 +174,37 @@ async def delete_job(
         return {"message": f"Job {job_id} deleted successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to delete job: {str(e)}")
+
+
+@job_router.put("/videos/{video_id}")
+async def update_video(
+    video_id: str,
+    payload: VideoUpdateRequest,
+    username: str = Query(...),
+    db_video: AWS_DynamoDB_Video = Depends(AWS_DynamoDB_Video),
+):
+    try:
+        db_video.updateVideoInDb(
+            video_id=video_id,
+            username=username,
+            title=payload.title,
+            description=payload.description,
+        )
+        return {"message": "Video updated successfully", "video_id": video_id}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to update video: {str(e)}")
+
+
+@job_router.delete("/videos/{video_id}")
+async def delete_video(
+    video_id: str,
+    username: str = Query(...),
+    db_video: AWS_DynamoDB_Video = Depends(AWS_DynamoDB_Video),
+):
+    try:
+        db_video.deleteVideoFromDb(video_id=video_id, username=username)
+        return {"message": f"Video {video_id} deleted successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to delete video: {str(e)}")
+
 

@@ -137,7 +137,7 @@ export class ApiGatewayConstruct extends Construct {
 
     this.api.addRoutes({
       path: "/jobs/{id}",
-      methods: [api.HttpMethod.GET],
+      methods: [api.HttpMethod.GET, api.HttpMethod.DELETE],
       integration: props.sampleIntegration,
       authorizer: this.authorizer,
     });
@@ -145,6 +145,13 @@ export class ApiGatewayConstruct extends Construct {
     this.api.addRoutes({
       path: "/videos",
       methods: [api.HttpMethod.GET, api.HttpMethod.POST],
+      integration: props.sampleIntegration,
+      authorizer: this.authorizer,
+    });
+
+    this.api.addRoutes({
+      path: "/videos/{id}",
+      methods: [api.HttpMethod.PUT, api.HttpMethod.DELETE],
       integration: props.sampleIntegration,
       authorizer: this.authorizer,
     });
