@@ -10,6 +10,7 @@ import {
   faCircleCheck,
   faXmark,
   faTrash,
+  faLightbulb,
 } from "@fortawesome/free-solid-svg-icons";
 import { ProgressStepper } from "./uploadComponents/ProgressStepper";
 
@@ -24,6 +25,8 @@ export interface ActiveJobItem {
   video_url?: string;
   error_message?: string;
   created_at?: string;
+  prompt_text?: string;
+  input_type?: string;
 }
 
 interface GeneratingCardProps {
@@ -31,13 +34,21 @@ interface GeneratingCardProps {
   onDismissFailed?: (jobId: string) => void;
 }
 
-const getStepDetails = (status: string) => {
+const getStepDetails = (status: string, isPrompt: boolean) => {
   switch (status) {
     case "PENDING":
     case "PROCESSING_DOCUMENT":
-      return { label: "Ingesting PDF", icon: faFileLines, percent: 25 };
+      return {
+        label: isPrompt ? "Analyzing Topic" : "Ingesting PDF",
+        icon: isPrompt ? faLightbulb : faFileLines,
+        percent: 25,
+      };
     case "SUMMARIZING":
-      return { label: "AI Summarizing", icon: faBrain, percent: 50 };
+      return {
+        label: isPrompt ? "Writing Script" : "AI Summarizing",
+        icon: faBrain,
+        percent: 50,
+      };
     case "SYNTHESIZING_VOICE":
       return { label: "Voice Synthesis", icon: faMicrophoneLines, percent: 70 };
     case "RENDERING_VIDEO":
@@ -55,10 +66,15 @@ export const GeneratingCard: React.FC<GeneratingCardProps> = ({
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const isFailed = job.status === "FAILED";
-  const step = getStepDetails(job.status);
+  const isPrompt =
+    job.input_type === "prompt" ||
+    Boolean(job.prompt_text && !job.filename?.endsWith(".pdf"));
+  const step = getStepDetails(job.status, isPrompt);
 
   const cleanFilename = job.filename
     ? job.filename.replace(".pdf", "").replace(/_/g, " ")
+    : job.prompt_text
+    ? job.prompt_text.slice(0, 35) + (job.prompt_text.length > 35 ? "..." : "")
     : "Study Short";
 
   const handleCardClick = () => {
@@ -203,6 +219,7 @@ export const GeneratingCard: React.FC<GeneratingCardProps> = ({
               summaryText={job.summary_text}
               videoUrl={job.video_url}
               errorMessage={job.error_message}
+              inputType={job.input_type || (job.prompt_text ? "prompt" : "pdf")}
               onReset={() => {
                 if (isFailed && onDismissFailed) {
                   onDismissFailed(job.job_id);

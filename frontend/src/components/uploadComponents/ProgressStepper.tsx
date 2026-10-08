@@ -9,6 +9,7 @@ import {
   faMicrophoneLines,
   faFilm,
   faCircleCheck,
+  faLightbulb,
 } from "@fortawesome/free-solid-svg-icons";
 
 export interface ProgressStepperProps {
@@ -16,42 +17,10 @@ export interface ProgressStepperProps {
   summaryText?: string;
   videoUrl?: string;
   errorMessage?: string;
+  inputType?: "pdf" | "prompt" | string;
   onReset?: () => void;
   onViewGallery?: () => void;
 }
-
-const steps = [
-  {
-    key: "PROCESSING_DOCUMENT",
-    label: "Ingesting PDF",
-    description: "Extracting readable study text",
-    icon: faFileLines,
-  },
-  {
-    key: "SUMMARIZING",
-    label: "AI Summarization",
-    description: "Distilling topic with Claude 3 Haiku",
-    icon: faBrain,
-  },
-  {
-    key: "SYNTHESIZING_VOICE",
-    label: "Voice Synthesis",
-    description: "Generating Amazon Polly neural speech",
-    icon: faMicrophoneLines,
-  },
-  {
-    key: "RENDERING_VIDEO",
-    label: "Video Compositing",
-    description: "Stitching background & synced subtitles",
-    icon: faFilm,
-  },
-  {
-    key: "COMPLETED",
-    label: "Shorts Ready",
-    description: "Processed and saved to gallery",
-    icon: faCircleCheck,
-  },
-];
 
 const getStepIndex = (status: string): number => {
   switch (status) {
@@ -96,9 +65,44 @@ export const ProgressStepper: React.FC<ProgressStepperProps> = ({
   summaryText,
   videoUrl,
   errorMessage,
+  inputType = "pdf",
   onReset,
   onViewGallery,
 }) => {
+  const isPrompt = inputType === "prompt";
+  const steps = [
+    {
+      key: "PROCESSING_DOCUMENT",
+      label: isPrompt ? "Analyzing Topic" : "Ingesting PDF",
+      description: isPrompt ? "Structuring prompt for video script" : "Extracting readable study text",
+      icon: isPrompt ? faLightbulb : faFileLines,
+    },
+    {
+      key: "SUMMARIZING",
+      label: isPrompt ? "Script Writing" : "AI Summarization",
+      description: "Distilling topic with Claude 3 Haiku",
+      icon: faBrain,
+    },
+    {
+      key: "SYNTHESIZING_VOICE",
+      label: "Voice Synthesis",
+      description: "Generating Amazon Polly neural speech",
+      icon: faMicrophoneLines,
+    },
+    {
+      key: "RENDERING_VIDEO",
+      label: "Video Compositing",
+      description: "Stitching background & synced subtitles",
+      icon: faFilm,
+    },
+    {
+      key: "COMPLETED",
+      label: "Shorts Ready",
+      description: "Processed and saved to gallery",
+      icon: faCircleCheck,
+    },
+  ];
+
   const currentIndex = getStepIndex(status);
   const isFailed = status === "FAILED";
   const isDone = status === "COMPLETED";
@@ -151,12 +155,15 @@ export const ProgressStepper: React.FC<ProgressStepperProps> = ({
           <div className="flex-1">
             <h4 className="font-semibold text-sm">Processing Encountered an Issue</h4>
             <p className="text-xs text-red-200 mt-1">
-              {errorMessage || "An unexpected error occurred during rendering. Please retry with a valid PDF."}
+              {errorMessage ||
+                (isPrompt
+                  ? "An unexpected error occurred during rendering. Please retry with a revised topic prompt."
+                  : "An unexpected error occurred during rendering. Please retry with a valid PDF.")}
             </p>
             {onReset && (
               <button
                 onClick={onReset}
-                className="mt-3 px-4 py-1.5 bg-red-500/20 hover:bg-red-500/30 text-red-200 text-xs font-semibold rounded-lg transition-colors"
+                className="mt-3 px-4 py-1.5 bg-red-500/20 hover:bg-red-500/30 text-red-200 text-xs font-semibold rounded-lg transition-colors cursor-pointer"
               >
                 Try Again
               </button>
@@ -222,7 +229,11 @@ export const ProgressStepper: React.FC<ProgressStepperProps> = ({
         <div className="p-4 rounded-xl bg-white/5 border border-white/10 text-left">
           <div className="flex items-center gap-2 mb-2 text-xs font-semibold text-[var(--highlight-text)]">
             <FontAwesomeIcon icon={faBrain} />
-            <span>AI Summarization Preview (Bedrock Claude 3):</span>
+            <span>
+              {isPrompt
+                ? "Generated Script Narration (Bedrock Claude 3):"
+                : "AI Summarization Preview (Bedrock Claude 3):"}
+            </span>
           </div>
           <p className="text-xs text-gray-300 leading-relaxed italic line-clamp-4">
             "{summaryText}"

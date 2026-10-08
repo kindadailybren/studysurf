@@ -72,6 +72,10 @@ class AWS_DynamoDB_Job:
         }
         if job.pdf_s3_key:
             item["pdfS3Key"] = {"S": job.pdf_s3_key}
+        if job.prompt_text:
+            item["promptText"] = {"S": job.prompt_text}
+        if job.input_type:
+            item["inputType"] = {"S": job.input_type}
         if job.audio_s3_key:
             item["audioS3Key"] = {"S": job.audio_s3_key}
         if job.video_url:
@@ -181,6 +185,8 @@ class AWS_DynamoDB_Job:
             "audio_s3_key": item.get("audioS3Key", {}).get("S"),
             "video_url": item.get("videoUrl", {}).get("S"),
             "summary_text": item.get("summaryText", {}).get("S"),
+            "prompt_text": item.get("promptText", {}).get("S"),
+            "input_type": item.get("inputType", {}).get("S", "pdf"),
             "error_message": item.get("errorMessage", {}).get("S"),
             "created_at": item.get("createdAt", {}).get("S"),
             "updated_at": item.get("updatedAt", {}).get("S"),

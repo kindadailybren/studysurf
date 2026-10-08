@@ -18,12 +18,18 @@ def handler(event, context):
     polly_service = AWS_Polly()
     pdf_parser = PDFParser()
 
+    region = os.environ.get("AWS_REGION", "ap-southeast-1")
+    s3_client = boto3.client("s3", region_name=region)
+    media_bucket = s3_service.mediaBucket
+
     for record in event.get("Records", []):
         try:
             body = json.loads(record.get("body", "{}"))
             job_id = body.get("job_id")
             username = body.get("username")
             pdf_s3_key = body.get("pdf_s3_key")
+            prompt_text = body.get("prompt_text")
+            input_type = body.get("input_type", "prompt" if prompt_text else "pdf")
             style = body.get("style", "subway")
             voice = body.get("voice", "Matthew")
 
@@ -31,33 +37,39 @@ def handler(event, context):
                 print(f"[WARN] Skipping malformed SQS record: {body}")
                 continue
 
-            print(f"[INFO] Processing job {job_id} for user {username}")
+            print(f"[INFO] Processing job {job_id} for user {username} (type: {input_type})")
 
             # 1. Update status: PROCESSING_DOCUMENT
             db_job.updateJobStatus(job_id, username, JobStatus.PROCESSING_DOCUMENT.value)
 
-            # 2. Download and parse PDF
-            local_pdf_path = f"/tmp/{job_id}.pdf"
-            region = os.environ.get("AWS_REGION", "ap-southeast-1")
-            s3_client = boto3.client("s3", region_name=region)
-            media_bucket = s3_service.mediaBucket
+            if prompt_text:
+                print(f"[INFO] Topic-based generation for job {job_id}: '{prompt_text[:60]}...'")
+                # 2. Bedrock topic narration
+                db_job.updateJobStatus(job_id, username, JobStatus.SUMMARIZING.value)
+                summary_response = bedrock_service.gen_topic_narration(prompt_text)
+                summary_text = summary_response["content"][0]["text"]
+            else:
+                if not pdf_s3_key:
+                    raise ValueError("Neither pdf_s3_key nor prompt_text was provided for job.")
 
-            s3_client.download_file(media_bucket, pdf_s3_key, local_pdf_path)
+                # 2. Download and parse PDF
+                local_pdf_path = f"/tmp/{job_id}.pdf"
+                s3_client.download_file(media_bucket, pdf_s3_key, local_pdf_path)
 
-            extracted_text = pdf_parser.extract_text_util(local_pdf_path)
-            if not extracted_text.strip():
-                raise ValueError("Could not extract any readable text from uploaded PDF.")
+                extracted_text = pdf_parser.extract_text_util(local_pdf_path)
+                if not extracted_text.strip():
+                    raise ValueError("Could not extract any readable text from uploaded PDF.")
 
-            # Clean local temporary file
-            try:
-                os.remove(local_pdf_path)
-            except Exception:
-                pass
+                # Clean local temporary file
+                try:
+                    os.remove(local_pdf_path)
+                except Exception:
+                    pass
 
-            # 3. Update status: SUMMARIZING with Bedrock
-            db_job.updateJobStatus(job_id, username, JobStatus.SUMMARIZING.value)
-            summary_response = bedrock_service.gen_summarization(extracted_text)
-            summary_text = summary_response["content"][0]["text"]
+                # 3. Update status: SUMMARIZING with Bedrock
+                db_job.updateJobStatus(job_id, username, JobStatus.SUMMARIZING.value)
+                summary_response = bedrock_service.gen_summarization(extracted_text)
+                summary_text = summary_response["content"][0]["text"]
 
             # 4. Update status: SYNTHESIZING_VOICE with Amazon Polly
             db_job.updateJobStatus(
