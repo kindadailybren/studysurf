@@ -2,6 +2,7 @@ import os
 import random
 import urllib.parse
 import boto3
+from botocore.client import Config
 from fastapi.responses import JSONResponse
 from utils.getFilePath_util import get_temp_file_path
 
@@ -9,7 +10,14 @@ from utils.getFilePath_util import get_temp_file_path
 class AWS_S3:
     def __init__(self):
         region = os.environ.get("AWS_REGION", "ap-southeast-1")
-        self.s3_client = boto3.client("s3", region_name=region)
+        self.s3_client = boto3.client(
+            "s3",
+            region_name=region,
+            config=Config(
+                signature_version="s3v4",
+                s3={"addressing_style": "virtual"},
+            ),
+        )
         self.mediaBucket = os.environ.get(
             "MEDIA_BUCKET_NAME",
             os.environ.get("S3_BUCKET_NAME", "studysurf-outputvids"),
