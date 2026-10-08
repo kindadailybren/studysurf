@@ -1,76 +1,111 @@
-import { useDropzone } from "react-dropzone"
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faFileImport } from "@fortawesome/free-solid-svg-icons"
+import React from "react";
+import { useDropzone } from "react-dropzone";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faCloudArrowUp,
+  faFilePdf,
+  faXmark,
+} from "@fortawesome/free-solid-svg-icons";
 
 interface FileDropProps {
   file: File[];
   setFile: (file: File[]) => void;
-  setData: (data: { answer: string }) => void;
 }
 
-export const FileDrop = ({ file, setFile, setData, }: FileDropProps) => {
-  const onDrop = async (acceptedFiles: File[]) => {
-    setFile(acceptedFiles)
-  }
+export const FileDrop: React.FC<FileDropProps> = ({ file, setFile }) => {
+  const onDrop = (acceptedFiles: File[]) => {
+    if (acceptedFiles.length > 0) {
+      setFile([acceptedFiles[0]]);
+    }
+  };
 
-  const clearFile = () => {
-    setFile([])
-    setData({ answer: "No video selected" })
-  }
+  const clearFile = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setFile([]);
+  };
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
+  const { getRootProps, getInputProps, isDragActive, isDragReject } =
+    useDropzone({
+      onDrop,
+      accept: {
+        "application/pdf": [".pdf"],
+      },
+      maxFiles: 1,
+      multiple: false,
+    });
+
+  const selectedFile = file[0];
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  };
 
   return (
-    <>
-      <h1 className="text-2xl pb-3">Upload File:</h1>
-      {isDragActive ? (
+    <div className="w-full">
+      <div className="flex items-center justify-between mb-3">
+        <h2 className="text-xl font-semibold text-gray-200 flex items-center gap-2">
+          <span className="text-[var(--highlight-text)]">3.</span> Upload Study Document
+        </h2>
+        <span className="text-xs text-gray-400">PDFs up to 50 MB supported</span>
+      </div>
 
-        // File Hovering---------------------------------------------------------------
-        <div {...getRootProps()} className="w-full h-1/6">
-          <input {...getInputProps()} className="hidden" />
-          <div className="flex flex-col justify-center border-dashed border-2 rounded-xl w-full h-full gap-2 bg-[#252525] duration-300">
-            <FontAwesomeIcon icon={faFileImport} size="xl" style={{ color: "#3b94dc" }} />
-            <p className="text-center">Drop the file here ...</p>
+      <div
+        {...getRootProps()}
+        className={`relative border-2 border-dashed rounded-2xl p-8 text-center cursor-pointer transition-all duration-300 flex flex-col items-center justify-center min-h-[180px] ${
+          isDragActive
+            ? "border-[var(--highlight-text)] bg-[var(--highlight-bg)]/80 scale-[1.01]"
+            : isDragReject
+            ? "border-red-500 bg-red-500/10"
+            : selectedFile
+            ? "border-emerald-500/60 bg-emerald-500/5 hover:border-emerald-500"
+            : "border-[var(--primary-border)] bg-[var(--secondary-bg)] hover:border-[var(--highlight-text)]/60 hover:bg-[var(--secondary-bg-hvr)]"
+        }`}
+      >
+        <input {...getInputProps()} />
+
+        {selectedFile ? (
+          <div className="flex items-center justify-between gap-4 w-full max-w-md bg-white/5 border border-white/10 rounded-xl p-4 transition-all">
+            <div className="flex items-center gap-3 overflow-hidden">
+              <div className="w-10 h-10 rounded-lg bg-red-500/20 text-red-400 flex items-center justify-center flex-shrink-0 text-xl">
+                <FontAwesomeIcon icon={faFilePdf} />
+              </div>
+              <div className="text-left overflow-hidden">
+                <p className="text-sm font-semibold text-gray-200 truncate">
+                  {selectedFile.name}
+                </p>
+                <p className="text-xs text-gray-400">
+                  {formatFileSize(selectedFile.size)} • PDF ready for AI summarization
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={clearFile}
+              className="w-8 h-8 rounded-full bg-white/5 hover:bg-red-500/20 hover:text-red-400 text-gray-400 flex items-center justify-center transition-colors"
+              title="Remove file"
+            >
+              <FontAwesomeIcon icon={faXmark} />
+            </button>
           </div>
-        </div>
-      ) : (
-        file && file.length === 1 ? (
-
-          // Successful Drop---------------------------------------------------------------
-          <ul>
-            <li className="relative text-center border border-[var(--primary-border)] rounded-md p-4 w-fit" key={file[0].name}>
-              <button onClick={clearFile} className="absolute top-1 right-1 text-red-500 hover:text-red-700 text-sm w-fit" aria-label="Remove file">
-                ✕
-              </button>
-              {file[0].name}
-            </li>
-          </ul>
-        ) : file.length > 1 ? (
-
-          // Multiple File Drop Error---------------------------------------------------------------
-          <>
-            <div {...getRootProps()} className="w-full h-1/6">
-              <input {...getInputProps()} className="hidden" />
-              <div className="flex flex-col justify-center border-dashed border-2 rounded-xl w-full h-full gap-2 bg-[#151515]">
-                <FontAwesomeIcon icon={faFileImport} size="xl" style={{ color: "#3b94dc" }} />
-                <p className="text-center text-red-500">Only one file allowed</p>
-              </div>
-            </div>
-          </>
         ) : (
-
-          // Default Dropzone---------------------------------------------------------------
-          <>
-            <div {...getRootProps()} className="w-full h-1/6">
-              <input {...getInputProps()} className="hidden" />
-              <div className="flex flex-col justify-center border-dashed border-2 rounded-xl w-full h-full gap-2 bg-[#151515]">
-                <FontAwesomeIcon icon={faFileImport} size="xl" style={{ color: "#3b94dc" }} />
-                <p className="text-center">Drag and drop a file here<br />or click to select one</p>
-              </div>
+          <div className="flex flex-col items-center gap-3">
+            <div className="w-14 h-14 rounded-full bg-[var(--highlight-bg)] text-[var(--highlight-text)] flex items-center justify-center text-2xl shadow-inner">
+              <FontAwesomeIcon icon={faCloudArrowUp} />
             </div>
-          </>
-        )
-      )}
-    </>
-  )
-}
+            <div>
+              <p className="text-base font-semibold text-gray-200">
+                {isDragActive
+                  ? "Drop your study document here..."
+                  : "Drag & drop your study PDF here, or click to browse"}
+              </p>
+              <p className="text-xs text-gray-400 mt-1">
+                Lecture slides, syllabus, textbook chapters, or study guides (.pdf)
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};

@@ -19,7 +19,38 @@ class User(BaseModel):
     confirmed: bool = False
 
 
+class JobStatus(str, Enum):
+    PENDING = "PENDING"
+    PROCESSING_DOCUMENT = "PROCESSING_DOCUMENT"
+    SUMMARIZING = "SUMMARIZING"
+    SYNTHESIZING_VOICE = "SYNTHESIZING_VOICE"
+    RENDERING_VIDEO = "RENDERING_VIDEO"
+    COMPLETED = "COMPLETED"
+    FAILED = "FAILED"
+
+
+class Job(BaseModel):
+    job_id: str
+    username: str
+    filename: Optional[str] = "document.pdf"
+    status: JobStatus = JobStatus.PENDING
+    style: Optional[str] = "subway"  # subway, minecraft, slime
+    voice: Optional[str] = "Matthew"  # Matthew, Joanna, Brian
+    pdf_s3_key: Optional[str] = None
+    audio_s3_key: Optional[str] = None
+    video_s3_key: Optional[str] = None
+    video_url: Optional[str] = None
+    summary_text: Optional[str] = None
+    speech_marks: Optional[list] = None
+    error_message: Optional[str] = None
+    created_at: datetime = Field(default_factory=datetime.now)
+    updated_at: datetime = Field(default_factory=datetime.now)
+
+
 class Video(BaseModel):
     video_id: str
     username: Optional[str] = ""
     video_url: str
+    title: Optional[str] = "Study Summary"
+    created_at: Optional[str] = None
+    style: Optional[str] = "subway"

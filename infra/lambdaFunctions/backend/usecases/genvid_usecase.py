@@ -5,10 +5,11 @@ from fastapi.responses import JSONResponse
 from models.base import Video
 
 
-# ImageMagick for MoviePy - TO BE FIXED SINCE THIS CANNOT BE HOSTED
-os.environ["IMAGEMAGICK_BINARY"] = (
-    r"C:\Program Files\ImageMagick-7.1.2-Q16-HDRI\magick.exe"
-)
+# ImageMagick fallback for Linux if available
+if os.path.exists("/usr/bin/magick"):
+    os.environ["IMAGEMAGICK_BINARY"] = "/usr/bin/magick"
+elif os.path.exists("/usr/bin/convert"):
+    os.environ["IMAGEMAGICK_BINARY"] = "/usr/bin/convert"
 
 
 class GenVidUseCase:

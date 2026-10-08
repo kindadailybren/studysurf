@@ -115,7 +115,11 @@ class AuthUsecase:
     def deleteUser(self, credentials: UserDelete):
         try:
             user_data = self.auth.getUser(credentials.username)
-            user_id = user_data["UserAttributes"][2]["Value"]
+            user_id = credentials.username
+            for attr in user_data.get("UserAttributes", []):
+                if attr.get("Name") == "sub":
+                    user_id = attr.get("Value")
+                    break
 
             userDelete = self.auth.deleteUserCognito(credentials.accessCode)
             self.db.deleteUserDynamo(user_id)
@@ -127,11 +131,9 @@ class AuthUsecase:
 
     def logoutUser(self, accessToken):
         try:
-            response = self.auth.logoutUser(accessToken)
-            deleteRefreshTokenCookie(
-                response=JSONResponse(content={"message": "Logout successful"})
-            )
-
+            self.auth.logoutUser(accessToken)
+            response = JSONResponse(content={"message": "Logout successful"})
+            deleteRefreshTokenCookie(response=response)
             return response
 
         except ClientError as err:

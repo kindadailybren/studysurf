@@ -1,0 +1,117 @@
+name: Deploy to Staging
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy-staging:
+    name: Promotion Deployment to Staging Environment
+    runs-on: ubuntu-latest
+    environment: staging
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials (OIDC or Secret Fallback)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME_STAGING || secrets.AWS_ROLE_TO_ASSUME }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION || 'ap-southeast-1' }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: 'pip'
+          cache-dependency-path: infra/lambdaFunctions/backend/requirements.txt
+
+      - name: Package Backend Lambda Dependencies
+        working-directory: infra/lambdaFunctions/backend
+        run: |
+          python -m pip install --upgrade pip
+          mkdir -p lib
+          pip install \
+            --platform manylinux2014_x86_64 \
+            --implementation cp \
+            --python-version 3.13 \
+            --only-binary=:all: \
+            -t lib/ \
+            -r requirements.txt
+          find lib/ -type f -name "*.so" -exec strip {} + 2>/dev/null || true
+          find lib/ -type d -name "tests" -exec rm -rf {} + 2>/dev/null || true
+          find lib/ -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
+          find lib/ -type d -name "*.pyc" -delete
+          (cd lib && zip -rq ../aws_lambda.zip .)
+          zip -grq aws_lambda.zip app.py stage1_worker.py stage2_worker.py controllers models services usecases utils
+          rm -rf lib
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: infra/package-lock.json
+
+      - name: Install CDK Dependencies
+        working-directory: infra
+        run: npm ci
+
+      - name: Deploy CDK Staging Stacks (Stateful + Stateless)
+        working-directory: infra
+        run: |
+          npx cdk deploy staging-StatefulStack staging-StatelessStack \
+            --require-approval never \
+            --outputs-file ../cdk-outputs-staging.json
+
+      - name: Parse Stack Outputs
+        id: outputs
+        run: |
+          API_URL=$(jq -r '."staging-StatelessStack"["stagingStatelessStackApiUrl"] // empty' cdk-outputs-staging.json)
+          if [ -z "$API_URL" ]; then
+            API_URL=$(jq -r '."staging-StatelessStack"["ApiGatewayEndpoint"] // empty' cdk-outputs-staging.json)
+          fi
+          
+          BUCKET=$(jq -r '."staging-StatefulStack"["stagingStatefulStackFrontendBucketName"] // empty' cdk-outputs-staging.json)
+          if [ -z "$BUCKET" ]; then
+            BUCKET=$(jq -r '."staging-StatefulStack"["S3BucketFrontendBucketName"] // empty' cdk-outputs-staging.json)
+          fi
+
+          DIST_ID=$(jq -r '."staging-StatefulStack"["stagingStatefulStackDistributionId"] // empty' cdk-outputs-staging.json)
+          if [ -z "$DIST_ID" ]; then
+            DIST_ID=$(jq -r '."staging-StatefulStack"["CloudFrontDistributionId"] // empty' cdk-outputs-staging.json)
+          fi
+
+          echo "api_url=$API_URL" >> $GITHUB_OUTPUT
+          echo "bucket=$BUCKET" >> $GITHUB_OUTPUT
+          echo "dist_id=$DIST_ID" >> $GITHUB_OUTPUT
+
+      - name: Build Frontend Application
+        working-directory: frontend
+        env:
+          VITE_API_BASE_URL: ${{ steps.outputs.outputs.api_url }}
+        run: |
+          npm ci
+          npm run build
+
+      - name: Deploy Frontend to S3
+        run: |
+          BUCKET_NAME="${{ steps.outputs.outputs.bucket || secrets.S3_BUCKET_NAME_STAGING }}"
+          echo "Syncing frontend dist to S3: s3://$BUCKET_NAME"
+          aws s3 sync frontend/dist "s3://$BUCKET_NAME" --delete
+
+      - name: Invalidate CloudFront Cache
+        run: |
+          DISTRIBUTION_ID="${{ steps.outputs.outputs.dist_id || secrets.CLOUDFRONT_DISTRIBUTION_ID_STAGING }}"
+          if [ -n "$DISTRIBUTION_ID" ]; then
+            echo "Invalidating CloudFront distribution: $DISTRIBUTION_ID"
+            aws cloudfront create-invalidation --distribution-id "$DISTRIBUTION_ID" --paths "/*"
+          else
+            echo "No CloudFront Distribution ID provided; skipping cache invalidation."
+          fi

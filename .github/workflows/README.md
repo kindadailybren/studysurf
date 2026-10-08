@@ -1,96 +1,56 @@
-# GitHub Actions Workflows
+# 🚀 StudySurf CI/CD Workflows
 
-This directory contains GitHub Actions workflows for the StudySurf project, organized by component.
+Modern trunk-based multi-environment deployment pipelines using GitHub Actions, AWS CDK, and CloudFront.
 
-## Workflows
+---
 
-### 1. `deploy.yml` - Main Orchestrator
-- Detects changes in different directories
-- Triggers appropriate component workflows
-- Runs on pushes to `main` and pull requests
+## 📁 Active Workflows
 
-### 2. `backend-deploy.yml` - Backend Pipeline
-- **Triggers**: Changes in `backend/` directory
-- **Actions**:
-  - Lints Python code with flake8
-  - Checks code formatting with black
-  - Validates import sorting with isort
-  - Packages and deploys to AWS Lambda
-  - Runs CDK deploy if infrastructure changes are needed
+| Workflow | File | Trigger | Environments | Description |
+| :--- | :--- | :--- | :--- | :--- |
+| **CI Validation** | `ci.yaml` | Pull Request to `main` | N/A | Lints & compiles TypeScript (frontend + infra), validates Python compilation, and runs `cdk synth` for dev, staging, and prod. Zero deployments on PR. |
+| **Deploy to Dev** | `deploy-dev.yaml` | Push / Merge to `main` | `development` | Continuous automated deployment: deploys `dev-StatefulStack` + `dev-StatelessStack`, dynamically parses outputs, builds frontend, syncs to S3, and invalidates CloudFront. |
+| **Deploy to Staging** | `deploy-staging.yaml` | Manual `workflow_dispatch` | `staging` | One-click manual promotion to Staging: deploys stateful & stateless stacks, syncs frontend, and invalidates Staging CloudFront. |
+| **Deploy to Prod** | `deploy-prod.yaml` | Manual `workflow_dispatch` | `production` | One-click production release: deploys `prod-StatefulStack` + `prod-StatelessStack`, syncs production frontend build to S3, and invalidates Prod CloudFront. |
 
-### 3. `frontend-deploy.yml` - Frontend Pipeline
-- **Triggers**: Changes in `frontend/` directory
-- **Actions**:
-  - Lints TypeScript/React code with ESLint
-  - Performs type checking with TypeScript
-  - Builds the application with Vite
-  - Deploys to S3
-  - Invalidates CloudFront cache
+---
 
-### AWS Credentials
-- `AWS_ACCESS_KEY_ID` - AWS access key for deployment
-- `AWS_SECRET_ACCESS_KEY` - AWS secret key for deployment
-- `AWS_REGION` - AWS region (e.g., us-east-1)
+## 🔐 AWS Authentication & Credentials
 
-### Frontend Deployment
-- `S3_BUCKET_NAME` - S3 bucket name for frontend hosting
-- `CLOUDFRONT_DISTRIBUTION_ID` - CloudFront distribution ID for cache invalidation
+Workflows support both **AWS IAM OIDC** (recommended, zero static keys) and GitHub repository secrets:
 
-## Setup Instructions
+### Option A: AWS IAM OIDC (Recommended)
+Configure GitHub OIDC in AWS IAM and set the role ARN secrets:
+* `AWS_ROLE_TO_ASSUME` (or per-environment `AWS_ROLE_TO_ASSUME_DEV`, `AWS_ROLE_TO_ASSUME_STAGING`, `AWS_ROLE_TO_ASSUME_PROD`)
+* `AWS_REGION` (e.g. `ap-southeast-1`)
 
-1. **Configure AWS Credentials**:
-   - Create an IAM user with appropriate permissions for Lambda, S3, CloudFront, and CDK
-   - Add the credentials as GitHub secrets
+### Option B: Static IAM Secrets (Fallback)
+* `AWS_ACCESS_KEY_ID`
+* `AWS_SECRET_ACCESS_KEY`
+* `AWS_REGION`
 
-2. **Update Resource Names**:
-   - In `backend-deploy.yml`: Update Lambda function name (`studysurf-backend`)
-   - In `frontend-deploy.yml`: Verify S3 bucket and CloudFront distribution references
-   - In `infra-deploy.yml`: Adjust CloudFormation stack name filters if needed
+---
 
-3. **Environment Variables**:
-   - Add any required environment variables for your frontend build in `frontend-deploy.yml`
-   - Configure backend environment variables in your Lambda function or CDK
-
-## Workflow Behavior
-
-- **Pull Requests**: Run linting, testing, and validation only
-- **Main Branch**: Run full deployment pipeline after successful validation
-- **Path-based Triggers**: Only affected components are built and deployed
-- **Error Handling**: Workflows fail fast on linting or build errors
-
-## Local Development
-
-To run similar checks locally:
-
-### Backend
-```bash
-cd backend
-pip install flake8 black isort
-flake8 .
-black --check .
-isort --check-only .
-```
+## 🛠️ Local Development & Testing
 
 ### Frontend
 ```bash
 cd frontend
-npm run lint
-npx tsc --noEmit
+npm ci
 npm run build
 ```
 
-### Infrastructure
+### Infrastructure (CDK)
 ```bash
 cd infra
+npm ci
 npm run build
-npm test
-npx cdk synth
-npx cdk diff
+npx cdk synth dev-StatefulStack dev-StatelessStack
 ```
 
-## Troubleshooting
-
-- **Lambda deployment fails**: Check function name and IAM permissions
-- **S3 sync fails**: Verify bucket name and S3 permissions
-- **CloudFront invalidation fails**: Check distribution ID and CloudFront permissions
-- **CDK deployment fails**: Ensure CDK is bootstrapped and IAM permissions are sufficient
+### Backend (Python FastAPI)
+```bash
+cd infra/lambdaFunctions/backend
+python -m pip install -r requirements.txt
+python -m compileall -q .
+```

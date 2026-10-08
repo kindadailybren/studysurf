@@ -9,6 +9,8 @@ import { LandingPage } from './pages/LandingPage.tsx';
 import { MainPage } from './pages/MainPage';
 import { NotFoundPage } from './pages/NotFoundPage.tsx';
 
+import { LoginModals } from './components/LoginModals';
+
 function App() {
   const setAccessTokenStore = useAuthStore((state) => state.setAccessToken);
   const setIdTokenStore = useAuthStore((state) => state.setIdToken);
@@ -25,15 +27,12 @@ function App() {
         setUsernameStore(username);
       } catch (error) {
         if (axios.isAxiosError(error)) {
-          console.error("Error status:", error.response?.status);
-          console.error("Error body:", error.response?.data);
-        } else {
-          console.error("Non-Axios error:", error);
+          // Expected when not logged in or cookie expired
         }
       }
-    }
+    };
     refreshToken();
-  }, [setAccessTokenStore, setIdTokenStore, setUsernameStore])
+  }, [setAccessTokenStore, setIdTokenStore, setUsernameStore]);
 
   return (
     <>
@@ -42,6 +41,7 @@ function App() {
         <Route path="/*" element={<MainPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
+      <LoginModals />
     </>
   );
 }
