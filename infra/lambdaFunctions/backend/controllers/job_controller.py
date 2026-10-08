@@ -161,3 +161,17 @@ async def list_user_videos(
         if isinstance(video, dict) and video.get("video_url"):
             video["video_url"] = resolve_media_url(video["video_url"], s3)
     return videos
+
+
+@job_router.delete("/jobs/{job_id}")
+async def delete_job(
+    job_id: str,
+    username: str = Query(...),
+    db_job: AWS_DynamoDB_Job = Depends(AWS_DynamoDB_Job),
+):
+    try:
+        db_job.deleteJob(job_id=job_id, username=username)
+        return {"message": f"Job {job_id} deleted successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to delete job: {str(e)}")
+

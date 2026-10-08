@@ -152,6 +152,15 @@ class AWS_DynamoDB_Job:
         )
         return [self._unmarshal_job(item) for item in response.get("Items", [])]
 
+    def deleteJob(self, job_id: str, username: str):
+        return self.dynamodb.delete_item(
+            TableName=self.table,
+            Key={
+                "PK": {"S": f"USER#{username}"},
+                "SK": {"S": f"JOB#{job_id}"},
+            },
+        )
+
     def _unmarshal_job(self, item):
         return {
             "job_id": item.get("jobId", {}).get("S", ""),
