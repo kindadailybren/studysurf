@@ -1,43 +1,53 @@
-import boto3
+import os
 import json
+import boto3
 
 
 class AWS_Polly:
     def __init__(self):
-        self.polly_client = boto3.client("polly", region_name="ap-southeast-1")
+        region = os.environ.get("AWS_REGION", "ap-southeast-1")
+        self.polly_client = boto3.client("polly", region_name=region)
+        self.mediaBucket = os.environ.get(
+            "MEDIA_BUCKET_NAME",
+            os.environ.get("S3_BUCKET_NAME", "studysurf-outputvids"),
+        )
 
-    def gen_audio(self, response_summary):
-        polly = boto3.client("polly", region_name="ap-southeast-1")
+    def gen_audio(self, text_or_summary, voice_id: str = "Matthew", job_id: str = None):
+        if isinstance(text_or_summary, dict) and "content" in text_or_summary:
+            textReference = text_or_summary["content"][0]["text"]
+        else:
+            textReference = str(text_or_summary)
 
-        textReference = response_summary["content"][0]["text"]
+        prefix = f"audio/{job_id}/" if job_id else "audio/"
 
-        response = polly.start_speech_synthesis_task(
+        response = self.polly_client.start_speech_synthesis_task(
             Engine="neural",
             OutputFormat="mp3",
-            OutputS3BucketName="polly-practice-bren",
-            OutputS3KeyPrefix="voice/",
+            OutputS3BucketName=self.mediaBucket,
+            OutputS3KeyPrefix=prefix,
             Text=textReference,
-            VoiceId="Matthew",
+            VoiceId=voice_id,
         )
 
         return response, textReference
 
-    def gen_speech_marks(self, response_summary):
-        polly = boto3.client("polly", region_name="ap-southeast-1")
+    def gen_speech_marks(self, text_or_summary, voice_id: str = "Matthew"):
+        if isinstance(text_or_summary, dict) and "content" in text_or_summary:
+            textReference = text_or_summary["content"][0]["text"]
+        else:
+            textReference = str(text_or_summary)
 
-        textReference = response_summary["content"][0]["text"]
-
-        marks_response = polly.synthesize_speech(
+        marks_response = self.polly_client.synthesize_speech(
             Engine="neural",
             OutputFormat="json",
             Text=textReference,
-            VoiceId="Matthew",
-            SpeechMarkTypes=["word"]
+            VoiceId=voice_id,
+            SpeechMarkTypes=["word"],
         )
 
-        speech_marks = marks_response["AudioStream"].read().decode("utf-8").splitlines()
-
+        speech_marks = (
+            marks_response["AudioStream"].read().decode("utf-8").splitlines()
+        )
         parsed_marks = [json.loads(line) for line in speech_marks if line.strip()]
-        #sample :[  '{"time":0,"type":"word","start":0,"end":5,"value":"Hello"}', ]
 
         return parsed_marks

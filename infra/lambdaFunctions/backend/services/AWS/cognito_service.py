@@ -1,12 +1,16 @@
+import os
 import boto3
 from models.user import UserCreate, UserLogin, UserConfirm, UserConfirmPasswordChange
 
 
 class AWS_Cognito:
     def __init__(self):
-        self.cognitoClient = boto3.client("cognito-idp", region_name="ap-southeast-1")
-        self.userPoolId = "ap-southeast-1_BJK9jXo9C"
-        self.cognitoAppClientId = "25ch5mniuhjv9t64oqtlbhmnmq"
+        region = os.environ.get("AWS_REGION", "ap-southeast-1")
+        self.cognitoClient = boto3.client("cognito-idp", region_name=region)
+        self.userPoolId = os.environ.get("USER_POOL_ID", "ap-southeast-1_BJK9jXo9C")
+        self.cognitoAppClientId = os.environ.get(
+            "APP_CLIENT_ID", os.environ.get("USER_POOL_CLIENT_ID", "25ch5mniuhjv9t64oqtlbhmnmq")
+        )
 
     def listUsers(self):
         users = self.cognitoClient.list_users(
