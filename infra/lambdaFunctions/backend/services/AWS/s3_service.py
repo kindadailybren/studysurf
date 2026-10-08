@@ -129,8 +129,10 @@ class AWS_S3:
                 Key=key,
                 ExtraArgs={"ContentType": "video/mp4"},
             )
-            region = self.s3_client.meta.region_name
-            return f"https://{self.mediaBucket}.s3.{region}.amazonaws.com/{key}"
+            cf_domain = os.environ.get("CLOUDFRONT_DOMAIN")
+            if cf_domain:
+                return f"https://{cf_domain}/{key}"
+            return self.generatePresignedDownloadUrl(key, expiration=604800)
         except Exception as e:
             print(f"[ERROR] Failed to upload video: {e}")
             return None

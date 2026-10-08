@@ -44,6 +44,7 @@ export class StatelessStack extends cdk.Stack {
         userPoolClient: props.userPoolClient,
         ingestionQueue: this.sqsConstruct.ingestionQueue,
         videoRenderQueue: this.sqsConstruct.videoRenderQueue,
+        cloudFrontDomainName: props.cloudFrontDomainName,
       },
     );
   }
