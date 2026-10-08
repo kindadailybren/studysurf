@@ -25,6 +25,33 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION || 'ap-southeast-1' }}
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: 'pip'
+          cache-dependency-path: infra/lambdaFunctions/backend/requirements.txt
+
+      - name: Package Backend Lambda Dependencies
+        working-directory: infra/lambdaFunctions/backend
+        run: |
+          python -m pip install --upgrade pip
+          mkdir -p lib
+          pip install \
+            --platform manylinux2014_x86_64 \
+            --implementation cp \
+            --python-version 3.13 \
+            --only-binary=:all: \
+            -t lib/ \
+            -r requirements.txt
+          find lib/ -type f -name "*.so" -exec strip {} + 2>/dev/null || true
+          find lib/ -type d -name "tests" -exec rm -rf {} + 2>/dev/null || true
+          find lib/ -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
+          find lib/ -type d -name "*.pyc" -delete
+          (cd lib && zip -rq ../aws_lambda.zip .)
+          zip -grq aws_lambda.zip app.py stage1_worker.py stage2_worker.py controllers models services usecases utils
+          rm -rf lib
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
