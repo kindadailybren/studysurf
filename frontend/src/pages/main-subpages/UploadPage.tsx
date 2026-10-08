@@ -8,7 +8,7 @@ import { FileDrop } from "../../components/uploadComponents/FileDrop";
 import { SelectVideoStyle } from "../../components/uploadComponents/selectVideoStyle";
 import { ProgressStepper } from "../../components/uploadComponents/ProgressStepper";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBolt, faLock } from "@fortawesome/free-solid-svg-icons";
+import { faBolt, faLock, faSpinner } from "@fortawesome/free-solid-svg-icons";
 import "../../styles/App.css";
 
 interface JobStatusData {
@@ -22,6 +22,7 @@ interface JobStatusData {
 export const UploadPage: React.FC = () => {
   const navigate = useNavigate();
   const username = useAuthStore((state) => state.username);
+  const isAuthLoading = useAuthStore((state) => state.isAuthLoading);
   const setIsOpenSignIn = useLoginModalStore((state) => state.setIsOpenSignIn);
 
   const [file, setFile] = useState<File[]>([]);
@@ -29,13 +30,22 @@ export const UploadPage: React.FC = () => {
   const [selectedVoice, setSelectedVoice] = useState<string>("Matthew");
 
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  const [isCheckingActiveJob, setIsCheckingActiveJob] = useState<boolean>(true);
   const [currentJob, setCurrentJob] = useState<JobStatusData | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const pollingRef = useRef<number | null>(null);
 
   // Restore any active in-progress job on mount / refresh
   useEffect(() => {
-    if (!username) return;
+    if (isAuthLoading) {
+      setIsCheckingActiveJob(true);
+      return;
+    }
+
+    if (!username) {
+      setIsCheckingActiveJob(false);
+      return;
+    }
 
     let isMounted = true;
     const restoreActiveJob = async () => {
@@ -56,6 +66,10 @@ export const UploadPage: React.FC = () => {
         }
       } catch (err) {
         console.error("Failed to restore active job:", err);
+      } finally {
+        if (isMounted) {
+          setIsCheckingActiveJob(false);
+        }
       }
     };
 
@@ -67,7 +81,7 @@ export const UploadPage: React.FC = () => {
         clearInterval(pollingRef.current);
       }
     };
-  }, [username]);
+  }, [username, isAuthLoading]);
 
   const startJobPolling = (jobId: string) => {
     if (pollingRef.current) clearInterval(pollingRef.current);
@@ -176,7 +190,7 @@ export const UploadPage: React.FC = () => {
           </p>
         </div>
 
-        {!username && (
+        {!isAuthLoading && !username && (
           <button
             onClick={() => setIsOpenSignIn(true)}
             className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 hover:border-[var(--highlight-text)] text-sm text-[var(--highlight-text)] transition-colors w-fit"
@@ -188,7 +202,15 @@ export const UploadPage: React.FC = () => {
       </div>
 
       {/* Main Studio Area */}
-      {isProcessing && currentJob ? (
+      {isAuthLoading || isCheckingActiveJob ? (
+        <div className="flex flex-col items-center justify-center p-20 gap-3 text-gray-400">
+          <FontAwesomeIcon
+            icon={faSpinner}
+            className="text-3xl animate-spin text-[var(--highlight-text)]"
+          />
+          <p className="text-sm">Initializing studio session...</p>
+        </div>
+      ) : isProcessing && currentJob ? (
         <ProgressStepper
           status={currentJob.status}
           summaryText={currentJob.summary_text}
