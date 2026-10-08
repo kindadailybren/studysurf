@@ -28,6 +28,7 @@ interface VideoItem {
 export const GalleryPage: React.FC = () => {
   const navigate = useNavigate();
   const username = useAuthStore((state) => state.username);
+  const isAuthLoading = useAuthStore((state) => state.isAuthLoading);
   const setIsOpenSignIn = useLoginModalStore((state) => state.setIsOpenSignIn);
 
   const [videos, setVideos] = useState<VideoItem[]>([]);
@@ -86,6 +87,11 @@ export const GalleryPage: React.FC = () => {
 
   // Initial load
   useEffect(() => {
+    if (isAuthLoading) {
+      setLoading(true);
+      return;
+    }
+
     if (!username) {
       setVideos([]);
       setActiveJobs([]);
@@ -110,7 +116,7 @@ export const GalleryPage: React.FC = () => {
         pollingRef.current = null;
       }
     };
-  }, [username]);
+  }, [username, isAuthLoading]);
 
   // Polling loop for active jobs
   useEffect(() => {
@@ -206,7 +212,7 @@ export const GalleryPage: React.FC = () => {
           </p>
         </div>
 
-        {username && (
+        {!isAuthLoading && username && (
           <button
             onClick={() => navigate("/upload")}
             className="flex items-center gap-2 px-5 py-2.5 bg-[var(--highlight-text)] hover:bg-blue-500 text-black font-bold text-sm rounded-xl transition-all shadow-md w-fit cursor-pointer"
@@ -218,7 +224,15 @@ export const GalleryPage: React.FC = () => {
       </div>
 
       {/* Content State */}
-      {!username ? (
+      {isAuthLoading || (username && loading) ? (
+        <div className="flex flex-col items-center justify-center p-20 gap-3 text-gray-400">
+          <FontAwesomeIcon
+            icon={faSpinner}
+            className="text-3xl animate-spin text-[var(--highlight-text)]"
+          />
+          <p className="text-sm">Fetching your video collection...</p>
+        </div>
+      ) : !username ? (
         <div className="flex flex-col items-center justify-center p-16 text-center border border-dashed border-[var(--primary-border)] rounded-2xl bg-[var(--secondary-bg)]/50 max-w-xl mx-auto my-12">
           <div className="w-16 h-16 rounded-full bg-[var(--highlight-bg)] text-[var(--highlight-text)] flex items-center justify-center text-2xl mb-4">
             <FontAwesomeIcon icon={faLock} />
@@ -235,14 +249,6 @@ export const GalleryPage: React.FC = () => {
           >
             Sign In Now
           </button>
-        </div>
-      ) : loading ? (
-        <div className="flex flex-col items-center justify-center p-20 gap-3 text-gray-400">
-          <FontAwesomeIcon
-            icon={faSpinner}
-            className="text-3xl animate-spin text-[var(--highlight-text)]"
-          />
-          <p className="text-sm">Fetching your video collection...</p>
         </div>
       ) : totalCount === 0 ? (
         <div className="flex flex-col items-center justify-center p-16 text-center border border-dashed border-[var(--primary-border)] rounded-2xl bg-[var(--secondary-bg)]/50 max-w-xl mx-auto my-12">
