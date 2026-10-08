@@ -9,13 +9,13 @@ type AuthStore = {
   setIdToken: (idToken: string) => void;
 }
 
-export const useAuthStore = create<AuthStore>((set) => ({
+export const useAuthStore = create<AuthStore>()((set) => ({
   accessToken: '',
   idToken: '',
   username: '',
-  setAccessToken: (accessToken) => set({accessToken}),
-  setUsername: (username) => set({username}),
-  setIdToken: (idToken) => set({idToken}),
+  setAccessToken: (accessToken: string) => set({ accessToken }),
+  setUsername: (username: string) => set({ username }),
+  setIdToken: (idToken: string) => set({ idToken }),
 }));
 
 // zustand my GOAT

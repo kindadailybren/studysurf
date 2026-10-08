@@ -15,17 +15,18 @@ type LoginModalStore = {
   setUsernameInput: (idToken: string) => void;
 }
 
-export const useLoginModalStore = create<LoginModalStore>((set) => ({
+export const useLoginModalStore = create<LoginModalStore>()((set) => ({
   isOpenSignIn: false,
   isOpenSignUp: false,
   isOpenAccConfirm: false,
   isOpenForgotPass: false,
   isOpenForgotPassUsername: false,
   usernameInput: '',
-  setIsOpenSignIn: (isOpenSignIn) => set({isOpenSignIn}),
-  setIsOpenSignUp: (isOpenSignUp) => set({isOpenSignUp}),
-  setIsOpenAccConfirm: (isOpenAccConfirm) => set({isOpenAccConfirm}),
-  setIsOpenForgotPass: (isOpenForgotPass) => set({isOpenForgotPass}),
-  setIsOpenForgotPassUsername: (isOpenForgotPassUsername) => set({isOpenForgotPassUsername}),
-  setUsernameInput: (usernameInput) => set({usernameInput}),
+  setIsOpenSignIn: (isOpenSignIn: boolean) => set({ isOpenSignIn }),
+  setIsOpenSignUp: (isOpenSignUp: boolean) => set({ isOpenSignUp }),
+  setIsOpenAccConfirm: (isOpenAccConfirm: boolean) => set({ isOpenAccConfirm }),
+  setIsOpenForgotPass: (isOpenForgotPass: boolean) => set({ isOpenForgotPass }),
+  setIsOpenForgotPassUsername: (isOpenForgotPassUsername: boolean) =>
+    set({ isOpenForgotPassUsername }),
+  setUsernameInput: (usernameInput: string) => set({ usernameInput }),
 }));
