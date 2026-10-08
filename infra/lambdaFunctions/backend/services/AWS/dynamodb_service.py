@@ -153,17 +153,24 @@ class AWS_DynamoDB_Job:
         return [self._unmarshal_job(item) for item in response.get("Items", [])]
 
     def deleteJob(self, job_id: str, username: str):
+        clean_id = job_id.replace("JOB#", "")
         return self.dynamodb.delete_item(
             TableName=self.table,
             Key={
                 "PK": {"S": f"USER#{username}"},
-                "SK": {"S": f"JOB#{job_id}"},
+                "SK": {"S": f"JOB#{clean_id}"},
             },
         )
 
     def _unmarshal_job(self, item):
+        job_id = item.get("jobId", {}).get("S", "")
+        if not job_id:
+            sk = item.get("SK", {}).get("S", "")
+            if sk.startswith("JOB#"):
+                job_id = sk.replace("JOB#", "")
+
         return {
-            "job_id": item.get("jobId", {}).get("S", ""),
+            "job_id": job_id,
             "username": item.get("username", {}).get("S", ""),
             "filename": item.get("filename", {}).get("S", "document.pdf"),
             "status": item.get("status", {}).get("S", "PENDING"),
@@ -194,6 +201,7 @@ class AWS_DynamoDB_Video:
             "videoId": {"S": video.video_id},
             "videoUrl": {"S": video.video_url},
             "title": {"S": video.title or "Study Summary"},
+            "description": {"S": video.description or ""},
             "style": {"S": video.style or "subway"},
             "createdDate": {"S": video.created_at or datetime.now().isoformat()},
         }
@@ -217,8 +225,57 @@ class AWS_DynamoDB_Video:
                     ),
                     "video_url": item.get("videoUrl", {}).get("S", ""),
                     "title": item.get("title", {}).get("S", "Study Summary"),
+                    "description": item.get("description", {}).get("S", ""),
                     "style": item.get("style", {}).get("S", "subway"),
                     "created_at": item.get("createdDate", {}).get("S", ""),
                 }
             )
         return videos
+
+    def updateVideoInDb(
+        self,
+        video_id: str,
+        username: str,
+        title: Optional[str] = None,
+        description: Optional[str] = None,
+    ):
+        clean_id = video_id.replace("VIDEO#", "")
+        update_expr_parts = []
+        expr_attr_values = {}
+        expr_attr_names = {}
+
+        if title is not None:
+            update_expr_parts.append("#t = :title")
+            expr_attr_values[":title"] = {"S": title}
+            expr_attr_names["#t"] = "title"
+
+        if description is not None:
+            update_expr_parts.append("#d = :description")
+            expr_attr_values[":description"] = {"S": description}
+            expr_attr_names["#d"] = "description"
+
+        if not update_expr_parts:
+            return None
+
+        update_expression = "SET " + ", ".join(update_expr_parts)
+        return self.dynamodb.update_item(
+            TableName=self.table,
+            Key={
+                "PK": {"S": f"USER#{username}"},
+                "SK": {"S": f"VIDEO#{clean_id}"},
+            },
+            UpdateExpression=update_expression,
+            ExpressionAttributeValues=expr_attr_values,
+            ExpressionAttributeNames=expr_attr_names,
+            ReturnValues="ALL_NEW",
+        )
+
+    def deleteVideoFromDb(self, video_id: str, username: str):
+        clean_id = video_id.replace("VIDEO#", "")
+        return self.dynamodb.delete_item(
+            TableName=self.table,
+            Key={
+                "PK": {"S": f"USER#{username}"},
+                "SK": {"S": f"VIDEO#{clean_id}"},
+            },
+        )

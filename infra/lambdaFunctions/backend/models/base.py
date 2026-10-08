@@ -52,5 +52,11 @@ class Video(BaseModel):
     username: Optional[str] = ""
     video_url: str
     title: Optional[str] = "Study Summary"
+    description: Optional[str] = ""
     created_at: Optional[str] = None
     style: Optional[str] = "subway"
+
+
+class VideoUpdateRequest(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
