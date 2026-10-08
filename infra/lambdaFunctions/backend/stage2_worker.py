@@ -51,16 +51,21 @@ def handler(event, context):
                 continue
 
             # Look up job details from DynamoDB
-            job = db_job.getJobByIdGSI(job_id)
+            job = None
+            if username:
+                job = db_job.getJob(job_id, username)
+            if not job:
+                job = db_job.getJobByIdGSI(job_id)
+
             if not job:
                 print(f"[ERROR] Job {job_id} not found in DynamoDB.")
                 continue
 
-            username = job.get("username")
+            username = job.get("username") or username
             filename = job.get("filename", "document.pdf")
-            style = job.get("style", "subway")
+            style = job.get("style") or body.get("style", "subway")
             summary_text = job.get("summary_text", "")
-            audio_s3_key = job.get("audio_s3_key")
+            audio_s3_key = job.get("audio_s3_key") or body.get("audio_s3_key") or f"audio/{job_id}.mp3"
 
             # Parse speech marks stored in DynamoDB
             dynamodb_client = boto3.client("dynamodb", region_name=region)
