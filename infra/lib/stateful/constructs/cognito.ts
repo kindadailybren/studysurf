@@ -7,6 +7,7 @@ interface CognitoConstructProps extends BaseConstructProps { }
 
 export class CognitoConstruct extends Construct {
   public userPool: cognito.UserPool;
+  public userPoolClient: cognito.UserPoolClient;
 
   constructor(scope: Construct, id: string, props: CognitoConstructProps) {
     super(scope, id);
@@ -53,7 +54,7 @@ export class CognitoConstruct extends Construct {
   }
 
   private createUserPoolClient(props: CognitoConstructProps) {
-    this.userPool.addClient(`${props.stage}-Cognito-UserPoolClient`, {
+    this.userPoolClient = this.userPool.addClient(`${props.stage}-Cognito-UserPoolClient`, {
       authFlows: {
         adminUserPassword: true,
         userPassword: true,

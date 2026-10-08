@@ -18,32 +18,16 @@ export class StatelessStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props: StatelessStackProps) {
     super(scope, id, props);
 
+    this.createSqsConstruct(props);
     this.createLambdaConstruct(props);
     this.createApiGatewayConstruct(props);
-    this.createSqsConstruct(props);
     this.createSnsConstruct(props);
     this.createCloudWatchConstruct(props);
-  }
-
-  private createApiGatewayConstruct(props: StatelessStackProps): void {
-    this.apiGatewayConstruct = new ApiGatewayConstruct(
-      this,
-      `${props.stage}-ApiGateway-Construct`,
-      {
-        stage: props.stage,
-        sampleIntegration: this.lambdaConstruct.sampleIntegration,
-      },
-    );
+    this.createOutputs();
   }
 
   private createSqsConstruct(props: StatelessStackProps): void {
     this.sqsConstruct = new SqsConstruct(this, `${props.stage}-SQS-Construct`, {
-      stage: props.stage,
-    });
-  }
-
-  private createSnsConstruct(props: StatelessStackProps) {
-    this.snsConstruct = new SnsConstruct(this, `${props.stage}-SNS-Construct`, {
       stage: props.stage,
     });
   }
@@ -54,8 +38,34 @@ export class StatelessStack extends cdk.Stack {
       `${props.stage}-Lambda-Construct`,
       {
         stage: props.stage,
+        dataTable: props.dataTable,
+        mediaBucket: props.mediaBucket,
+        userPool: props.userPool,
+        userPoolClient: props.userPoolClient,
+        ingestionQueue: this.sqsConstruct.ingestionQueue,
+        videoRenderQueue: this.sqsConstruct.videoRenderQueue,
       },
     );
+  }
+
+  private createApiGatewayConstruct(props: StatelessStackProps): void {
+    this.apiGatewayConstruct = new ApiGatewayConstruct(
+      this,
+      `${props.stage}-ApiGateway-Construct`,
+      {
+        stage: props.stage,
+        sampleIntegration: this.lambdaConstruct.sampleIntegration,
+        userPool: props.userPool,
+        userPoolClient: props.userPoolClient,
+        cloudFrontDomainName: props.cloudFrontDomainName,
+      },
+    );
+  }
+
+  private createSnsConstruct(props: StatelessStackProps) {
+    this.snsConstruct = new SnsConstruct(this, `${props.stage}-SNS-Construct`, {
+      stage: props.stage,
+    });
   }
 
   private createCloudWatchConstruct(props: StatelessStackProps): void {
@@ -68,5 +78,22 @@ export class StatelessStack extends cdk.Stack {
         errorAlertTopic: this.snsConstruct.errorAlertTopic,
       },
     );
+  }
+
+  private createOutputs(): void {
+    new cdk.CfnOutput(this, "ApiGateway-Endpoint", {
+      value: this.apiGatewayConstruct.api.url || "",
+      exportName: `${this.stackName}-ApiUrl`,
+    });
+
+    new cdk.CfnOutput(this, "SQS-IngestionQueue-Url", {
+      value: this.sqsConstruct.ingestionQueue.queueUrl,
+      exportName: `${this.stackName}-IngestionQueueUrl`,
+    });
+
+    new cdk.CfnOutput(this, "SQS-VideoRenderQueue-Url", {
+      value: this.sqsConstruct.videoRenderQueue.queueUrl,
+      exportName: `${this.stackName}-VideoRenderQueueUrl`,
+    });
   }
 }

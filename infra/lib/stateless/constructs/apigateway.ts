@@ -1,57 +1,77 @@
 import * as api from "aws-cdk-lib/aws-apigatewayv2";
 import * as integrations from "aws-cdk-lib/aws-apigatewayv2-integrations";
+import * as authorizers from "aws-cdk-lib/aws-apigatewayv2-authorizers";
+import * as cognito from "aws-cdk-lib/aws-cognito";
 import { Construct } from "constructs";
 import { BaseConstructProps } from "../../types";
 
 interface ApiGatewayConstructProps extends BaseConstructProps {
   sampleIntegration: integrations.HttpLambdaIntegration;
+  userPool: cognito.IUserPool;
+  userPoolClient: cognito.IUserPoolClient;
+  cloudFrontDomainName?: string;
 }
 
 export class ApiGatewayConstruct extends Construct {
   public api: api.HttpApi;
+  public authorizer: authorizers.HttpUserPoolAuthorizer;
 
   constructor(scope: Construct, id: string, props: ApiGatewayConstructProps) {
     super(scope, id);
 
+    this.createAuthorizer(props);
     this.createApiGateway(props);
     this.createApiRoutes(props);
   }
 
+  private createAuthorizer(props: ApiGatewayConstructProps): void {
+    this.authorizer = new authorizers.HttpUserPoolAuthorizer(
+      `${props.stage}-HttpApi-UserPoolAuthorizer`,
+      props.userPool,
+      {
+        userPoolClients: [props.userPoolClient],
+        identitySource: ["$request.header.Authorization"],
+      },
+    );
+  }
+
   private createApiGateway(props: ApiGatewayConstructProps): void {
+    const allowedOrigins = [
+      "http://localhost:5173",
+      "http://127.0.0.1:5173",
+      "http://localhost:3000",
+    ];
+
+    if (props.cloudFrontDomainName) {
+      allowedOrigins.push(`https://${props.cloudFrontDomainName}`);
+    }
+
     this.api = new api.HttpApi(this, `${props.stage}-ApiGateway-HttpApi`, {
       apiName: `${props.stage}-ApiGateway-HttpApi`,
       corsPreflight: {
-        allowHeaders: ['content-type', 'Authorization'],
-        allowMethods: [api.CorsHttpMethod.GET, api.CorsHttpMethod.POST, api.CorsHttpMethod.OPTIONS],
-        allowOrigins: [
-          'http://dev-s3-bucket-application-studysurf.s3-website-ap-southeast-1.amazonaws.com',
-          'http://staging-s3-bucket-application-studysurf.s3-website-ap-southeast-1.amazonaws.com',
-          'https://d3guxtdjraajgf.cloudfront.net',
-        ], // Or specify your frontend domain
+        allowHeaders: ["content-type", "Authorization"],
+        allowMethods: [
+          api.CorsHttpMethod.GET,
+          api.CorsHttpMethod.POST,
+          api.CorsHttpMethod.PUT,
+          api.CorsHttpMethod.DELETE,
+          api.CorsHttpMethod.OPTIONS,
+        ],
+        allowOrigins: allowedOrigins,
         allowCredentials: true,
       },
     });
   }
 
   private createApiRoutes(props: ApiGatewayConstructProps): void {
+    // Public Health Check
     this.api.addRoutes({
       path: "/hello",
       methods: [api.HttpMethod.GET],
       integration: props.sampleIntegration,
     });
 
-    this.api.addRoutes({
-      path: "/genvid",
-      methods: [api.HttpMethod.POST],
-      integration: props.sampleIntegration,
-    });
-
-    this.api.addRoutes({
-      path: "/videos",
-      methods: [api.HttpMethod.POST],
-      integration: props.sampleIntegration,
-    });
-
+    // Public Auth Endpoints
     this.api.addRoutes({
       path: "/getUsers",
       methods: [api.HttpMethod.GET],
@@ -89,12 +109,6 @@ export class ApiGatewayConstruct extends Construct {
     });
 
     this.api.addRoutes({
-      path: "/deleteUser",
-      methods: [api.HttpMethod.POST],
-      integration: props.sampleIntegration,
-    });
-
-    this.api.addRoutes({
       path: "/forgetPass",
       methods: [api.HttpMethod.POST],
       integration: props.sampleIntegration,
@@ -104,6 +118,50 @@ export class ApiGatewayConstruct extends Construct {
       path: "/forgetPassConfirm",
       methods: [api.HttpMethod.POST],
       integration: props.sampleIntegration,
+    });
+
+    // Protected Routes (Secured with Cognito JWT Authorizer)
+    this.api.addRoutes({
+      path: "/jobs/upload-url",
+      methods: [api.HttpMethod.POST],
+      integration: props.sampleIntegration,
+      authorizer: this.authorizer,
+    });
+
+    this.api.addRoutes({
+      path: "/jobs",
+      methods: [api.HttpMethod.POST, api.HttpMethod.GET],
+      integration: props.sampleIntegration,
+      authorizer: this.authorizer,
+    });
+
+    this.api.addRoutes({
+      path: "/jobs/{id}",
+      methods: [api.HttpMethod.GET],
+      integration: props.sampleIntegration,
+      authorizer: this.authorizer,
+    });
+
+    this.api.addRoutes({
+      path: "/videos",
+      methods: [api.HttpMethod.GET, api.HttpMethod.POST],
+      integration: props.sampleIntegration,
+      authorizer: this.authorizer,
+    });
+
+    this.api.addRoutes({
+      path: "/deleteUser",
+      methods: [api.HttpMethod.POST],
+      integration: props.sampleIntegration,
+      authorizer: this.authorizer,
+    });
+
+    // Legacy genvid (supported during migration, secured)
+    this.api.addRoutes({
+      path: "/genvid",
+      methods: [api.HttpMethod.POST],
+      integration: props.sampleIntegration,
+      authorizer: this.authorizer,
     });
   }
 }
