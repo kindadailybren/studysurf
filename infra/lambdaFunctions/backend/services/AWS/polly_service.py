@@ -12,6 +12,20 @@ class AWS_Polly:
             os.environ.get("S3_BUCKET_NAME", "studysurf-outputvids"),
         )
 
+    def synthesize_audio_bytes(self, text_or_summary, voice_id: str = "Matthew") -> bytes:
+        if isinstance(text_or_summary, dict) and "content" in text_or_summary:
+            textReference = text_or_summary["content"][0]["text"]
+        else:
+            textReference = str(text_or_summary)
+
+        response = self.polly_client.synthesize_speech(
+            Engine="neural",
+            OutputFormat="mp3",
+            Text=textReference,
+            VoiceId=voice_id,
+        )
+        return response["AudioStream"].read()
+
     def gen_audio(self, text_or_summary, voice_id: str = "Matthew", job_id: str = None):
         if isinstance(text_or_summary, dict) and "content" in text_or_summary:
             textReference = text_or_summary["content"][0]["text"]

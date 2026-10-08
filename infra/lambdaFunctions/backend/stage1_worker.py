@@ -67,26 +67,31 @@ def handler(event, context):
                 summary_text=summary_text,
             )
 
-            # Start asynchronous Polly task to output MP3 into S3
-            polly_task, _ = polly_service.gen_audio(
-                summary_text, voice_id=voice, job_id=job_id
-            )
-            task_id = polly_task.get("SynthesisTask", {}).get("TaskId", "")
+            # Synchronous Polly speech synthesis (~1-2 seconds)
+            audio_bytes = polly_service.synthesize_audio_bytes(summary_text, voice_id=voice)
 
-            # Generate synchronous word-level speech marks for animated caption timing
+            # Upload audio MP3 directly to S3
+            audio_s3_key = f"audio/{job_id}.mp3"
+            s3_client.put_object(
+                Bucket=media_bucket,
+                Key=audio_s3_key,
+                Body=audio_bytes,
+                ContentType="audio/mpeg",
+            )
+
+            # Generate synchronous word-level speech marks for animated caption timing (~1 second)
             speech_marks = polly_service.gen_speech_marks(summary_text, voice_id=voice)
 
-            # Store speech marks and audio prefix in DynamoDB
-            expected_audio_key = f"audio/{job_id}/{task_id}.mp3"
+            # Update job in DynamoDB with audio_s3_key and summary_text
             db_job.updateJobStatus(
                 job_id,
                 username,
                 JobStatus.SYNTHESIZING_VOICE.value,
-                audio_s3_key=expected_audio_key,
+                audio_s3_key=audio_s3_key,
                 summary_text=summary_text,
             )
 
-            # Also persist speech marks into DynamoDB job item for Stage 2 worker
+            # Persist speech marks into DynamoDB job item for Stage 2 worker
             table_name = db_job.table
             dynamodb_client = boto3.client("dynamodb", region_name=region)
             dynamodb_client.update_item(
@@ -95,16 +100,34 @@ def handler(event, context):
                     "PK": {"S": f"USER#{username}"},
                     "SK": {"S": f"JOB#{job_id}"},
                 },
-                UpdateExpression="SET speechMarks = :sm, pollyTaskId = :tid",
+                UpdateExpression="SET speechMarks = :sm, audioS3Key = :akey",
                 ExpressionAttributeValues={
                     ":sm": {"S": json.dumps(speech_marks)},
-                    ":tid": {"S": task_id},
+                    ":akey": {"S": audio_s3_key},
                 },
             )
 
-            print(
-                f"[SUCCESS] Stage 1 completed for job {job_id}. Polly task {task_id} initiated."
-            )
+            # 5. Direct SQS handoff to Stage 2 Video Render Queue
+            render_queue_url = os.environ.get("VIDEO_RENDER_QUEUE_URL")
+            if render_queue_url:
+                sqs_client = boto3.client("sqs", region_name=region)
+                render_payload = {
+                    "job_id": job_id,
+                    "username": username,
+                    "audio_s3_key": audio_s3_key,
+                    "style": style,
+                }
+                sqs_client.send_message(
+                    QueueUrl=render_queue_url,
+                    MessageBody=json.dumps(render_payload),
+                )
+                print(
+                    f"[SUCCESS] Stage 1 forwarded job {job_id} directly to Video Render Queue."
+                )
+            else:
+                print(
+                    f"[WARN] VIDEO_RENDER_QUEUE_URL not configured. SQS forward skipped."
+                )
 
         except Exception as e:
             print(f"[ERROR] Stage 1 worker failed for record: {e}")

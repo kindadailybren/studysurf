@@ -126,6 +126,7 @@ export class LambdaConstruct extends Construct {
         environment: {
           TABLE_NAME: props.dataTable.tableName,
           MEDIA_BUCKET_NAME: props.mediaBucket.bucketName,
+          VIDEO_RENDER_QUEUE_URL: props.videoRenderQueue.queueUrl,
           STAGE: props.stage,
         },
       },
@@ -142,6 +143,7 @@ export class LambdaConstruct extends Construct {
     // Permissions
     props.dataTable.grantReadWriteData(this.stage1WorkerFunction);
     props.mediaBucket.grantReadWrite(this.stage1WorkerFunction);
+    props.videoRenderQueue.grantSendMessages(this.stage1WorkerFunction);
 
     this.stage1WorkerFunction.addToRolePolicy(
       new iam.PolicyStatement({

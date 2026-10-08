@@ -80,14 +80,24 @@ class AWS_S3:
             response = self.s3_client.list_objects_v2(
                 Bucket=self.mediaBucket, Prefix=prefix
             )
+            objects = [
+                obj
+                for obj in response.get("Contents", [])
+                if obj["Key"].endswith(".mp4") and obj.get("Size", 0) > 0
+            ]
 
-            # Fallback to generic backgrounds if style subfolder empty
-            if "Contents" not in response or not response["Contents"]:
+            # Fallback to root backgrounds/ if style subfolder has no valid mp4s
+            if not objects:
                 response = self.s3_client.list_objects_v2(
                     Bucket=self.mediaBucket, Prefix="backgrounds/"
                 )
+                objects = [
+                    obj
+                    for obj in response.get("Contents", [])
+                    if obj["Key"].endswith(".mp4") and obj.get("Size", 0) > 0
+                ]
 
-            if "Contents" not in response or not response["Contents"]:
+            if not objects:
                 print("[WARN] No background videos found in S3 media bucket.")
                 # Check for local fallback in media/
                 local_fallback = os.path.join(
@@ -95,12 +105,6 @@ class AWS_S3:
                 )
                 if os.path.exists(local_fallback):
                     return local_fallback
-                return None
-
-            objects = [
-                obj for obj in response["Contents"] if obj["Key"].endswith(".mp4")
-            ]
-            if not objects:
                 return None
 
             random_object = random.choice(objects)
