@@ -7,7 +7,6 @@ import { LogoutUserButton } from "../../components/LogoutUserButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faShieldHalved,
-  faServer,
   faCircleCheck,
 } from "@fortawesome/free-solid-svg-icons";
 
@@ -21,7 +20,7 @@ export const SettingsPage: React.FC = () => {
       <div className="mb-8 border-b border-[var(--primary-border)] pb-6">
         <h1 className="text-3xl font-extrabold text-gray-100">Settings</h1>
         <p className="text-sm text-gray-400 mt-1">
-          Manage your account credentials, preferences, and cloud storage.
+          Manage your account credentials, preferences, and session security.
         </p>
       </div>
 
@@ -50,40 +49,13 @@ export const SettingsPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
-            <div className="p-3.5 rounded-xl bg-white/2 border border-white/5">
+          <div className="pt-4">
+            <div className="p-3.5 rounded-xl bg-white/2 border border-white/5 max-w-sm">
               <span className="text-xs text-gray-400">Account Status</span>
               <p className="text-sm font-semibold text-emerald-400 flex items-center gap-1.5 mt-0.5">
-                <FontAwesomeIcon icon={faCircleCheck} /> {username ? "Active & Verified" : "Guest Mode"}
+                <FontAwesomeIcon icon={faCircleCheck} />{" "}
+                {username ? "Active & Verified" : "Guest Mode"}
               </p>
-            </div>
-            <div className="p-3.5 rounded-xl bg-white/2 border border-white/5">
-              <span className="text-xs text-gray-400">Cloud Storage Tier</span>
-              <p className="text-sm font-semibold text-gray-200 mt-0.5">
-                S3 Media Storage (Unlimited Previews)
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Architecture & Cloud System Info */}
-        <div className="bg-[var(--secondary-bg)] border border-[var(--primary-border)] rounded-2xl p-6 shadow-lg">
-          <div className="flex items-center gap-2 mb-4">
-            <FontAwesomeIcon icon={faServer} className="text-[var(--highlight-text)]" />
-            <h3 className="font-bold text-gray-100 text-base">Backend Architecture</h3>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-gray-300">
-            <div className="p-3 rounded-xl bg-white/5">
-              <span className="text-gray-400 block mb-1">Compute</span>
-              <span className="font-semibold text-gray-100">AWS Lambda + SQS</span>
-            </div>
-            <div className="p-3 rounded-xl bg-white/5">
-              <span className="text-gray-400 block mb-1">AI Pipeline</span>
-              <span className="font-semibold text-gray-100">Claude 3 Haiku + Polly</span>
-            </div>
-            <div className="p-3 rounded-xl bg-white/5">
-              <span className="text-gray-400 block mb-1">Compositing</span>
-              <span className="font-semibold text-gray-100">MoviePy + FFmpeg</span>
             </div>
           </div>
         </div>

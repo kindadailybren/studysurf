@@ -104,16 +104,7 @@ export const GeneratingCard: React.FC<GeneratingCardProps> = ({
         )}
 
         {/* Top Badges */}
-        <div className="relative z-10 flex items-center justify-between">
-          <span
-            className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border backdrop-blur-md ${
-              isFailed
-                ? "bg-red-500/20 text-red-400 border-red-500/30"
-                : "bg-black/60 text-cyan-300 border-cyan-500/30"
-            }`}
-          >
-            {job.style || "subway"}
-          </span>
+        <div className="relative z-10 flex items-center justify-end">
 
           <div
             className={`w-7 h-7 rounded-full flex items-center justify-center text-xs backdrop-blur-md ${
