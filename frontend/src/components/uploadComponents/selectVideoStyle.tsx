@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faGamepad,
@@ -7,6 +7,9 @@ import {
   faCar,
   faMicrophone,
   faCheck,
+  faFlask,
+  faFaceSurprise,
+  faTv,
 } from "@fortawesome/free-solid-svg-icons";
 
 interface SelectVideoStyleProps {
@@ -47,28 +50,66 @@ export const stylesList = [
   },
 ];
 
-export const voicesList = [
+export interface VoiceItem {
+  id: string;
+  name: string;
+  accent: string;
+  icon: any;
+  badge?: string;
+}
+
+export const standardVoices: VoiceItem[] = [
   {
     id: "Matthew",
     name: "Matthew",
     accent: "US English (Male)",
+    icon: faMicrophone,
   },
   {
     id: "Joanna",
     name: "Joanna",
     accent: "US English (Female)",
+    icon: faMicrophone,
   },
   {
     id: "Brian",
     name: "Brian",
     accent: "British (Male)",
+    icon: faMicrophone,
   },
   {
     id: "Amy",
     name: "Amy",
     accent: "British (Female)",
+    icon: faMicrophone,
   },
 ];
+
+export const characterVoices: VoiceItem[] = [
+  {
+    id: "rick_sanchez",
+    name: "Rick Sanchez",
+    accent: "Mad Scientist • Rick & Morty",
+    icon: faFlask,
+    badge: "Iconic",
+  },
+  {
+    id: "morty_smith",
+    name: "Morty Smith",
+    accent: "Anxious Sidekick • Rick & Morty",
+    icon: faFaceSurprise,
+    badge: "Animated",
+  },
+  {
+    id: "peter_griffin",
+    name: "Peter Griffin",
+    accent: "Family Guy",
+    icon: faTv,
+    badge: "Pop Culture",
+  },
+];
+
+export const voicesList = [...standardVoices, ...characterVoices];
 
 export const SelectVideoStyle: React.FC<SelectVideoStyleProps> = ({
   selectedStyle,
@@ -76,6 +117,16 @@ export const SelectVideoStyle: React.FC<SelectVideoStyleProps> = ({
   selectedVoice,
   setSelectedVoice,
 }) => {
+  const isSelectedCharacter = characterVoices.some(
+    (v) => v.id === selectedVoice
+  );
+  const [voiceCategory, setVoiceCategory] = useState<"standard" | "character">(
+    isSelectedCharacter ? "character" : "standard"
+  );
+
+  const displayedVoices =
+    voiceCategory === "standard" ? standardVoices : characterVoices;
+
   return (
     <div className="w-full flex flex-col gap-6 my-4">
       {/* Background Style Picker */}
@@ -124,15 +175,44 @@ export const SelectVideoStyle: React.FC<SelectVideoStyleProps> = ({
 
       {/* Voice Narrator Picker */}
       <div>
-        <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
           <h2 className="text-xl font-semibold text-gray-200 flex items-center gap-2">
             <span className="text-[var(--highlight-text)]">2.</span> Choose Voice Narrator
           </h2>
-          <span className="text-xs text-gray-400">Amazon Polly Neural Speech</span>
+
+          {/* Voice Category Segmented Tabs */}
+          <div className="flex p-0.5 rounded-xl bg-black/40 border border-white/10">
+            <button
+              type="button"
+              onClick={() => setVoiceCategory("standard")}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                voiceCategory === "standard"
+                  ? "bg-[var(--secondary-bg)] text-white shadow-sm border border-white/10"
+                  : "text-gray-400 hover:text-gray-200"
+              }`}
+            >
+              Standard
+            </button>
+            <button
+              type="button"
+              onClick={() => setVoiceCategory("character")}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                voiceCategory === "character"
+                  ? "bg-[var(--secondary-bg)] text-white shadow-sm border border-white/10"
+                  : "text-gray-400 hover:text-gray-200"
+              }`}
+            >
+              Custom Characters
+            </button>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          {voicesList.map((voice) => {
+        <div
+          className={`grid grid-cols-1 sm:grid-cols-2 ${
+            voiceCategory === "standard" ? "lg:grid-cols-4" : "lg:grid-cols-3"
+          } gap-3`}
+        >
+          {displayedVoices.map((voice) => {
             const isSelected = selectedVoice === voice.id;
             return (
               <div
@@ -151,10 +231,15 @@ export const SelectVideoStyle: React.FC<SelectVideoStyleProps> = ({
                 )}
                 <div className="flex items-center gap-2 mb-1">
                   <FontAwesomeIcon
-                    icon={faMicrophone}
+                    icon={voice.icon}
                     className={isSelected ? "text-[var(--highlight-text)]" : "text-gray-400"}
                   />
                   <h3 className="font-semibold text-sm text-gray-100">{voice.name}</h3>
+                  {voice.badge && (
+                    <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 font-medium border border-cyan-500/20 ml-auto mr-5">
+                      {voice.badge}
+                    </span>
+                  )}
                 </div>
                 <p className="text-xs text-[var(--highlight-text)] font-medium">
                   {voice.accent}
