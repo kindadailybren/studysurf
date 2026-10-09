@@ -130,6 +130,7 @@ export class LambdaConstruct extends Construct {
           MEDIA_BUCKET_NAME: props.mediaBucket.bucketName,
           VIDEO_RENDER_QUEUE_URL: props.videoRenderQueue.queueUrl,
           STAGE: props.stage,
+          FISH_AUDIO_API_KEY: process.env.FISH_AUDIO_API_KEY || "",
         },
       },
     );

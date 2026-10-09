@@ -4,6 +4,7 @@ import boto3
 from utils.pdf_utils.pdfparse import PDFParser
 from services.AWS.bedrock_service import AWS_Bedrock
 from services.AWS.polly_service import AWS_Polly
+from services.fish_audio_service import FishAudioService
 from services.AWS.dynamodb_service import AWS_DynamoDB_Job
 from services.AWS.s3_service import AWS_S3
 from models.base import JobStatus
@@ -16,6 +17,7 @@ def handler(event, context):
     s3_service = AWS_S3()
     bedrock_service = AWS_Bedrock()
     polly_service = AWS_Polly()
+    fish_audio_service = FishAudioService()
     pdf_parser = PDFParser()
 
     region = os.environ.get("AWS_REGION", "ap-southeast-1")
@@ -37,7 +39,7 @@ def handler(event, context):
                 print(f"[WARN] Skipping malformed SQS record: {body}")
                 continue
 
-            print(f"[INFO] Processing job {job_id} for user {username} (type: {input_type})")
+            print(f"[INFO] Processing job {job_id} for user {username} (type: {input_type}, voice: {voice})")
 
             # 1. Update status: PROCESSING_DOCUMENT
             db_job.updateJobStatus(job_id, username, JobStatus.PROCESSING_DOCUMENT.value)
@@ -66,12 +68,19 @@ def handler(event, context):
                 except Exception:
                     pass
 
+                # Clean ephemeral uploaded PDF from S3 immediately
+                try:
+                    s3_client.delete_object(Bucket=media_bucket, Key=pdf_s3_key)
+                    print(f"[INFO] Deleted ephemeral PDF from S3: {pdf_s3_key}")
+                except Exception as s3_err:
+                    print(f"[WARN] Failed to delete ephemeral PDF from S3: {s3_err}")
+
                 # 3. Update status: SUMMARIZING with Bedrock
                 db_job.updateJobStatus(job_id, username, JobStatus.SUMMARIZING.value)
                 summary_response = bedrock_service.gen_summarization(extracted_text)
                 summary_text = summary_response["content"][0]["text"]
 
-            # 4. Update status: SYNTHESIZING_VOICE with Amazon Polly
+            # 4. Update status: SYNTHESIZING_VOICE
             db_job.updateJobStatus(
                 job_id,
                 username,
@@ -79,8 +88,26 @@ def handler(event, context):
                 summary_text=summary_text,
             )
 
-            # Synchronous Polly speech synthesis (~1-2 seconds)
-            audio_bytes = polly_service.synthesize_audio_bytes(summary_text, voice_id=voice)
+            audio_bytes = None
+            speech_marks = None
+
+            # Route custom character voices to Fish Audio with graceful fallback
+            if fish_audio_service.is_custom_character(voice):
+                print(f"[INFO] Custom character voice '{voice}' requested for job {job_id}")
+                try:
+                    audio_bytes = fish_audio_service.synthesize_audio_bytes(summary_text, voice_id=voice)
+                    speech_marks = fish_audio_service.gen_speech_marks(summary_text, audio_bytes=audio_bytes)
+                    print(f"[SUCCESS] Synthesized custom voice '{voice}' via Fish Audio ({len(audio_bytes)} bytes)")
+                except Exception as fa_err:
+                    print(f"[WARN] Fish Audio synthesis failed for '{voice}': {fa_err}. Falling back to default Polly voice (Matthew).")
+                    audio_bytes = None
+                    speech_marks = None
+
+            if not audio_bytes:
+                fallback_voice = voice if not fish_audio_service.is_custom_character(voice) else "Matthew"
+                print(f"[INFO] Synthesizing audio via Amazon Polly (voice: {fallback_voice})")
+                audio_bytes = polly_service.synthesize_audio_bytes(summary_text, voice_id=fallback_voice)
+                speech_marks = polly_service.gen_speech_marks(summary_text, voice_id=fallback_voice)
 
             # Upload audio MP3 directly to S3
             audio_s3_key = f"audio/{job_id}.mp3"
@@ -90,9 +117,6 @@ def handler(event, context):
                 Body=audio_bytes,
                 ContentType="audio/mpeg",
             )
-
-            # Generate synchronous word-level speech marks for animated caption timing (~1 second)
-            speech_marks = polly_service.gen_speech_marks(summary_text, voice_id=voice)
 
             # Update job in DynamoDB with audio_s3_key and summary_text
             db_job.updateJobStatus(
