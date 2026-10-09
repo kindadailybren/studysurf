@@ -120,11 +120,8 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
           muted
         />
 
-        {/* Top Badges */}
-        <div className="relative z-20 flex items-center justify-between">
-          <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[var(--highlight-text)] border border-white/10">
-            {style}
-          </span>
+        {/* Top Actions */}
+        <div className="relative z-20 flex items-center justify-end">
           <div className="flex items-center gap-1.5">
             {/* Quick delete on hover */}
             {onDelete && (

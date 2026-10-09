@@ -272,11 +272,6 @@ export const UploadPage: React.FC = () => {
       {/* Studio Header */}
       <div className="w-full flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 border-b border-[var(--primary-border)] pb-6">
         <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs font-bold tracking-wider uppercase px-2.5 py-0.5 rounded-full bg-[var(--highlight-bg)] text-[var(--highlight-text)]">
-              AI Video Studio
-            </span>
-          </div>
           <h1 className="text-3xl font-extrabold text-gray-100">
             Create Study Short
           </h1>
