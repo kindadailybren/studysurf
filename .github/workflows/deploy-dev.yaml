@@ -72,8 +72,6 @@ jobs:
 
       - name: Deploy CDK Dev Stacks (Stateful + Stateless)
         working-directory: infra
-        env:
-          FISH_AUDIO_API_KEY: ${{ secrets.FISH_AUDIO_API_KEY }}
         run: |
           npx cdk deploy dev-StatefulStack dev-StatelessStack \
             --require-approval never \
