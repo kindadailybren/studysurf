@@ -3,6 +3,8 @@ const commons = {
     account: process.env.AWS_ACCOUNT_ID,
   },
   stage: "staging",
+  domainName: process.env.CUSTOM_DOMAIN_NAME || "staging.studysurf.breindel.me",
+  certificateArn: process.env.ACM_CERTIFICATE_ARN,
 };
 
 const Stateful = {
@@ -11,6 +13,8 @@ const Stateful = {
     ...commons.env,
     region: process.env.AWS_REGION,
   },
+  domainName: commons.domainName,
+  certificateArn: commons.certificateArn,
 };
 
 const Stateless = {
@@ -19,6 +23,7 @@ const Stateless = {
     ...commons.env,
     region: process.env.AWS_REGION,
   },
+  customDomainName: commons.domainName,
 };
 
 export default {

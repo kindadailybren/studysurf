@@ -10,6 +10,7 @@ interface ApiGatewayConstructProps extends BaseConstructProps {
   userPool: cognito.IUserPool;
   userPoolClient: cognito.IUserPoolClient;
   cloudFrontDomainName?: string;
+  customDomainName?: string;
 }
 
 export class ApiGatewayConstruct extends Construct {
@@ -46,10 +47,21 @@ export class ApiGatewayConstruct extends Construct {
       allowedOrigins.push(`https://${props.cloudFrontDomainName}`);
     }
 
+    if (props.customDomainName) {
+      allowedOrigins.push(`https://${props.customDomainName}`);
+    }
+
     this.api = new api.HttpApi(this, `${props.stage}-ApiGateway-HttpApi`, {
       apiName: `${props.stage}-ApiGateway-HttpApi`,
       corsPreflight: {
-        allowHeaders: ["content-type", "Authorization"],
+        allowHeaders: [
+          "content-type",
+          "authorization",
+          "Content-Type",
+          "Authorization",
+          "Accept",
+          "X-Requested-With",
+        ],
         allowMethods: [
           api.CorsHttpMethod.GET,
           api.CorsHttpMethod.POST,

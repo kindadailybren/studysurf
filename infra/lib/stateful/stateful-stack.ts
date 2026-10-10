@@ -1,4 +1,5 @@
 import * as cdk from "aws-cdk-lib";
+import * as acm from "aws-cdk-lib/aws-certificatemanager";
 import * as cloudfront from "aws-cdk-lib/aws-cloudfront";
 import * as origins from "aws-cdk-lib/aws-cloudfront-origins";
 import { Construct } from "constructs";
@@ -20,7 +21,7 @@ export class StatefulStack extends cdk.Stack {
     this.createCognitoConstruct(props);
     this.createS3Construct(props);
     this.createCloudFrontDistribution(props);
-    this.createOutputs();
+    this.createOutputs(props);
   }
 
   private createDynamoDbConstruct(props: StatefulStackProps): void {
@@ -54,10 +55,30 @@ export class StatefulStack extends cdk.Stack {
       this.s3Construct.mediaBucket,
     );
 
+    let certificate: acm.ICertificate | undefined = undefined;
+    if (props.certificateArn) {
+      certificate = acm.Certificate.fromCertificateArn(
+        this,
+        `${props.stage}-AcmCertificate`,
+        props.certificateArn,
+      );
+    }
+
+    const domainNames =
+      props.domainName && certificate ? [props.domainName] : undefined;
+
     this.distribution = new cloudfront.Distribution(
       this,
       `${props.stage}-CloudFront-Distribution`,
       {
+        domainNames: domainNames,
+        certificate: certificate,
+        sslSupportMethod: certificate
+          ? cloudfront.SSLMethod.SNI
+          : undefined,
+        minimumProtocolVersion: certificate
+          ? cloudfront.SecurityPolicyProtocol.TLS_V1_2_2021
+          : undefined,
         defaultBehavior: {
           origin: origins.S3BucketOrigin.withOriginAccessControl(
             this.s3Construct.frontendBucket,
@@ -93,7 +114,7 @@ export class StatefulStack extends cdk.Stack {
     );
   }
 
-  private createOutputs(): void {
+  private createOutputs(props: StatefulStackProps): void {
     new cdk.CfnOutput(this, "Cognito-UserPool-UserPoolId", {
       value: this.cognitoConstruct.userPool.userPoolId,
       exportName: `${this.stackName}-UserPoolId`,
@@ -128,5 +149,12 @@ export class StatefulStack extends cdk.Stack {
       value: this.distribution.distributionDomainName,
       exportName: `${this.stackName}-DistributionDomain`,
     });
+
+    if (props.domainName) {
+      new cdk.CfnOutput(this, "CloudFront-CustomDomain", {
+        value: `https://${props.domainName}`,
+        exportName: `${this.stackName}-CustomDomain`,
+      });
+    }
   }
 }

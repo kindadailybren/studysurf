@@ -14,13 +14,13 @@ allowed_origins = [
     "http://localhost:3000",
 ]
 frontend_url = os.environ.get("FRONTEND_URL")
-if frontend_url:
+if frontend_url and frontend_url not in allowed_origins:
     allowed_origins.append(frontend_url)
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
-    allow_origin_regex=r"https://.*\.cloudfront\.net",
+    allow_origin_regex=r"^https://([a-zA-Z0-9-]+\.)*(breindel\.me|cloudfront\.net)$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
