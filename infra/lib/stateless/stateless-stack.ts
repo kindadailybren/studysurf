@@ -45,6 +45,7 @@ export class StatelessStack extends cdk.Stack {
         ingestionQueue: this.sqsConstruct.ingestionQueue,
         videoRenderQueue: this.sqsConstruct.videoRenderQueue,
         cloudFrontDomainName: props.cloudFrontDomainName,
+        customDomainName: props.customDomainName,
       },
     );
   }
@@ -59,6 +60,7 @@ export class StatelessStack extends cdk.Stack {
         userPool: props.userPool,
         userPoolClient: props.userPoolClient,
         cloudFrontDomainName: props.cloudFrontDomainName,
+        customDomainName: props.customDomainName,
       },
     );
   }

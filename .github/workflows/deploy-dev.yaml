@@ -72,6 +72,9 @@ jobs:
 
       - name: Deploy CDK Dev Stacks (Stateful + Stateless)
         working-directory: infra
+        env:
+          ACM_CERTIFICATE_ARN: ${{ vars.ACM_CERTIFICATE_ARN || secrets.ACM_CERTIFICATE_ARN }}
+          CUSTOM_DOMAIN_NAME: ${{ vars.CUSTOM_DOMAIN_NAME_DEV || vars.CUSTOM_DOMAIN_NAME || '' }}
         run: |
           npx cdk deploy dev-StatefulStack dev-StatelessStack \
             --require-approval never \
@@ -95,9 +98,21 @@ jobs:
             DIST_ID=$(jq -r '."dev-StatefulStack"["CloudFrontDistributionId"] // empty' cdk-outputs-dev.json)
           fi
 
+          DIST_DOMAIN=$(jq -r '."dev-StatefulStack"["devStatefulStackDistributionDomain"] // empty' cdk-outputs-dev.json)
+          if [ -z "$DIST_DOMAIN" ]; then
+            DIST_DOMAIN=$(jq -r '."dev-StatefulStack"["CloudFrontDistributionDomain"] // empty' cdk-outputs-dev.json)
+          fi
+
+          CUSTOM_DOMAIN=$(jq -r '."dev-StatefulStack"["devStatefulStackCustomDomain"] // empty' cdk-outputs-dev.json)
+          if [ -z "$CUSTOM_DOMAIN" ]; then
+            CUSTOM_DOMAIN=$(jq -r '."dev-StatefulStack"["CloudFrontCustomDomain"] // empty' cdk-outputs-dev.json)
+          fi
+
           echo "api_url=$API_URL" >> $GITHUB_OUTPUT
           echo "bucket=$BUCKET" >> $GITHUB_OUTPUT
           echo "dist_id=$DIST_ID" >> $GITHUB_OUTPUT
+          echo "dist_domain=$DIST_DOMAIN" >> $GITHUB_OUTPUT
+          echo "custom_domain=$CUSTOM_DOMAIN" >> $GITHUB_OUTPUT
 
       - name: Build Frontend Application
         working-directory: frontend
@@ -121,4 +136,13 @@ jobs:
             aws cloudfront create-invalidation --distribution-id "$DISTRIBUTION_ID" --paths "/*"
           else
             echo "No CloudFront Distribution ID provided; skipping cache invalidation."
+          fi
+
+      - name: Deployment Summary
+        run: |
+          echo "### 🚀 Dev Deployment Successful!" >> $GITHUB_STEP_SUMMARY
+          echo "- **API URL:** \`${{ steps.outputs.outputs.api_url }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **CloudFront Distribution Domain:** \`${{ steps.outputs.outputs.dist_domain }}\`" >> $GITHUB_STEP_SUMMARY
+          if [ -n "${{ steps.outputs.outputs.custom_domain }}" ]; then
+            echo "- **Custom Domain URL:** ${{ steps.outputs.outputs.custom_domain }}" >> $GITHUB_STEP_SUMMARY
           fi

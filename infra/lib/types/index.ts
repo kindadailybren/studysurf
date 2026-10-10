@@ -12,7 +12,10 @@ export interface BaseStackProps extends cdk.StackProps {
   stage: string;
 }
 
-export interface StatefulStackProps extends BaseStackProps { }
+export interface StatefulStackProps extends BaseStackProps {
+  domainName?: string;
+  certificateArn?: string;
+}
 
 export interface StatelessStackProps extends BaseStackProps {
   userPool: cognito.IUserPool;
@@ -20,6 +23,7 @@ export interface StatelessStackProps extends BaseStackProps {
   dataTable: dynamodb.ITable;
   mediaBucket: s3.IBucket;
   cloudFrontDomainName?: string;
+  customDomainName?: string;
 }
 
 export interface GlobalStackProps extends BaseStackProps {

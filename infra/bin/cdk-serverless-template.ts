@@ -26,6 +26,7 @@ const devStatelessStack = new StatelessStack(
     dataTable: devStatefulStack.dynamoDbConstruct.dataDb,
     mediaBucket: devStatefulStack.s3Construct.mediaBucket,
     cloudFrontDomainName: devStatefulStack.distribution.distributionDomainName,
+    customDomainName: DevProps.Stateless.customDomainName,
   },
 );
 
@@ -47,6 +48,7 @@ const stagingStatelessStack = new StatelessStack(
     dataTable: stagingStatefulStack.dynamoDbConstruct.dataDb,
     mediaBucket: stagingStatefulStack.s3Construct.mediaBucket,
     cloudFrontDomainName: stagingStatefulStack.distribution.distributionDomainName,
+    customDomainName: StagingProps.Stateless.customDomainName,
   },
 );
 
@@ -68,5 +70,6 @@ const prodStatelessStack = new StatelessStack(
     dataTable: prodStatefulStack.dynamoDbConstruct.dataDb,
     mediaBucket: prodStatefulStack.s3Construct.mediaBucket,
     cloudFrontDomainName: prodStatefulStack.distribution.distributionDomainName,
+    customDomainName: ProdProps.Stateless.customDomainName,
   },
 );
