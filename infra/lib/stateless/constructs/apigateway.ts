@@ -37,26 +37,26 @@ export class ApiGatewayConstruct extends Construct {
   }
 
   private createApiGateway(props: ApiGatewayConstructProps): void {
-    const allowedOrigins = [
+    const rawAllowedOrigins = [
       "http://localhost:5173",
       "http://127.0.0.1:5173",
       "http://localhost:3000",
     ];
 
     if (props.cloudFrontDomainName) {
-      allowedOrigins.push(`https://${props.cloudFrontDomainName}`);
+      rawAllowedOrigins.push(`https://${props.cloudFrontDomainName}`);
     }
 
     if (props.customDomainName) {
-      allowedOrigins.push(`https://${props.customDomainName}`);
+      rawAllowedOrigins.push(`https://${props.customDomainName}`);
     }
+
+    const allowedOrigins = Array.from(new Set(rawAllowedOrigins));
 
     this.api = new api.HttpApi(this, `${props.stage}-ApiGateway-HttpApi`, {
       apiName: `${props.stage}-ApiGateway-HttpApi`,
       corsPreflight: {
         allowHeaders: [
-          "content-type",
-          "authorization",
           "Content-Type",
           "Authorization",
           "Accept",
