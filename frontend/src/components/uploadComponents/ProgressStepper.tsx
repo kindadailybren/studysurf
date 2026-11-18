@@ -80,7 +80,7 @@ export const ProgressStepper: React.FC<ProgressStepperProps> = ({
     {
       key: "SUMMARIZING",
       label: isPrompt ? "Script Writing" : "AI Summarization",
-      description: "Distilling topic with Claude 3 Haiku",
+      description: "Distilling topic with Amazon Nova Lite",
       icon: faBrain,
     },
     {
@@ -231,8 +231,8 @@ export const ProgressStepper: React.FC<ProgressStepperProps> = ({
             <FontAwesomeIcon icon={faBrain} />
             <span>
               {isPrompt
-                ? "Generated Script Narration (Bedrock Claude 3):"
-                : "AI Summarization Preview (Bedrock Claude 3):"}
+                ? "Generated Script Narration (Amazon Nova Lite):"
+                : "AI Summarization Preview (Amazon Nova Lite):"}
             </span>
           </div>
           <p className="text-xs text-gray-300 leading-relaxed italic line-clamp-4">
