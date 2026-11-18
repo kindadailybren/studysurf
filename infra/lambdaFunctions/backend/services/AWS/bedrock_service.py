@@ -1,5 +1,4 @@
 import os
-import json
 import boto3
 from utils.pdf_utils.pdfparse import PDFParser
 
@@ -11,6 +10,15 @@ class AWS_Bedrock:
             "bedrock-runtime", region_name=region
         )
         self.pdf_parser = PDFParser()
+
+        if region.startswith("us-"):
+            default_model = "us.amazon.nova-lite-v1:0"
+        elif region.startswith("eu-"):
+            default_model = "eu.amazon.nova-lite-v1:0"
+        else:
+            default_model = "apac.amazon.nova-lite-v1:0"
+
+        self.model_id = os.environ.get("BEDROCK_MODEL_ID", default_model)
 
     def gen_summarization(self, file_or_text):
         if isinstance(file_or_text, str):
@@ -27,24 +35,21 @@ class AWS_Bedrock:
             "Make it engaging, memorable, and conversational. Do not say anything like 'Here is a summary' or 'In summary'."
         )
 
-        payload = {
-            "modelId": "anthropic.claude-3-haiku-20240307-v1:0",
-            "contentType": "application/json",
-            "accept": "*/*",
-            "body": json.dumps(
+        response = self.bedrock_runtime.converse(
+            modelId=self.model_id,
+            messages=[
                 {
-                    "messages": [{"role": "user", "content": prompt}],
-                    "max_tokens": 1000,
-                    "temperature": 0.7,
-                    "anthropic_version": "bedrock-2023-05-31",
+                    "role": "user",
+                    "content": [{"text": prompt}],
                 }
-            ),
-        }
-
-        response = self.bedrock_runtime.invoke_model(**payload)
-        response_body = json.loads(response.get("body").read())
-
-        return response_body
+            ],
+            inferenceConfig={
+                "maxTokens": 1000,
+                "temperature": 0.7,
+            },
+        )
+        generated_text = response["output"]["message"]["content"][0]["text"]
+        return {"content": [{"text": generated_text}]}
 
     def gen_topic_narration(self, topic: str):
         if not topic or not topic.strip():
@@ -60,22 +65,18 @@ class AWS_Bedrock:
             "- DO NOT include any intro or outro phrases like 'Here is an explanation', 'Welcome to this short', or 'In conclusion'. Jump straight into the explanation."
         )
 
-        payload = {
-            "modelId": "anthropic.claude-3-haiku-20240307-v1:0",
-            "contentType": "application/json",
-            "accept": "*/*",
-            "body": json.dumps(
+        response = self.bedrock_runtime.converse(
+            modelId=self.model_id,
+            messages=[
                 {
-                    "messages": [{"role": "user", "content": prompt}],
-                    "max_tokens": 1000,
-                    "temperature": 0.7,
-                    "anthropic_version": "bedrock-2023-05-31",
+                    "role": "user",
+                    "content": [{"text": prompt}],
                 }
-            ),
-        }
-
-        response = self.bedrock_runtime.invoke_model(**payload)
-        response_body = json.loads(response.get("body").read())
-
-        return response_body
-
+            ],
+            inferenceConfig={
+                "maxTokens": 1000,
+                "temperature": 0.7,
+            },
+        )
+        generated_text = response["output"]["message"]["content"][0]["text"]
+        return {"content": [{"text": generated_text}]}
